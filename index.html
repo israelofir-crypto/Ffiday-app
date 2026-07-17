@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>שישי בבוקר בפתח תקווה 🌅</title>
+<title>שישי בבוקר 🌅 מוצאים בילוי בכל עיר</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -48,6 +48,9 @@
     from { opacity: 0; transform: translateY(10px); }
     to   { opacity: 1; transform: translateY(0); }
   }
+  @media (prefers-reduced-motion: reduce) {
+    .card { animation: none; }
+  }
 
   .progress {
     height: 8px; background: var(--tag-bg);
@@ -72,12 +75,26 @@
     font-family: inherit;
     cursor: pointer;
     text-align: center;
-    transition: all .15s ease;
+    transition: border-color .15s ease, transform .15s ease;
     color: var(--text);
   }
   .option-btn .emoji { display: block; font-size: 1.8rem; margin-bottom: 6px; }
   .option-btn:hover { border-color: var(--primary); transform: translateY(-2px); }
+  .option-btn:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
   .option-btn:active { transform: scale(.97); }
+
+  .custom-city { margin-top: 14px; display: flex; gap: 8px; }
+  .custom-city input {
+    flex: 1;
+    border: 2px solid var(--tag-bg);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 1rem;
+    font-family: inherit;
+    background: #fffdf9;
+    color: var(--text);
+  }
+  .custom-city input:focus { outline: none; border-color: var(--primary); }
 
   .back-link {
     background: none; border: none; color: var(--muted);
@@ -124,8 +141,9 @@
   .btn {
     font-family: inherit; font-size: 1rem; font-weight: 600;
     border: none; border-radius: 12px; padding: 12px 22px; cursor: pointer;
-    transition: all .15s ease;
+    transition: background .15s ease;
   }
+  .btn:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
   .btn-primary { background: var(--primary); color: #fff; }
   .btn-primary:hover { background: var(--primary-dark); }
   .btn-secondary { background: var(--tag-bg); color: var(--text); }
@@ -137,8 +155,8 @@
 <body>
 
 <header>
-  <h1>🌅 שישי בבוקר בפתח תקווה</h1>
-  <p>ענו על כמה שאלות קצרות ונמצא לכם את הבילוי המושלם לשישי בבוקר</p>
+  <h1>🌅 שישי בבוקר</h1>
+  <p>בוחרים עיר, עונים על כמה שאלות קצרות — ומקבלים את הבילוי המושלם לשישי בבוקר</p>
 </header>
 
 <div class="container" id="app"></div>
@@ -148,6 +166,13 @@
 </footer>
 
 <script>
+const CITIES = [
+  { id: "petah-tikva", label: "פתח תקווה", emoji: "🌳" },
+  { id: "tel-aviv",    label: "תל אביב",   emoji: "🏖️" },
+  { id: "jerusalem",   label: "ירושלים",   emoji: "🕍" },
+  { id: "haifa",       label: "חיפה",      emoji: "⛰️" },
+];
+
 const QUESTIONS = [
   {
     key: "who",
@@ -187,163 +212,487 @@ const QUESTIONS = [
       { value: "any",   label: "שווה לפנק",          emoji: "💳" },
     ],
   },
+  {
+    key: "radius",
+    text: "באיזה רדיוס מחפשים?",
+    options: [
+      { value: "3",  label: "קרוב קרוב (עד ~3 ק\"מ)",      emoji: "🚶" },
+      { value: "10", label: "בעיר והסביבה (עד ~10 ק\"מ)",  emoji: "🚗" },
+      { value: "99", label: "מוכנים לנסוע — בלי הגבלה",     emoji: "🛣️" },
+    ],
+  },
 ];
 
-// name, icon, desc, tip, who[], vibe[], setting, budget (0=free, 1=low, 2=paid)
-const PLACES = [
+// name, icon, desc, tip, who[], vibe[], setting, budget (0=free, 1=low, 2=paid), query
+const PLACES_BY_CITY = {
+  "petah-tikva": [
+    {
+      name: "הפארק הגדול של פתח תקווה",
+      icon: "🌳",
+      desc: "האגם, הברווזים, מדשאות ענק ומתקני משחקים. קלאסיקה של שישי בבוקר — מביאים שמיכה, קפה מהבית, ונותנים לילדים להשתולל.",
+      tip: "בשישי בבוקר עדיין רגוע יחסית — אחרי 10:30 מתחיל להתמלא.",
+      who: ["family", "couple", "friends", "solo"], vibe: ["nature"],
+      setting: "outdoor", budget: 0, km: 2, query: "הפארק הגדול פתח תקווה",
+    },
+    {
+      name: "פינת החי בפארק הגדול",
+      icon: "🦜",
+      desc: "פינת חי עירונית חמודה בתוך הפארק — טווסים, עיזים, תוכים וארנבות. הילדים מתים על זה, והכניסה חינמית.",
+      tip: "משלבים עם סיבוב באגם ומגרש המשחקים הסמוך.",
+      who: ["family"], vibe: ["nature"],
+      setting: "outdoor", budget: 0, km: 2, query: "פינת החי פתח תקווה",
+    },
+    {
+      name: "שוק העיר פתח תקווה",
+      icon: "🍅",
+      desc: "השוק בשישי בבוקר הוא חגיגה: פירות וירקות טריים, חומוס מהביל, בורקסים ומאפים לקראת שבת. אווירה תוססת ואותנטית.",
+      tip: "מגיעים רעבים ויוצאים עם שקיות מלאות. שיא העומס בין 10:00 ל-12:00.",
+      who: ["couple", "friends", "solo", "family"], vibe: ["food"],
+      setting: "outdoor", budget: 1, km: 1, query: "שוק פתח תקווה",
+    },
+    {
+      name: "ארוחת בוקר במתחם סגולה",
+      icon: "🍳",
+      desc: "אזור התעשייה סגולה מלא בתי קפה ומסעדות עם ארוחות בוקר שוות — שקשוקה, ג'חנון ומאפים. חניה בשפע ואווירה נינוחה.",
+      tip: "בשישי כדאי להזמין מקום מראש — המקומות הפופולריים מתמלאים.",
+      who: ["couple", "friends", "family"], vibe: ["food"],
+      setting: "indoor", budget: 2, km: 4, query: "בתי קפה סגולה פתח תקווה",
+    },
+    {
+      name: "מוזיאון פתח תקווה לאמנות",
+      icon: "🎨",
+      desc: "מוזיאון עכשווי ומפתיע במרכז העיר, עם תערוכות מתחלפות של אמנות ישראלית. שקט, ממוזג, ומעולה לשעה-שעתיים של השראה.",
+      tip: "פתוח בשישי בבוקר; בדקו באתר אילו תערוכות מוצגות כרגע.",
+      who: ["couple", "solo", "friends"], vibe: ["culture"],
+      setting: "indoor", budget: 1, km: 1, query: "מוזיאון פתח תקווה לאמנות",
+    },
+    {
+      name: "בית יד לבנים ומוזיאון העיר",
+      icon: "🏛️",
+      desc: "סיפורה של 'אם המושבות' — היסטוריה מקומית, תצלומים ותערוכות על ראשית ההתיישבות. מתאים לחובבי נוסטלגיה והיסטוריה.",
+      tip: "משלבים עם טיול רגלי ברחובות המושבה ההיסטוריים שמסביב.",
+      who: ["couple", "solo", "family"], vibe: ["culture"],
+      setting: "indoor", budget: 0, km: 1, query: "יד לבנים פתח תקווה",
+    },
+    {
+      name: "טיילת נחל הירקון",
+      icon: "🚴",
+      desc: "מסלול הליכה ורכיבה לאורך הירקון, ירוק ושטוח — מושלם לריצת בוקר, רכיבה או סתם הליכה טובה עם פודקאסט.",
+      tip: "יוצאים מוקדם לפני החום; אפשר להמשיך מערבה עד תל אביב.",
+      who: ["solo", "couple", "friends"], vibe: ["active", "nature"],
+      setting: "outdoor", budget: 0, km: 3, query: "פארק הירקון מקורות הירקון",
+    },
+    {
+      name: "גן לאומי מקורות הירקון (תל אפק)",
+      icon: "🏞️",
+      desc: "עשר דקות נסיעה מהעיר: מבצר עות'מאני, אגם עם נופרים ומדשאות פיקניק ענקיות. טבע אמיתי ממש ליד הבית.",
+      tip: "כניסה בתשלום סמלי; מגיעים מוקדם לתפוס פינת פיקניק מוצלת.",
+      who: ["family", "couple", "friends"], vibe: ["nature"],
+      setting: "outdoor", budget: 1, km: 7, query: "גן לאומי מקורות הירקון",
+    },
+    {
+      name: "קפה ומאפה במושבה הוותיקה של פ\"ת",
+      icon: "☕",
+      desc: "בתי קפה שכונתיים ברחובות השקטים של מרכז העיר הוותיק — קרואסון, הפוך ועיתון של שישי. פשוט ומדויק.",
+      tip: "אחרי הקפה שווה סיבוב רגלי ברחוב חובבי ציון ההיסטורי.",
+      who: ["solo", "couple"], vibe: ["food"],
+      setting: "indoor", budget: 1, km: 1, query: "בית קפה מרכז פתח תקווה",
+    },
+    {
+      name: "הקניון הגדול פתח תקווה",
+      icon: "🛍️",
+      desc: "שופינג של שישי בבוקר במזגן: חנויות, בתי קפה ופינות ישיבה. בשישי בבוקר עדיין נעים לפני שהעומס מתחיל.",
+      tip: "רוב החנויות נסגרות בסביבות 14:30 בשישי — מתחילים מוקדם.",
+      who: ["friends", "couple", "family"], vibe: ["food", "culture"],
+      setting: "indoor", budget: 2, km: 3, query: "הקניון הגדול פתח תקווה",
+    },
+    {
+      name: "ג'ימבורי ומתחמי קפיצה לילדים",
+      icon: "🤸",
+      desc: "מתחמי טרמפולינות וג'ימבורי ממוזגים בעיר — הילדים שורפים אנרגיה וההורים שותים קפה בשקט. מנצח בימים חמים.",
+      tip: "בשישי בבוקר פחות עמוס מאשר בשבת; גרביים חובה!",
+      who: ["family"], vibe: ["active"],
+      setting: "indoor", budget: 2, km: 3, query: "ג'ימבורי פתח תקווה",
+    },
+    {
+      name: "בוקר ספורטיבי בפארק — מתקני כושר ומגרשים",
+      icon: "🏀",
+      desc: "מתקני כושר פתוחים, מגרשי כדורסל ומסלולי ריצה בפארק הגדול ובגנים השכונתיים. מרימים דופק ומתחילים את הסופ\"ש חזק.",
+      tip: "בשישי בבוקר יש אווירת קהילה — קבוצות ריצה ומשחקי כדורסל פתוחים.",
+      who: ["solo", "friends"], vibe: ["active"],
+      setting: "outdoor", budget: 0, km: 2, query: "הפארק הגדול פתח תקווה מתקני כושר",
+    },
+    {
+      name: "בריכה / קאנטרי עירוני",
+      icon: "🏊",
+      desc: "שחיית בוקר מרעננת באחד הקאנטרי קלאב בעיר. מתחילים את השישי במים ויוצאים אדם חדש.",
+      tip: "בדקו מראש שעות קבלת קהל למי שאינו מנוי.",
+      who: ["solo", "couple", "family"], vibe: ["active"],
+      setting: "outdoor", budget: 2, km: 3, query: "קאנטרי פתח תקווה",
+    },
+    {
+      name: "פיקניק ומשחקי קופסה במדשאות",
+      icon: "🧺",
+      desc: "מביאים מחצלת, פירות, קלפים ומשחקי קופסה למדשאות הפארק הגדול. בילוי חינמי לגמרי שתמיד עובד.",
+      tip: "תחנת קפה בדרך + מאפייה = פיקניק מושלם בלי הכנות.",
+      who: ["friends", "family", "couple"], vibe: ["nature", "food"],
+      setting: "outdoor", budget: 0, km: 2, query: "הפארק הגדול פתח תקווה",
+    },
+  ],
+
+  "tel-aviv": [
+    {
+      name: "פארק הירקון (גני יהושע)",
+      icon: "🌳",
+      desc: "הריאה הירוקה של תל אביב: מדשאות אינסופיות, אגם עם סירות, פינות פיקניק ומתקני משחקים. שישי בבוקר קלאסי.",
+      tip: "אפשר לשכור סירות פדלים באגם או ג'ימבורי פתוח לילדים בגני יהושע.",
+      who: ["family", "couple", "friends", "solo"], vibe: ["nature"],
+      setting: "outdoor", budget: 0, km: 3, query: "פארק הירקון תל אביב",
+    },
+    {
+      name: "שוק הכרמל",
+      icon: "🍅",
+      desc: "השוק הכי מפורסם בעיר בשיא של שישי: דוכני פירות, ג'וסים, מאפים, אוכל רחוב ודוכני טעימות. חוויה של צבעים וריחות.",
+      tip: "נכנסים גם לסמטאות הצדדיות של כרם התימנים — שם החומוס הכי טוב.",
+      who: ["couple", "friends", "solo"], vibe: ["food"],
+      setting: "outdoor", budget: 1, km: 1, query: "שוק הכרמל תל אביב",
+    },
+    {
+      name: "נמל תל אביב",
+      icon: "⚓",
+      desc: "רחבת עץ על הים, שוק הנמל עם דוכני אוכל איכותיים, בתי קפה מול הגלים ומרחב בטוח לילדים על האופניים.",
+      tip: "שוק האיכרים בנמל פעיל בשישי בבוקר — תוצרת טרייה ישר מהחקלאים.",
+      who: ["family", "couple", "friends"], vibe: ["food", "nature"],
+      setting: "outdoor", budget: 2, km: 4, query: "נמל תל אביב",
+    },
+    {
+      name: "טיילת וחופי תל אביב",
+      icon: "🏖️",
+      desc: "הליכת בוקר על הטיילת מיפו ועד הנמל, שחייה בים או פשוט קפה מול הגלים. הבילוי החינמי הכי טוב בעיר.",
+      tip: "בשישי בבוקר הים בדרך כלל רגוע והחופים עוד ריקים יחסית — עד 11:00.",
+      who: ["solo", "couple", "friends", "family"], vibe: ["nature", "active"],
+      setting: "outdoor", budget: 0, km: 2, query: "טיילת תל אביב",
+    },
+    {
+      name: "מוזיאון תל אביב לאמנות",
+      icon: "🎨",
+      desc: "המוזיאון הגדול בעיר: אמנות ישראלית ובינלאומית, אדריכלות מרהיבה באגף החדש ותערוכות מתחלפות ברמה עולמית.",
+      tip: "פתוח בשישי בבוקר; מומלץ להקדים כי בצהריים מתמלא.",
+      who: ["couple", "solo", "friends"], vibe: ["culture"],
+      setting: "indoor", budget: 2, km: 2, query: "מוזיאון תל אביב לאמנות",
+    },
+    {
+      name: "שוק הפשפשים ביפו",
+      icon: "🪞",
+      desc: "וינטג', עתיקות, בגדים יד שנייה ובתי קפה מגניבים בסמטאות יפו. שישי בבוקר הוא הזמן הכי טוב לחפש אוצרות.",
+      tip: "מתמקחים בכיף, ואחר כך עולים לגן הפסגה לתצפית על כל החוף.",
+      who: ["couple", "friends", "solo"], vibe: ["culture", "food"],
+      setting: "outdoor", budget: 1, km: 4, query: "שוק הפשפשים יפו",
+    },
+    {
+      name: "שדרות רוטשילד ובתי הקפה",
+      icon: "☕",
+      desc: "הליכה בשדרה הכי אייקונית בעיר, עצירה בביתני הקפה, בניני באוהאוס משופצים ואווירת שישי תל אביבית אמיתית.",
+      tip: "משכירים אופניים עירוניים ועושים את כל השדרה עד הבימה.",
+      who: ["couple", "solo", "friends"], vibe: ["food", "culture"],
+      setting: "outdoor", budget: 1, km: 1, query: "שדרות רוטשילד תל אביב",
+    },
+    {
+      name: "ספורטק תל אביב",
+      icon: "🏀",
+      desc: "מתחם הספורט הפתוח הגדול בישראל: מגרשי כדורסל, קיר טיפוס, סקייטפארק ומסלולי ריצה על גדות הירקון.",
+      tip: "בשישי בבוקר מתארגנים משחקי כדורסל פתוחים — פשוט מצטרפים.",
+      who: ["friends", "solo"], vibe: ["active"],
+      setting: "outdoor", budget: 0, km: 3, query: "ספורטק תל אביב",
+    },
+    {
+      name: "מתחם דיזנגוף סנטר",
+      icon: "🛍️",
+      desc: "הקניון הכי תל אביבי שיש — חנויות מקומיות, שוק אוכל בשישי, חנויות ספרים ואופנה. מבוך שכיף ללכת בו לאיבוד.",
+      tip: "בשישי מתקיים שוק האוכל המפורסם — דוכני שף במחירים שווים.",
+      who: ["friends", "couple"], vibe: ["food", "culture"],
+      setting: "indoor", budget: 2, km: 1, query: "דיזנגוף סנטר תל אביב",
+    },
+    {
+      name: "מתחם התחנה (התחנה הראשונה)",
+      icon: "🚂",
+      desc: "תחנת הרכבת ההיסטורית ששופצה למתחם בילוי: בתי קפה, דוכנים, מרחב פתוח לילדים וקרבה לחוף. נעים ומשפחתי.",
+      tip: "משלבים עם הליכה קצרה לנווה צדק היפהפייה ממש ליד.",
+      who: ["family", "couple"], vibe: ["food", "culture"],
+      setting: "outdoor", budget: 1, km: 3, query: "מתחם התחנה תל אביב",
+    },
+  ],
+
+  "jerusalem": [
+    {
+      name: "שוק מחנה יהודה",
+      icon: "🍞",
+      desc: "השוק המפורסם בישראל בשיא של יום שישי: חלות טריות, קובה, חומוס, חלווה ותבלינים. אנרגיה שאין בשום מקום אחר.",
+      tip: "מגיעים עד 11:00 — אחר כך הצפיפות בשיאה. חובה לטעום קובה בסמטת השוק העיראקי.",
+      who: ["couple", "friends", "solo", "family"], vibe: ["food"],
+      setting: "outdoor", budget: 1, km: 1, query: "שוק מחנה יהודה ירושלים",
+    },
+    {
+      name: "העיר העתיקה והכותל",
+      icon: "🕍",
+      desc: "סמטאות בנות אלפי שנים, ארבעה רבעים, גגות מצפים והכותל המערבי. שישי בבוקר הוא זמן מיוחד במיוחד להסתובב שם.",
+      tip: "נכנסים משער יפו ועולים לטיילת הגגות — תצפית מדהימה וכמעט ריקה בבוקר.",
+      who: ["couple", "solo", "friends", "family"], vibe: ["culture"],
+      setting: "outdoor", budget: 0, km: 2, query: "העיר העתיקה ירושלים שער יפו",
+    },
+    {
+      name: "מוזיאון ישראל",
+      icon: "🏛️",
+      desc: "המוזיאון הגדול בישראל: מגילות ים המלח בהיכל הספר, דגם ירושלים של ימי בית שני ואוספי אמנות ברמה עולמית.",
+      tip: "פתוח בשישי בבוקר; מתחילים מהיכל הספר לפני שמגיעות הקבוצות.",
+      who: ["couple", "solo", "family"], vibe: ["culture"],
+      setting: "indoor", budget: 2, km: 3, query: "מוזיאון ישראל ירושלים",
+    },
+    {
+      name: "פארק המסילה",
+      icon: "🚴",
+      desc: "מסילת הרכבת ההיסטורית שהפכה לפארק אורכי ירוק — מסלול הליכה וריצה מהתחנה הראשונה עד מלחה. שטוח, מוצל ונעים.",
+      tip: "מתחילים מהתחנה הראשונה עם קפה ומסיימים בגן החיות — מסלול משפחתי מושלם.",
+      who: ["solo", "couple", "family", "friends"], vibe: ["active", "nature"],
+      setting: "outdoor", budget: 0, km: 2, query: "פארק המסילה ירושלים",
+    },
+    {
+      name: "טיילת ארמון הנציב",
+      icon: "🌄",
+      desc: "התצפית הכי יפה על ירושלים: העיר העתיקה, הר הזיתים ומדבר יהודה בפנורמה אחת. מקום מושלם לקפה של בוקר עם נוף.",
+      tip: "בשישי בבוקר האור הכי יפה לצילומים — ורגוע לגמרי.",
+      who: ["couple", "solo", "family"], vibe: ["nature"],
+      setting: "outdoor", budget: 0, km: 4, query: "טיילת ארמון הנציב ירושלים",
+    },
+    {
+      name: "גן החיות התנ\"כי",
+      icon: "🦁",
+      desc: "אחד מגני החיות היפים בעולם, בנוי בוואדי ירוק עם אגם. הילדים מאושרים וההורים נהנים לא פחות.",
+      tip: "מגיעים עם הפתיחה — החיות הכי פעילות בבוקר והחניה עוד פנויה.",
+      who: ["family"], vibe: ["nature"],
+      setting: "outdoor", budget: 2, km: 6, query: "גן החיות התנכי ירושלים",
+    },
+    {
+      name: "עין כרם",
+      icon: "⛪",
+      desc: "שכונה ציורית בין הרים: סמטאות אבן, כנסיות עתיקות, גלריות ובתי קפה רומנטיים. מרגיש כמו כפר בטוסקנה.",
+      tip: "עולים ברגל למעיין ואז יורדים לארוחת בוקר באחד מבתי הקפה בכיכר.",
+      who: ["couple", "solo"], vibe: ["nature", "food", "culture"],
+      setting: "outdoor", budget: 1, km: 7, query: "עין כרם ירושלים",
+    },
+    {
+      name: "מתחם ממילא",
+      icon: "🛍️",
+      desc: "שדרת קניות פתוחה ומעוצבת בין העיר החדשה לשער יפו: מותגים, גלריות פיסול ברחוב ובתי קפה עם נוף לחומות.",
+      tip: "משלבים קניות עם כניסה רגלית לעיר העתיקה — הכול במרחק הליכה.",
+      who: ["friends", "couple"], vibe: ["food", "culture"],
+      setting: "outdoor", budget: 2, km: 2, query: "ממילא ירושלים",
+    },
+    {
+      name: "מוזיאון המדע ע\"ש בלומפילד",
+      icon: "🔬",
+      desc: "מוזיאון אינטראקטיבי שכולו ידיים-על-המדע: ניסויים, תצוגות פיזיקה מטורפות והדגמות חיות. הילדים לא ירצו לצאת.",
+      tip: "בשישי בבוקר יש בדרך כלל הדגמות מדע חיות — בדקו שעות באתר.",
+      who: ["family"], vibe: ["culture", "active"],
+      setting: "indoor", budget: 2, km: 4, query: "מוזיאון המדע ירושלים",
+    },
+  ],
+
+  "haifa": [
+    {
+      name: "הגנים הבהאיים",
+      icon: "🌺",
+      desc: "פלא עולמי בלב העיר: מדרגות גנים מושלמות היורדות מהכרמל אל הים. הכניסה לתצפית העליונה חופשית והנוף עוצר נשימה.",
+      tip: "מתחילים מהטיילת בדרך יפה נוף למעלה — התצפית הכי טובה על המפרץ.",
+      who: ["couple", "solo", "friends", "family"], vibe: ["nature", "culture"],
+      setting: "outdoor", budget: 0, km: 1, query: "הגנים הבהאיים חיפה",
+    },
+    {
+      name: "המושבה הגרמנית",
+      icon: "☕",
+      desc: "שדרת בן גוריון עם בתי הטמפלרים ההיסטוריים, בתי קפה ומסעדות — והגנים הבהאיים ברקע. ארוחת הבוקר הכי יפה בחיפה.",
+      tip: "יושבים בצד המערבי של השדרה — ככה הגנים מולכם כל הארוחה.",
+      who: ["couple", "friends", "family"], vibe: ["food"],
+      setting: "outdoor", budget: 2, km: 1, query: "המושבה הגרמנית חיפה",
+    },
+    {
+      name: "חוף דדו והטיילת",
+      icon: "🏖️",
+      desc: "החוף הכי מטופח בחיפה עם טיילת ארוכה, מדשאות ומתקני כושר. הליכת בוקר על קו המים או שחייה מרעננת.",
+      tip: "בשישי בבוקר מתאספות שם קבוצות מתנפנפים וגלשני רוח — כיף לצפות.",
+      who: ["family", "couple", "solo", "friends"], vibe: ["nature", "active"],
+      setting: "outdoor", budget: 0, km: 5, query: "חוף דדו חיפה",
+    },
+    {
+      name: "ואדי ניסנאס",
+      icon: "🥙",
+      desc: "השכונה הערבית הוותיקה עם השוק, הפלאפל המפורסם, הכנאפה והאווירה האותנטית. סיור אוכל רגלי מושלם לשישי.",
+      tip: "חובה פלאפל במקום הוותיק בשוק וכנאפה לקינוח — מגיעים רעבים.",
+      who: ["couple", "friends", "solo"], vibe: ["food", "culture"],
+      setting: "outdoor", budget: 1, km: 2, query: "ואדי ניסנאס חיפה",
+    },
+    {
+      name: "מדעטק — המוזיאון הלאומי למדע",
+      icon: "🔬",
+      desc: "מוזיאון מדע אינטראקטיבי ענק בבניין הטכניון ההיסטורי: מאות מוצגים לגעת, לנסות ולהתפעל. גן עדן לילדים סקרנים.",
+      tip: "מתחילים מקומת הפיזיקה — ההדגמות הכי מרשימות שם.",
+      who: ["family"], vibe: ["culture", "active"],
+      setting: "indoor", budget: 2, km: 2, query: "מדעטק חיפה",
+    },
+    {
+      name: "פארק הכרמל ונחל קלח",
+      icon: "🌲",
+      desc: "הפארק הלאומי הגדול בישראל, עשר דקות מהעיר: יער ים-תיכוני, מסלולי הליכה מוצלים ותצפיות על הים והעמקים.",
+      tip: "מסלול נחל קלח מעגלי וקל — מתאים גם עם ילדים.",
+      who: ["family", "couple", "friends", "solo"], vibe: ["nature", "active"],
+      setting: "outdoor", budget: 0, km: 8, query: "פארק הכרמל",
+    },
+    {
+      name: "טיילת לואי (יפה נוף)",
+      icon: "🌄",
+      desc: "טיילת פנורמית על רכס הכרמל עם תצפית על כל מפרץ חיפה, הגליל ובימים בהירים עד החרמון. הליכת בוקר עם נוף אינסופי.",
+      tip: "מגיעים מוקדם — באור בוקר רואים הכי רחוק והאוויר צלול.",
+      who: ["solo", "couple"], vibe: ["nature"],
+      setting: "outdoor", budget: 0, km: 3, query: "טיילת לואי חיפה",
+    },
+    {
+      name: "עיר תחתית ושוק תלפיות",
+      icon: "🎨",
+      desc: "האזור המתחדש של חיפה: גלריות, בתי קפה היפסטריים, אוכל רחוב ושוק תלפיות ההיסטורי שקם לתחייה. שישי בבוקר תוסס.",
+      tip: "בשישי יש שוק איכרים ודוכני אוכל סביב שוק תלפיות המשופץ.",
+      who: ["friends", "couple", "solo"], vibe: ["food", "culture"],
+      setting: "outdoor", budget: 1, km: 3, query: "שוק תלפיות חיפה",
+    },
+    {
+      name: "רכבל ומנזר סטלה מאריס",
+      icon: "🚡",
+      desc: "עולים ברכבל מחוף בת גלים לראש הכרמל, מבקרים במנזר הכרמליטי ונהנים מתצפית ים מרהיבה. אטרקציה חיפאית קלאסית.",
+      tip: "אם יש זמן, יורדים ברגל דרך מערת אליהו — מסלול קצר ויפה.",
+      who: ["family", "couple"], vibe: ["nature", "culture"],
+      setting: "outdoor", budget: 1, km: 4, query: "רכבל חיפה סטלה מאריס",
+    },
+  ],
+};
+
+// Generic suggestions for any typed city — Google Maps search does the finding.
+const GENERIC_PLACES = [
   {
-    name: "הפארק הגדול של פתח תקווה",
+    name: "הפארק העירוני",
     icon: "🌳",
-    desc: "האגם, הברווזים, מדשאות ענק ומתקני משחקים. קלאסיקה של שישי בבוקר — מביאים שמיכה, קפה מהבית, ונותנים לילדים להשתולל.",
-    tip: "בשישי בבוקר עדיין רגוע יחסית — אחרי 10:30 מתחיל להתמלא.",
-    who: ["family", "couple", "friends", "solo"],
-    vibe: ["nature"],
-    setting: "outdoor", budget: 0,
-    query: "הפארק הגדול פתח תקווה",
+    desc: "כמעט בכל עיר יש פארק מרכזי עם מדשאות, פינות ישיבה ומתקני משחקים — הקלאסיקה של שישי בבוקר.",
+    tip: "מביאים קפה, שמיכה וכדור — וזה כל מה שצריך.",
+    who: ["family", "couple", "friends", "solo"], vibe: ["nature"],
+    setting: "outdoor", budget: 0, km: 2, query: "פארק",
   },
   {
-    name: "פינת החי בפארק הגדול",
-    icon: "🦜",
-    desc: "פינת חי עירונית חמודה בתוך הפארק — טווסים, עיזים, תוכים וארנבות. הילדים מתים על זה, והכניסה חינמית.",
-    tip: "משלבים עם סיבוב באגם ומגרש המשחקים הסמוך.",
-    who: ["family"],
-    vibe: ["nature"],
-    setting: "outdoor", budget: 0,
-    query: "פינת החי פתח תקווה",
-  },
-  {
-    name: "שוק העיר פתח תקווה",
+    name: "השוק המקומי",
     icon: "🍅",
-    desc: "השוק בשישי בבוקר הוא חגיגה: פירות וירקות טריים, חומוס מהביל, בורקסים ומאפים לקראת שבת. אווירה תוססת ואותנטית.",
-    tip: "מגיעים רעבים ויוצאים עם שקיות מלאות. שיא העומס בין 10:00 ל-12:00.",
-    who: ["couple", "friends", "solo", "family"],
-    vibe: ["food"],
-    setting: "outdoor", budget: 1,
-    query: "שוק פתח תקווה",
+    desc: "שוק ביום שישי בבוקר זו חוויה: תוצרת טרייה, מאפים, אוכל מוכן לשבת ואווירה תוססת.",
+    tip: "מגיעים רעבים ולפני 11:00 — ככה נהנים בלי צפיפות.",
+    who: ["couple", "friends", "solo", "family"], vibe: ["food"],
+    setting: "outdoor", budget: 1, km: 2, query: "שוק",
   },
   {
-    name: "ארוחת בוקר במתחם סגולה",
+    name: "ארוחת בוקר בבית קפה",
     icon: "🍳",
-    desc: "אזור התעשייה סגולה מלא בתי קפה ומסעדות עם ארוחות בוקר שוות — שקשוקה, ג'חנון ומאפים. חניה בשפע ואווירה נינוחה.",
-    tip: "בשישי כדאי להזמין מקום מראש — המקומות הפופולריים מתמלאים.",
-    who: ["couple", "friends", "family"],
-    vibe: ["food"],
-    setting: "indoor", budget: 2,
-    query: "בתי קפה סגולה פתח תקווה",
+    desc: "שקשוקה, הפוך ועיתון של שישי — ארוחת בוקר טובה היא הדרך הכי בדוקה לפתוח את הסופ\"ש.",
+    tip: "בשישי בבוקר כדאי להזמין מקום מראש במקומות המבוקשים.",
+    who: ["couple", "friends", "family", "solo"], vibe: ["food"],
+    setting: "indoor", budget: 2, km: 1, query: "ארוחת בוקר בית קפה",
   },
   {
-    name: "מוזיאון פתח תקווה לאמנות",
+    name: "מוזיאון או גלריה",
     icon: "🎨",
-    desc: "מוזיאון עכשווי ומפתיע במרכז העיר, עם תערוכות מתחלפות של אמנות ישראלית. שקט, ממוזג, ומעולה לשעה-שעתיים של השראה.",
-    tip: "פתוח בשישי בבוקר; בדקו באתר אילו תערוכות מוצגות כרגע.",
-    who: ["couple", "solo", "friends"],
-    vibe: ["culture"],
-    setting: "indoor", budget: 1,
-    query: "מוזיאון פתח תקווה לאמנות",
+    desc: "שעה-שעתיים של תרבות בבוקר שקט וממוזג — רוב המוזיאונים פתוחים בשישי בבוקר ורגועים יחסית.",
+    tip: "בדקו שעות פתיחה מראש — בשישי הרבה מוזיאונים סוגרים ב-14:00.",
+    who: ["couple", "solo", "friends", "family"], vibe: ["culture"],
+    setting: "indoor", budget: 1, km: 3, query: "מוזיאון",
   },
   {
-    name: "בית יד לבנים ומוזיאון העיר",
-    icon: "🏛️",
-    desc: "סיפורה של 'אם המושבות' — היסטוריה מקומית, תצלומים ותערוכות על ראשית ההתיישבות. מתאים לחובבי נוסטלגיה והיסטוריה.",
-    tip: "משלבים עם טיול רגלי ברחובות המושבה ההיסטוריים שמסביב.",
-    who: ["couple", "solo", "family"],
-    vibe: ["culture"],
-    setting: "indoor", budget: 0,
-    query: "יד לבנים פתח תקווה",
+    name: "מסלול הליכה או טיילת",
+    icon: "🚶",
+    desc: "הליכת בוקר טובה בטיילת, בפארק או בשביל מסומן ליד העיר — מתחילים את הסופ\"ש עם ראש נקי.",
+    tip: "יוצאים מוקדם לפני החום ולוקחים מים.",
+    who: ["solo", "couple", "friends"], vibe: ["active", "nature"],
+    setting: "outdoor", budget: 0, km: 4, query: "טיילת מסלול הליכה",
   },
   {
-    name: "טיילת נחל הירקון",
-    icon: "🚴",
-    desc: "מסלול הליכה ורכיבה לאורך הירקון, ירוק ושטוח — מושלם לריצת בוקר, רכיבה או סתם הליכה טובה עם פודקאסט.",
-    tip: "יוצאים מוקדם לפני החום; אפשר להמשיך מערבה עד תל אביב.",
-    who: ["solo", "couple", "friends"],
-    vibe: ["active", "nature"],
-    setting: "outdoor", budget: 0,
-    query: "פארק הירקון מקורות הירקון",
-  },
-  {
-    name: "גן לאומי מקורות הירקון (תל אפק)",
-    icon: "🏞️",
-    desc: "עשר דקות נסיעה מהעיר: מבצר עות'מאני, אגם עם נופרים ומדשאות פיקניק ענקיות. טבע אמיתי ממש ליד הבית.",
-    tip: "כניסה בתשלום סמלי; מגיעים מוקדם לתפוס פינת פיקניק מוצלת.",
-    who: ["family", "couple", "friends"],
-    vibe: ["nature"],
-    setting: "outdoor", budget: 1,
-    query: "גן לאומי מקורות הירקון",
-  },
-  {
-    name: "קפה ומאפה במושבה הגרמנית של פ\"ת",
-    icon: "☕",
-    desc: "בתי קפה שכונתיים ברחובות השקטים של מרכז העיר הוותיק — קרואסון, הפוך ועיתון של שישי. פשוט ומדויק.",
-    tip: "אחרי הקפה שווה סיבוב רגלי ברחוב חובבי ציון ההיסטורי.",
-    who: ["solo", "couple"],
-    vibe: ["food"],
-    setting: "indoor", budget: 1,
-    query: "בית קפה מרכז פתח תקווה",
-  },
-  {
-    name: "הקניון הגדול פתח תקווה",
-    icon: "🛍️",
-    desc: "שופינג של שישי בבוקר במזגן: חנויות, בתי קפה ופינות ישיבה. בשישי בבוקר עדיין נעים לפני שהעומס מתחיל.",
-    tip: "רוב החנויות נסגרות בסביבות 14:30 בשישי — מתחילים מוקדם.",
-    who: ["friends", "couple", "family"],
-    vibe: ["food", "culture"],
-    setting: "indoor", budget: 2,
-    query: "הקניון הגדול פתח תקווה",
-  },
-  {
-    name: "ג'ימבורי ומתחמי קפיצה לילדים",
+    name: "ג'ימבורי או פארק חבלים לילדים",
     icon: "🤸",
-    desc: "מתחמי טרמפולינות וג'ימבורי ממוזגים בעיר — הילדים שורפים אנרגיה וההורים שותים קפה בשקט. מנצח בימים חמים.",
-    tip: "בשישי בבוקר פחות עמוס מאשר בשבת; גרביים חובה!",
-    who: ["family"],
-    vibe: ["active"],
-    setting: "indoor", budget: 2,
-    query: "ג'ימבורי פתח תקווה",
+    desc: "מקום שהילדים שורפים בו אנרגיה — טרמפולינות, מתקני טיפוס או פארק חבלים — וההורים נחים בצד.",
+    tip: "בשישי בבוקר עמוס פחות משבת; גרביים לא לשכוח.",
+    who: ["family"], vibe: ["active"],
+    setting: "indoor", budget: 2, km: 5, query: "ג'ימבורי לילדים",
   },
   {
-    name: "בוקר ספורטיבי בפארק — מתקני כושר ומגרשים",
-    icon: "🏀",
-    desc: "מתקני כושר פתוחים, מגרשי כדורסל ומסלולי ריצה בפארק הגדול ובגנים השכונתיים. מרימים דופק ומתחילים את הסופ\"ש חזק.",
-    tip: "בשישי בבוקר יש אווירת קהילה — קבוצות ריצה ומשחקי כדורסל פתוחים.",
-    who: ["solo", "friends"],
-    vibe: ["active"],
-    setting: "outdoor", budget: 0,
-    query: "הפארק הגדול פתח תקווה מתקני כושר",
+    name: "אתר היסטורי או אתר טבע קרוב",
+    icon: "🏞️",
+    desc: "גן לאומי, שמורת טבע או אתר עתיקות במרחק נסיעה קצרה — טיול בוקר קטן שמרגיש כמו חופשה.",
+    tip: "מגיעים עם הפתיחה — מקומות כאלה מתמלאים בשישי.",
+    who: ["family", "couple", "friends"], vibe: ["nature", "culture"],
+    setting: "outdoor", budget: 1, km: 15, query: "גן לאומי שמורת טבע ליד",
   },
   {
-    name: "בריכה / קאנטרי עירוני",
+    name: "בריכה או קאנטרי",
     icon: "🏊",
-    desc: "שחיית בוקר מרעננת באחד הקאנטרי קלאב בעיר. מתחילים את השישי במים ויוצאים אדם חדש.",
-    tip: "בדקו מראש שעות קבלת קהל למי שאינו מנוי.",
-    who: ["solo", "couple", "family"],
-    vibe: ["active"],
-    setting: "outdoor", budget: 2,
-    query: "קאנטרי פתח תקווה",
-  },
-  {
-    name: "פיקניק ומשחקי קופסה במדשאות",
-    icon: "🧺",
-    desc: "מביאים מחצלת, פירות, קלפים ומשחקי קופסה למדשאות הפארק הגדול. בילוי חינמי לגמרי שתמיד עובד.",
-    tip: "תחנת קפה בדרך + מאפייה = פיקניק מושלם בלי הכנות.",
-    who: ["friends", "family", "couple"],
-    vibe: ["nature", "food"],
-    setting: "outdoor", budget: 0,
-    query: "הפארק הגדול פתח תקווה",
+    desc: "שחיית בוקר מרעננת בבריכה מקומית — מתחילים את השישי במים ויוצאים אדם חדש.",
+    tip: "בדקו שעות קבלת קהל למי שאינו מנוי.",
+    who: ["solo", "couple", "family"], vibe: ["active"],
+    setting: "outdoor", budget: 2, km: 4, query: "בריכה קאנטרי",
   },
 ];
 
-const state = { step: 0, answers: {} };
+const state = { city: null, cityLabel: "", step: 0, answers: {} };
 const app = document.getElementById("app");
 
 function render() {
-  if (state.step < QUESTIONS.length) renderQuestion();
+  if (!state.city) renderCity();
+  else if (state.step < QUESTIONS.length) renderQuestion();
   else renderResults();
+}
+
+function renderCity() {
+  app.innerHTML = `
+    <div class="card question">
+      <div class="progress"><div style="width:0%"></div></div>
+      <h2>📍 איפה מבלים היום?</h2>
+      <div class="options">
+        ${CITIES.map(c => `
+          <button class="option-btn" data-city="${c.id}">
+            <span class="emoji">${c.emoji}</span>${c.label}
+          </button>`).join("")}
+      </div>
+      <div class="custom-city">
+        <input type="text" id="city-input" placeholder="או הקלידו עיר אחרת… (למשל: באר שבע)" maxlength="40">
+        <button class="btn btn-primary" id="city-go">קדימה</button>
+      </div>
+    </div>`;
+
+  app.querySelectorAll("[data-city]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      state.city = btn.dataset.city;
+      state.cityLabel = CITIES.find(c => c.id === btn.dataset.city).label;
+      state.step = 0; state.answers = {};
+      render();
+    });
+  });
+
+  const input = document.getElementById("city-input");
+  const go = () => {
+    const name = input.value.trim();
+    if (!name) { input.focus(); return; }
+    state.city = "custom";
+    state.cityLabel = name;
+    state.step = 0; state.answers = {};
+    render();
+  };
+  document.getElementById("city-go").addEventListener("click", go);
+  input.addEventListener("keydown", e => { if (e.key === "Enter") go(); });
 }
 
 function renderQuestion() {
   const q = QUESTIONS[state.step];
-  const pct = (state.step / QUESTIONS.length) * 100;
+  const pct = ((state.step + 1) / (QUESTIONS.length + 1)) * 100;
   app.innerHTML = `
     <div class="card question">
       <div class="progress"><div style="width:${pct}%"></div></div>
@@ -354,7 +703,7 @@ function renderQuestion() {
             <span class="emoji">${o.emoji}</span>${o.label}
           </button>`).join("")}
       </div>
-      ${state.step > 0 ? `<button class="back-link" id="back">→ חזרה לשאלה הקודמת</button>` : ""}
+      <button class="back-link" id="back">→ חזרה ${state.step > 0 ? "לשאלה הקודמת" : "לבחירת עיר"}</button>
     </div>`;
 
   app.querySelectorAll(".option-btn").forEach(btn => {
@@ -364,8 +713,21 @@ function renderQuestion() {
       render();
     });
   });
-  const back = document.getElementById("back");
-  if (back) back.addEventListener("click", () => { state.step--; render(); });
+  document.getElementById("back").addEventListener("click", () => {
+    if (state.step > 0) state.step--;
+    else { state.city = null; state.cityLabel = ""; }
+    render();
+  });
+}
+
+function currentPlaces() {
+  if (state.city === "custom") {
+    return GENERIC_PLACES.map(p => ({
+      ...p,
+      query: `${p.query} ${state.cityLabel}`,
+    }));
+  }
+  return PLACES_BY_CITY[state.city];
 }
 
 function scorePlace(p) {
@@ -382,49 +744,85 @@ function scorePlace(p) {
 }
 
 function renderResults() {
-  const scored = PLACES
+  const radius = Number(state.answers.radius || 99);
+  const scored = currentPlaces()
+    .filter(p => p.km <= radius)
     .map(p => ({ p, s: scorePlace(p) }))
     .filter(x => x.s >= 0)
     .sort((a, b) => b.s - a.s);
 
+  if (scored.length === 0) {
+    app.innerHTML = `
+      <div class="card">
+        <div class="result-header">
+          <h2>🔍 לא מצאנו התאמה ברדיוס הזה</h2>
+          <p>נסו להגדיל את הרדיוס או לשנות את התשובות</p>
+        </div>
+        <div class="actions">
+          <button class="btn btn-primary" id="widen">🛣️ הרחיבו את הרדיוס</button>
+          <button class="btn btn-secondary" id="restart">🔄 עיר או חיפוש חדש</button>
+        </div>
+      </div>`;
+    document.getElementById("widen").addEventListener("click", () => {
+      state.answers.radius = "99";
+      renderResults();
+    });
+    document.getElementById("restart").addEventListener("click", resetAll);
+    return;
+  }
+
   const top = scored.slice(0, 3).map(x => x.p);
+  const genericNote = state.city === "custom"
+    ? `<p>הצעות כלליות ל${escapeHTML(state.cityLabel)} — קישורי המפות ימצאו את המקומות הקרובים</p>`
+    : `<p>נבחרו במיוחד לפי התשובות שלכם</p>`;
 
   app.innerHTML = `
     <div class="card">
       <div class="result-header">
-        <h2>✨ הנה ההצעות שלנו לשישי הקרוב</h2>
-        <p>נבחרו במיוחד לפי התשובות שלכם</p>
+        <h2>✨ הצעות לשישי בבוקר ב${escapeHTML(state.cityLabel)}</h2>
+        ${genericNote}
       </div>
       ${top.map(placeHTML).join("")}
       <div class="actions">
         <button class="btn btn-primary" id="surprise">🎲 הפתיעו אותי</button>
-        <button class="btn btn-secondary" id="restart">🔄 להתחיל מחדש</button>
+        <button class="btn btn-secondary" id="restart">🔄 עיר או חיפוש חדש</button>
       </div>
     </div>`;
 
-  document.getElementById("restart").addEventListener("click", () => {
-    state.step = 0; state.answers = {}; render();
-  });
+  document.getElementById("restart").addEventListener("click", resetAll);
   document.getElementById("surprise").addEventListener("click", renderSurprise);
 }
 
 function renderSurprise() {
-  const pick = PLACES[Math.floor(Math.random() * PLACES.length)];
+  const radius = Number(state.answers.radius || 99);
+  const inRadius = currentPlaces().filter(p => p.km <= radius);
+  const places = inRadius.length ? inRadius : currentPlaces();
+  const pick = places[Math.floor(Math.random() * places.length)];
   app.innerHTML = `
     <div class="card">
       <div class="result-header">
-        <h2>🎲 ההגרלה בחרה בשבילכם:</h2>
+        <h2>🎲 ההגרלה בחרה בשבילכם ב${escapeHTML(state.cityLabel)}:</h2>
       </div>
       ${placeHTML(pick)}
       <div class="actions">
         <button class="btn btn-primary" id="surprise-again">🎲 עוד פעם</button>
-        <button class="btn btn-secondary" id="restart2">🔄 להתחיל מחדש</button>
+        <button class="btn btn-secondary" id="restart2">🔄 עיר או חיפוש חדש</button>
       </div>
     </div>`;
   document.getElementById("surprise-again").addEventListener("click", renderSurprise);
-  document.getElementById("restart2").addEventListener("click", () => {
-    state.step = 0; state.answers = {}; render();
-  });
+  document.getElementById("restart2").addEventListener("click", resetAll);
+}
+
+function resetAll() {
+  state.city = null; state.cityLabel = "";
+  state.step = 0; state.answers = {};
+  render();
+}
+
+function escapeHTML(s) {
+  return s.replace(/[&<>"']/g, c => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+  }[c]));
 }
 
 function placeHTML(p) {
@@ -435,12 +833,13 @@ function placeHTML(p) {
     <div class="place">
       <div class="icon">${p.icon}</div>
       <div>
-        <h3>${p.name}</h3>
-        <p class="desc">${p.desc}</p>
-        <span class="tip">💡 ${p.tip}</span>
+        <h3>${escapeHTML(p.name)}</h3>
+        <p class="desc">${escapeHTML(p.desc)}</p>
+        <span class="tip">💡 ${escapeHTML(p.tip)}</span>
         <div class="tags">
           <span class="tag">${budgetTag}</span>
           <span class="tag">${settingTag}</span>
+          <span class="tag">📍 ~${p.km} ק"מ מהמרכז</span>
         </div>
         <a class="maps-link" href="${mapsURL}" target="_blank" rel="noopener">📍 פתיחה במפות</a>
       </div>
