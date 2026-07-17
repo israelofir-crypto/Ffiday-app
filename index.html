@@ -364,6 +364,33 @@ const QUESTIONS = [
 const PLACES_BY_CITY = {
   "petah-tikva": [
     {
+      name: "המפל הנסתר (נחל הירקון)",
+      icon: "💦",
+      desc: "פנינה מקומית ליד ראש העין: מפל קטן ובריכת טבילה צלולה על יובל הירקון, מוקף ירוק. עשר דקות נסיעה וכבר בטבע אמיתי.",
+      tip: "מגיעים מוקדם בשישי — אחרי 10:00 מתחיל להתמלא. נעלי מים מומלצות.",
+      who: ["family", "couple", "friends", "solo"], vibe: ["nature"],
+      setting: "outdoor", budget: 0, km: 7, water: true, difficulty: "easy", route: "line", dip: true,
+      query: "המפל הנסתר ראש העין",
+    },
+    {
+      name: "עשר טחנות (פארק הירקון)",
+      icon: "🌊",
+      desc: "מתחם טחנות הקמח העתיקות על הירקון: מפלונים, מים זורמים ופינות פיקניק מוצלות. מקום מקסים לשכשוך רגליים ובוקר רגוע.",
+      tip: "משלבים עם רכיבת אופניים לאורך הירקון — המסלול עובר ממש שם.",
+      who: ["family", "couple", "friends", "solo"], vibe: ["nature"],
+      setting: "outdoor", budget: 0, km: 14, water: true, difficulty: "easy", route: "line", dip: true,
+      query: "שבע טחנות פארק הירקון",
+    },
+    {
+      name: "עין חניה (הרי ירושלים)",
+      icon: "⛲",
+      desc: "מעיין עם בריכת טבילה גדולה בנחל רפאים, ליד עצי פרי וחורבות עתיקות. שווה את הנסיעה כשרוצים טבילת מעיין אמיתית.",
+      tip: "בשישי בבוקר עוד רגוע יחסית; מביאים מים ונעלי מים.",
+      who: ["family", "couple", "friends", "solo"], vibe: ["nature"],
+      setting: "outdoor", budget: 0, km: 45, water: true, difficulty: "medium", route: "line", dip: true,
+      query: "עין חניה",
+    },
+    {
       name: "הפארק הגדול של פתח תקווה",
       icon: "🌳",
       desc: "האגם, הברווזים, מדשאות ענק ומתקני משחקים. קלאסיקה של שישי בבוקר — מביאים שמיכה, קפה מהבית, ונותנים לילדים להשתולל.",
@@ -479,6 +506,24 @@ const PLACES_BY_CITY = {
 
   "tel-aviv": [
     {
+      name: "המפל הנסתר (נחל הירקון)",
+      icon: "💦",
+      desc: "הסוד הכי פתוח של המרכז: מפל קטן ובריכת טבילה על יובל הירקון ליד ראש העין. חצי שעה מהעיר ומרגיש כמו צפון.",
+      tip: "מגיעים מוקדם בשישי — המקום קטן ומתמלא מהר. נעלי מים מומלצות.",
+      who: ["family", "couple", "friends", "solo"], vibe: ["nature"],
+      setting: "outdoor", budget: 0, km: 20, water: true, difficulty: "easy", route: "line", dip: true,
+      query: "המפל הנסתר ראש העין",
+    },
+    {
+      name: "עשר טחנות (פארק הירקון)",
+      icon: "🌊",
+      desc: "טחנות הקמח העתיקות על הירקון בתוך הפארק: מפלונים, מים זורמים ופינות פיקניק. שכשוך רגליים במרחק רכיבה מהבית.",
+      tip: "משכירים אופניים ומגיעים דרך שבילי הפארק — הדרך היא חצי מהכיף.",
+      who: ["family", "couple", "friends", "solo"], vibe: ["nature"],
+      setting: "outdoor", budget: 0, km: 6, water: true, difficulty: "easy", route: "line", dip: true,
+      query: "שבע טחנות פארק הירקון",
+    },
+    {
       name: "פארק הירקון (גני יהושע)",
       icon: "🌳",
       desc: "הריאה הירוקה של תל אביב: מדשאות אינסופיות, אגם עם סירות, פינות פיקניק ומתקני משחקים. שישי בבוקר קלאסי.",
@@ -508,7 +553,7 @@ const PLACES_BY_CITY = {
       desc: "הליכת בוקר על הטיילת מיפו ועד הנמל, שחייה בים או פשוט קפה מול הגלים. הבילוי החינמי הכי טוב בעיר.",
       tip: "בשישי בבוקר הים בדרך כלל רגוע והחופים עוד ריקים יחסית — עד 11:00.",
       who: ["solo", "couple", "friends", "family"], vibe: ["nature", "active"],
-      setting: "outdoor", budget: 0, km: 2, water: true, difficulty: "easy", route: "line", query: "טיילת תל אביב",
+      setting: "outdoor", budget: 0, km: 2, water: true, difficulty: "easy", route: "line", dip: true, query: "טיילת תל אביב",
     },
     {
       name: "מוזיאון תל אביב לאמנות",
@@ -561,6 +606,42 @@ const PLACES_BY_CITY = {
   ],
 
   "jerusalem": [
+    {
+      name: "עין לבן (פארק בגין)",
+      icon: "💦",
+      desc: "מעיין טבילה פופולרי בשולי העיר עם בריכה מקורה בצל, מבט על נחל רפאים ומסלול הליכה קצר. הטבילה הקרובה ביותר לירושלמים.",
+      tip: "בשישי בבוקר מגיעות משפחות — מקדימים כדי לתפוס את הבריכה רגועה.",
+      who: ["family", "couple", "friends", "solo"], vibe: ["nature"],
+      setting: "outdoor", budget: 0, km: 7, water: true, difficulty: "easy", route: "loop", dip: true,
+      query: "עין לבן ירושלים",
+    },
+    {
+      name: "עין חניה (נחל רפאים)",
+      icon: "⛲",
+      desc: "מעיין עם בריכת אבן גדולה, בוסתנים וחורבות ביזנטיות בנחל רפאים. טבילה מרעננת בנוף חקלאי עתיק.",
+      tip: "אפשר לשלב עם מסלול הליכה או רכיבה לאורך נחל רפאים.",
+      who: ["family", "couple", "friends", "solo"], vibe: ["nature"],
+      setting: "outdoor", budget: 0, km: 8, water: true, difficulty: "easy", route: "line", dip: true,
+      query: "עין חניה",
+    },
+    {
+      name: "עין סטף (הרי יהודה)",
+      icon: "🏞️",
+      desc: "מעיינות מדורגים בין טרסות עתיקות ביער הרי יהודה: נקבה חצובה, בריכות טבילה וצל של בוסתנים. אחד היפים באזור.",
+      tip: "יורדים בשביל קצר מהחניה; נעליים סגורות ופנס קטן לנקבה.",
+      who: ["family", "couple", "friends", "solo"], vibe: ["nature"],
+      setting: "outdoor", budget: 0, km: 13, water: true, difficulty: "medium", route: "loop", dip: true,
+      query: "עין סטף",
+    },
+    {
+      name: "עין פרת (נחל פרת)",
+      icon: "🌅",
+      desc: "שמורת טבע מדברית עוצרת נשימה עם מעיין ובריכות טבילה עמוקות בין צוקים. חצי שעה מהעיר ועולם אחר לגמרי.",
+      tip: "כניסה בתשלום ומגבלת מקומות בשישי — מגיעים ממש עם הפתיחה.",
+      who: ["family", "couple", "friends", "solo"], vibe: ["nature"],
+      setting: "outdoor", budget: 1, km: 15, water: true, difficulty: "medium", route: "line", dip: true,
+      query: "עין פרת שמורת טבע",
+    },
     {
       name: "שוק מחנה יהודה",
       icon: "🍞",
@@ -637,6 +718,33 @@ const PLACES_BY_CITY = {
 
   "haifa": [
     {
+      name: "בריכות נחל השופט (רמות מנשה)",
+      icon: "💦",
+      desc: "מסלול מים קליל בלב יערות רמות מנשה עם בריכות טבילה מוצלות וזרימה כל השנה. חביב במיוחד על משפחות.",
+      tip: "המסלול המעגלי הקצר מתאים גם לעגלות; מגיעים מוקדם לתפוס פינת פיקניק.",
+      who: ["family", "couple", "friends", "solo"], vibe: ["nature"],
+      setting: "outdoor", budget: 0, km: 30, water: true, difficulty: "easy", route: "loop", dip: true,
+      query: "נחל השופט בריכות",
+    },
+    {
+      name: "נחל כזיב — עין זיו (הגליל)",
+      icon: "🏞️",
+      desc: "אחד מנחלי האיתן היפים בישראל: בריכות טבילה צלולות מתחת למבצר מונפורט, צמחייה ירוקה ומים זורמים כל השנה.",
+      tip: "שישי בבוקר הוא הזמן — בצהריים השבילים מתמלאים. נעלי מים חובה.",
+      who: ["family", "couple", "friends", "solo"], vibe: ["nature"],
+      setting: "outdoor", budget: 0, km: 45, water: true, difficulty: "medium", route: "line", dip: true,
+      query: "נחל כזיב עין זיו",
+    },
+    {
+      name: "גן השלושה (הסחנה)",
+      icon: "🌴",
+      desc: "הבריכות הטבעיות המפורסמות בישראל: מים פושרים כל השנה, מפלים, מדשאות ומתקנים. נבחר לאחד המקומות היפים בעולם.",
+      tip: "בשישי מגיעים עם הפתיחה — זה המקום הכי מבוקש בעמק. כניסה בתשלום.",
+      who: ["family", "couple", "friends", "solo"], vibe: ["nature"],
+      setting: "outdoor", budget: 2, km: 50, water: true, difficulty: "easy", route: "loop", dip: true,
+      query: "גן השלושה סחנה",
+    },
+    {
       name: "הגנים הבהאיים",
       icon: "🌺",
       desc: "פלא עולמי בלב העיר: מדרגות גנים מושלמות היורדות מהכרמל אל הים. הכניסה לתצפית העליונה חופשית והנוף עוצר נשימה.",
@@ -658,7 +766,7 @@ const PLACES_BY_CITY = {
       desc: "החוף הכי מטופח בחיפה עם טיילת ארוכה, מדשאות ומתקני כושר. הליכת בוקר על קו המים או שחייה מרעננת.",
       tip: "בשישי בבוקר מתאספות שם קבוצות מתנפנפים וגלשני רוח — כיף לצפות.",
       who: ["family", "couple", "solo", "friends"], vibe: ["nature", "active"],
-      setting: "outdoor", budget: 0, km: 5, water: true, difficulty: "easy", route: "line", query: "חוף דדו חיפה",
+      setting: "outdoor", budget: 0, km: 5, water: true, difficulty: "easy", route: "line", dip: true, query: "חוף דדו חיפה",
     },
     {
       name: "ואדי ניסנאס",
@@ -713,6 +821,15 @@ const PLACES_BY_CITY = {
 
 // Generic suggestions for any typed city — Google Maps search does the finding.
 const GENERIC_PLACES = [
+    {
+      name: "מעיין או נחל לטבול בו",
+      icon: "💦",
+      desc: "כמעט בכל אזור מסתתר מעיין, נחל או מפל עם בריכת טבילה — כמו המפל הנסתר במרכז. קישור המפות ימצא את הקרובים אליכם.",
+      tip: "מחפשים במפות 'מעיין' ליד העיר — ומגיעים מוקדם לפני כולם.",
+      who: ["family", "couple", "friends", "solo"], vibe: ["nature"],
+      setting: "outdoor", budget: 0, km: 15, water: true, difficulty: "easy", route: "line", dip: true,
+      query: "מעיין טבילה נחל מפל ליד",
+    },
   {
     name: "הפארק העירוני",
     icon: "🌳",
@@ -783,7 +900,7 @@ const GENERIC_PLACES = [
     desc: "אם יש מקווה מים בסביבה — חוף, אגם או נחל — שישי בבוקר הוא הזמן הכי טוב: רגוע, נעים ולפני החום הגדול.",
     tip: "מגיעים מוקדם עם קפה — השקט של הבוקר שווה הכול.",
     who: ["family", "couple", "friends", "solo"], vibe: ["nature", "active"],
-    setting: "outdoor", budget: 0, km: 8, water: true, difficulty: "easy", route: "line", query: "חוף אגם",
+    setting: "outdoor", budget: 0, km: 8, water: true, difficulty: "easy", route: "line", dip: true, query: "חוף אגם",
   },
   {
     name: "מדרחוב או מרכז העיר",
@@ -810,9 +927,10 @@ const NATURE_QUESTIONS = [
     key: "water",
     text: "💧 שיהיה מים במסלול?",
     options: [
-      { value: "yes", label: "כן! אגם, נחל או ים", emoji: "💧" },
-      { value: "no",  label: "בלי מים, טבע יבש",   emoji: "🌵" },
-      { value: "any", label: "לא משנה לי",          emoji: "🤷" },
+      { value: "dip", label: "מעיין או נחל לטבול בו!", emoji: "💦" },
+      { value: "yes", label: "מים לנוף — אגם או ים",   emoji: "💧" },
+      { value: "no",  label: "בלי מים, טבע יבש",        emoji: "🌵" },
+      { value: "any", label: "לא משנה לי",               emoji: "🤷" },
     ],
   },
   {
@@ -957,7 +1075,9 @@ function scorePlace(p) {
   else if (a.budget === "low" && p.budget <= 1) score += 2;
   else if (a.budget !== "any" && p.budget === 2) score -= 2;
   if (a.vibe === "nature" && p.vibe.includes("nature")) {
-    if (a.water === "yes" && p.water) score += 2;
+    if (a.water === "dip" && p.dip) score += 5;
+    else if (a.water === "dip" && p.water) score += 1;
+    else if (a.water === "yes" && p.water) score += 2;
     else if (a.water === "no" && !p.water) score += 2;
     if (a.difficulty && a.difficulty !== "any" && p.difficulty === a.difficulty) score += 2;
     if (a.route && a.route !== "any" && p.route === a.route) score += 2;
@@ -1094,6 +1214,9 @@ async function loadLive() {
     if (state.answers.vibe === "nature" && state.answers.water === "yes") {
       selectors = [...selectors, 'natural~"water|beach|spring"', 'waterway="waterfall"'];
     }
+    if (state.answers.vibe === "nature" && state.answers.water === "dip") {
+      selectors = ['natural="spring"', 'waterway="waterfall"', 'natural="water"', 'leisure="swimming_area"'];
+    }
     const parts = selectors.map(sel =>
       `node[${sel}](around:${radiusM},${lat},${lon});way[${sel}](around:${radiusM},${lat},${lon});`
     ).join("");
@@ -1182,6 +1305,7 @@ function placeHTML(p, rank) {
           <span class="tag">${budgetTag}</span>
           <span class="tag">${settingTag}</span>
           <span class="tag">📍 ~${p.km} ק"מ מהמרכז</span>
+          ${p.dip ? `<span class="tag live">💦 אפשר לטבול</span>` : ""}
           ${p.water !== undefined ? `<span class="tag">${p.water ? "💧 עם מים" : "🌵 בלי מים"}</span>` : ""}
           ${p.difficulty ? `<span class="tag">${p.difficulty === "easy" ? "🚶 קל" : "🥾 בינוני"}</span>` : ""}
           ${p.route ? `<span class="tag">${p.route === "loop" ? "🔄 מעגלי" : "↔️ הלוך-חזור"}</span>` : ""}
