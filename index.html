@@ -369,7 +369,7 @@ const PLACES_BY_CITY = {
       desc: "האגם, הברווזים, מדשאות ענק ומתקני משחקים. קלאסיקה של שישי בבוקר — מביאים שמיכה, קפה מהבית, ונותנים לילדים להשתולל.",
       tip: "בשישי בבוקר עדיין רגוע יחסית — אחרי 10:30 מתחיל להתמלא.",
       who: ["family", "couple", "friends", "solo"], vibe: ["nature"],
-      setting: "outdoor", budget: 0, km: 2, query: "הפארק הגדול פתח תקווה",
+      setting: "outdoor", budget: 0, km: 2, water: true, difficulty: "easy", route: "loop", query: "הפארק הגדול פתח תקווה",
     },
     {
       name: "פינת החי בפארק הגדול",
@@ -377,7 +377,7 @@ const PLACES_BY_CITY = {
       desc: "פינת חי עירונית חמודה בתוך הפארק — טווסים, עיזים, תוכים וארנבות. הילדים מתים על זה, והכניסה חינמית.",
       tip: "משלבים עם סיבוב באגם ומגרש המשחקים הסמוך.",
       who: ["family"], vibe: ["nature"],
-      setting: "outdoor", budget: 0, km: 2, query: "פינת החי פתח תקווה",
+      setting: "outdoor", budget: 0, km: 2, water: false, difficulty: "easy", route: "loop", query: "פינת החי פתח תקווה",
     },
     {
       name: "שוק העיר פתח תקווה",
@@ -417,7 +417,7 @@ const PLACES_BY_CITY = {
       desc: "מסלול הליכה ורכיבה לאורך הירקון, ירוק ושטוח — מושלם לריצת בוקר, רכיבה או סתם הליכה טובה עם פודקאסט.",
       tip: "יוצאים מוקדם לפני החום; אפשר להמשיך מערבה עד תל אביב.",
       who: ["solo", "couple", "friends"], vibe: ["active", "nature"],
-      setting: "outdoor", budget: 0, km: 3, query: "פארק הירקון מקורות הירקון",
+      setting: "outdoor", budget: 0, km: 3, water: true, difficulty: "easy", route: "line", query: "פארק הירקון מקורות הירקון",
     },
     {
       name: "גן לאומי מקורות הירקון (תל אפק)",
@@ -425,7 +425,7 @@ const PLACES_BY_CITY = {
       desc: "עשר דקות נסיעה מהעיר: מבצר עות'מאני, אגם עם נופרים ומדשאות פיקניק ענקיות. טבע אמיתי ממש ליד הבית.",
       tip: "כניסה בתשלום סמלי; מגיעים מוקדם לתפוס פינת פיקניק מוצלת.",
       who: ["family", "couple", "friends"], vibe: ["nature"],
-      setting: "outdoor", budget: 1, km: 7, query: "גן לאומי מקורות הירקון",
+      setting: "outdoor", budget: 1, km: 7, water: true, difficulty: "easy", route: "loop", query: "גן לאומי מקורות הירקון",
     },
     {
       name: "קפה ומאפה במושבה הוותיקה של פ\"ת",
@@ -473,7 +473,7 @@ const PLACES_BY_CITY = {
       desc: "מביאים מחצלת, פירות, קלפים ומשחקי קופסה למדשאות הפארק הגדול. בילוי חינמי לגמרי שתמיד עובד.",
       tip: "תחנת קפה בדרך + מאפייה = פיקניק מושלם בלי הכנות.",
       who: ["friends", "family", "couple"], vibe: ["nature", "food"],
-      setting: "outdoor", budget: 0, km: 2, query: "הפארק הגדול פתח תקווה",
+      setting: "outdoor", budget: 0, km: 2, water: false, difficulty: "easy", route: "loop", query: "הפארק הגדול פתח תקווה",
     },
   ],
 
@@ -484,7 +484,7 @@ const PLACES_BY_CITY = {
       desc: "הריאה הירוקה של תל אביב: מדשאות אינסופיות, אגם עם סירות, פינות פיקניק ומתקני משחקים. שישי בבוקר קלאסי.",
       tip: "אפשר לשכור סירות פדלים באגם או ג'ימבורי פתוח לילדים בגני יהושע.",
       who: ["family", "couple", "friends", "solo"], vibe: ["nature"],
-      setting: "outdoor", budget: 0, km: 3, query: "פארק הירקון תל אביב",
+      setting: "outdoor", budget: 0, km: 3, water: true, difficulty: "easy", route: "loop", query: "פארק הירקון תל אביב",
     },
     {
       name: "שוק הכרמל",
@@ -500,7 +500,7 @@ const PLACES_BY_CITY = {
       desc: "רחבת עץ על הים, שוק הנמל עם דוכני אוכל איכותיים, בתי קפה מול הגלים ומרחב בטוח לילדים על האופניים.",
       tip: "שוק האיכרים בנמל פעיל בשישי בבוקר — תוצרת טרייה ישר מהחקלאים.",
       who: ["family", "couple", "friends"], vibe: ["food", "nature"],
-      setting: "outdoor", budget: 2, km: 4, query: "נמל תל אביב",
+      setting: "outdoor", budget: 2, km: 4, water: true, difficulty: "easy", route: "line", query: "נמל תל אביב",
     },
     {
       name: "טיילת וחופי תל אביב",
@@ -508,7 +508,7 @@ const PLACES_BY_CITY = {
       desc: "הליכת בוקר על הטיילת מיפו ועד הנמל, שחייה בים או פשוט קפה מול הגלים. הבילוי החינמי הכי טוב בעיר.",
       tip: "בשישי בבוקר הים בדרך כלל רגוע והחופים עוד ריקים יחסית — עד 11:00.",
       who: ["solo", "couple", "friends", "family"], vibe: ["nature", "active"],
-      setting: "outdoor", budget: 0, km: 2, query: "טיילת תל אביב",
+      setting: "outdoor", budget: 0, km: 2, water: true, difficulty: "easy", route: "line", query: "טיילת תל אביב",
     },
     {
       name: "מוזיאון תל אביב לאמנות",
@@ -591,7 +591,7 @@ const PLACES_BY_CITY = {
       desc: "מסילת הרכבת ההיסטורית שהפכה לפארק אורכי ירוק — מסלול הליכה וריצה מהתחנה הראשונה עד מלחה. שטוח, מוצל ונעים.",
       tip: "מתחילים מהתחנה הראשונה עם קפה ומסיימים בגן החיות — מסלול משפחתי מושלם.",
       who: ["solo", "couple", "family", "friends"], vibe: ["active", "nature"],
-      setting: "outdoor", budget: 0, km: 2, query: "פארק המסילה ירושלים",
+      setting: "outdoor", budget: 0, km: 2, water: false, difficulty: "easy", route: "line", query: "פארק המסילה ירושלים",
     },
     {
       name: "טיילת ארמון הנציב",
@@ -599,7 +599,7 @@ const PLACES_BY_CITY = {
       desc: "התצפית הכי יפה על ירושלים: העיר העתיקה, הר הזיתים ומדבר יהודה בפנורמה אחת. מקום מושלם לקפה של בוקר עם נוף.",
       tip: "בשישי בבוקר האור הכי יפה לצילומים — ורגוע לגמרי.",
       who: ["couple", "solo", "family"], vibe: ["nature"],
-      setting: "outdoor", budget: 0, km: 4, query: "טיילת ארמון הנציב ירושלים",
+      setting: "outdoor", budget: 0, km: 4, water: false, difficulty: "easy", route: "line", query: "טיילת ארמון הנציב ירושלים",
     },
     {
       name: "גן החיות התנ\"כי",
@@ -607,7 +607,7 @@ const PLACES_BY_CITY = {
       desc: "אחד מגני החיות היפים בעולם, בנוי בוואדי ירוק עם אגם. הילדים מאושרים וההורים נהנים לא פחות.",
       tip: "מגיעים עם הפתיחה — החיות הכי פעילות בבוקר והחניה עוד פנויה.",
       who: ["family"], vibe: ["nature"],
-      setting: "outdoor", budget: 2, km: 6, query: "גן החיות התנכי ירושלים",
+      setting: "outdoor", budget: 2, km: 6, water: true, difficulty: "easy", route: "loop", query: "גן החיות התנכי ירושלים",
     },
     {
       name: "עין כרם",
@@ -615,7 +615,7 @@ const PLACES_BY_CITY = {
       desc: "שכונה ציורית בין הרים: סמטאות אבן, כנסיות עתיקות, גלריות ובתי קפה רומנטיים. מרגיש כמו כפר בטוסקנה.",
       tip: "עולים ברגל למעיין ואז יורדים לארוחת בוקר באחד מבתי הקפה בכיכר.",
       who: ["couple", "solo"], vibe: ["nature", "food", "culture"],
-      setting: "outdoor", budget: 1, km: 7, query: "עין כרם ירושלים",
+      setting: "outdoor", budget: 1, km: 7, water: true, difficulty: "medium", route: "loop", query: "עין כרם ירושלים",
     },
     {
       name: "מתחם ממילא",
@@ -642,7 +642,7 @@ const PLACES_BY_CITY = {
       desc: "פלא עולמי בלב העיר: מדרגות גנים מושלמות היורדות מהכרמל אל הים. הכניסה לתצפית העליונה חופשית והנוף עוצר נשימה.",
       tip: "מתחילים מהטיילת בדרך יפה נוף למעלה — התצפית הכי טובה על המפרץ.",
       who: ["couple", "solo", "friends", "family"], vibe: ["nature", "culture"],
-      setting: "outdoor", budget: 0, km: 1, query: "הגנים הבהאיים חיפה",
+      setting: "outdoor", budget: 0, km: 1, water: false, difficulty: "medium", route: "line", query: "הגנים הבהאיים חיפה",
     },
     {
       name: "המושבה הגרמנית",
@@ -658,7 +658,7 @@ const PLACES_BY_CITY = {
       desc: "החוף הכי מטופח בחיפה עם טיילת ארוכה, מדשאות ומתקני כושר. הליכת בוקר על קו המים או שחייה מרעננת.",
       tip: "בשישי בבוקר מתאספות שם קבוצות מתנפנפים וגלשני רוח — כיף לצפות.",
       who: ["family", "couple", "solo", "friends"], vibe: ["nature", "active"],
-      setting: "outdoor", budget: 0, km: 5, query: "חוף דדו חיפה",
+      setting: "outdoor", budget: 0, km: 5, water: true, difficulty: "easy", route: "line", query: "חוף דדו חיפה",
     },
     {
       name: "ואדי ניסנאס",
@@ -682,7 +682,7 @@ const PLACES_BY_CITY = {
       desc: "הפארק הלאומי הגדול בישראל, עשר דקות מהעיר: יער ים-תיכוני, מסלולי הליכה מוצלים ותצפיות על הים והעמקים.",
       tip: "מסלול נחל קלח מעגלי וקל — מתאים גם עם ילדים.",
       who: ["family", "couple", "friends", "solo"], vibe: ["nature", "active"],
-      setting: "outdoor", budget: 0, km: 8, query: "פארק הכרמל",
+      setting: "outdoor", budget: 0, km: 8, water: false, difficulty: "medium", route: "loop", query: "פארק הכרמל",
     },
     {
       name: "טיילת לואי (יפה נוף)",
@@ -690,7 +690,7 @@ const PLACES_BY_CITY = {
       desc: "טיילת פנורמית על רכס הכרמל עם תצפית על כל מפרץ חיפה, הגליל ובימים בהירים עד החרמון. הליכת בוקר עם נוף אינסופי.",
       tip: "מגיעים מוקדם — באור בוקר רואים הכי רחוק והאוויר צלול.",
       who: ["solo", "couple"], vibe: ["nature"],
-      setting: "outdoor", budget: 0, km: 3, query: "טיילת לואי חיפה",
+      setting: "outdoor", budget: 0, km: 3, water: false, difficulty: "easy", route: "line", query: "טיילת לואי חיפה",
     },
     {
       name: "עיר תחתית ושוק תלפיות",
@@ -706,7 +706,7 @@ const PLACES_BY_CITY = {
       desc: "עולים ברכבל מחוף בת גלים לראש הכרמל, מבקרים במנזר הכרמליטי ונהנים מתצפית ים מרהיבה. אטרקציה חיפאית קלאסית.",
       tip: "אם יש זמן, יורדים ברגל דרך מערת אליהו — מסלול קצר ויפה.",
       who: ["family", "couple"], vibe: ["nature", "culture"],
-      setting: "outdoor", budget: 1, km: 4, query: "רכבל חיפה סטלה מאריס",
+      setting: "outdoor", budget: 1, km: 4, water: false, difficulty: "medium", route: "line", query: "רכבל חיפה סטלה מאריס",
     },
   ],
 };
@@ -719,7 +719,7 @@ const GENERIC_PLACES = [
     desc: "כמעט בכל עיר יש פארק מרכזי עם מדשאות, פינות ישיבה ומתקני משחקים — הקלאסיקה של שישי בבוקר.",
     tip: "מביאים קפה, שמיכה וכדור — וזה כל מה שצריך.",
     who: ["family", "couple", "friends", "solo"], vibe: ["nature"],
-    setting: "outdoor", budget: 0, km: 2, query: "פארק",
+    setting: "outdoor", budget: 0, km: 2, water: false, difficulty: "easy", route: "loop", query: "פארק",
   },
   {
     name: "השוק המקומי",
@@ -751,7 +751,7 @@ const GENERIC_PLACES = [
     desc: "הליכת בוקר טובה בטיילת, בפארק או בשביל מסומן ליד העיר — מתחילים את הסופ\"ש עם ראש נקי.",
     tip: "יוצאים מוקדם לפני החום ולוקחים מים.",
     who: ["solo", "couple", "friends"], vibe: ["active", "nature"],
-    setting: "outdoor", budget: 0, km: 4, query: "טיילת מסלול הליכה",
+    setting: "outdoor", budget: 0, km: 4, water: false, difficulty: "easy", route: "line", query: "טיילת מסלול הליכה",
   },
   {
     name: "ג'ימבורי או פארק חבלים לילדים",
@@ -767,7 +767,7 @@ const GENERIC_PLACES = [
     desc: "גן לאומי, שמורת טבע או אתר עתיקות במרחק נסיעה קצרה — טיול בוקר קטן שמרגיש כמו חופשה.",
     tip: "מגיעים עם הפתיחה — מקומות כאלה מתמלאים בשישי.",
     who: ["family", "couple", "friends"], vibe: ["nature", "culture"],
-    setting: "outdoor", budget: 1, km: 15, query: "גן לאומי שמורת טבע ליד",
+    setting: "outdoor", budget: 1, km: 15, water: false, difficulty: "medium", route: "loop", query: "גן לאומי שמורת טבע ליד",
   },
   {
     name: "בריכה או קאנטרי",
@@ -783,7 +783,7 @@ const GENERIC_PLACES = [
     desc: "אם יש מקווה מים בסביבה — חוף, אגם או נחל — שישי בבוקר הוא הזמן הכי טוב: רגוע, נעים ולפני החום הגדול.",
     tip: "מגיעים מוקדם עם קפה — השקט של הבוקר שווה הכול.",
     who: ["family", "couple", "friends", "solo"], vibe: ["nature", "active"],
-    setting: "outdoor", budget: 0, km: 8, query: "חוף אגם",
+    setting: "outdoor", budget: 0, km: 8, water: true, difficulty: "easy", route: "line", query: "חוף אגם",
   },
   {
     name: "מדרחוב או מרכז העיר",
@@ -799,9 +799,50 @@ const GENERIC_PLACES = [
     desc: "כמעט לכל עיר יש נקודת תצפית, גבעה או פינת טבע נסתרת — מקום מושלם לזריחה מאוחרת, צילומים ורגע של שקט.",
     tip: "בודקים במפות 'נקודת תצפית' ליד העיר — מפתיע כמה יש.",
     who: ["couple", "solo"], vibe: ["nature"],
-    setting: "outdoor", budget: 0, km: 5, query: "נקודת תצפית",
+    setting: "outdoor", budget: 0, km: 5, water: false, difficulty: "medium", route: "loop", query: "נקודת תצפית",
   },
 ];
+
+
+// Follow-up questions shown only when the chosen vibe is "nature"
+const NATURE_QUESTIONS = [
+  {
+    key: "water",
+    text: "💧 שיהיה מים במסלול?",
+    options: [
+      { value: "yes", label: "כן! אגם, נחל או ים", emoji: "💧" },
+      { value: "no",  label: "בלי מים, טבע יבש",   emoji: "🌵" },
+      { value: "any", label: "לא משנה לי",          emoji: "🤷" },
+    ],
+  },
+  {
+    key: "difficulty",
+    text: "🥾 איזו רמת קושי?",
+    options: [
+      { value: "easy",   label: "קל ונינוח",        emoji: "🚶" },
+      { value: "medium", label: "בינוני, עם אתגר",  emoji: "🥾" },
+      { value: "any",    label: "לא משנה לי",        emoji: "🤷" },
+    ],
+  },
+  {
+    key: "route",
+    text: "🔄 מסלול מעגלי או הלוך-חזור?",
+    options: [
+      { value: "loop", label: "מעגלי — בלי לחזור באותה דרך", emoji: "🔄" },
+      { value: "line", label: "קו ישר — הלוך ותשובה",         emoji: "↔️" },
+      { value: "any",  label: "לא משנה לי",                    emoji: "🤷" },
+    ],
+  },
+];
+
+function questionList() {
+  const qs = [...QUESTIONS];
+  if (state.answers.vibe === "nature") {
+    const vibeIdx = qs.findIndex(q => q.key === "vibe");
+    qs.splice(vibeIdx + 1, 0, ...NATURE_QUESTIONS);
+  }
+  return qs;
+}
 
 const state = { city: null, cityLabel: "", coords: null, step: 0, answers: {} };
 const app = document.getElementById("app");
@@ -848,7 +889,7 @@ function selectCity(id, label, coords) {
 /* ---------- main flow ---------- */
 function render() {
   if (!state.city) renderWelcome();
-  else if (state.step < QUESTIONS.length) renderQuestion();
+  else if (state.step < questionList().length) renderQuestion();
   else renderResults();
 }
 
@@ -862,8 +903,9 @@ function renderWelcome() {
 }
 
 function renderQuestion() {
-  const q = QUESTIONS[state.step];
-  const pct = ((state.step + 1) / (QUESTIONS.length + 1)) * 100;
+  const qs = questionList();
+  const q = qs[state.step];
+  const pct = ((state.step + 1) / (qs.length + 1)) * 100;
   app.innerHTML = `
     <div class="card question">
       <div class="progress"><div style="width:${pct}%"></div></div>
@@ -879,6 +921,11 @@ function renderQuestion() {
 
   app.querySelectorAll(".option-btn").forEach(btn => {
     btn.addEventListener("click", () => {
+      if (q.key === "vibe" && btn.dataset.value !== "nature") {
+        delete state.answers.water;
+        delete state.answers.difficulty;
+        delete state.answers.route;
+      }
       state.answers[q.key] = btn.dataset.value;
       state.step++;
       render();
@@ -909,6 +956,12 @@ function scorePlace(p) {
   else if (a.budget === "free" && p.budget === 0) score += 2;
   else if (a.budget === "low" && p.budget <= 1) score += 2;
   else if (a.budget !== "any" && p.budget === 2) score -= 2;
+  if (a.vibe === "nature" && p.vibe.includes("nature")) {
+    if (a.water === "yes" && p.water) score += 2;
+    else if (a.water === "no" && !p.water) score += 2;
+    if (a.difficulty && a.difficulty !== "any" && p.difficulty === a.difficulty) score += 2;
+    if (a.route && a.route !== "any" && p.route === a.route) score += 2;
+  }
   return score;
 }
 
@@ -1037,7 +1090,10 @@ async function loadLive() {
     if (!state.coords) state.coords = await geocodeCity(state.cityLabel);
     const { lat, lon } = state.coords;
     const radiusM = Math.min(radiusKm(), 20) * 1000;
-    const selectors = VIBE_SELECTORS[state.answers.vibe] || VIBE_SELECTORS.nature;
+    let selectors = VIBE_SELECTORS[state.answers.vibe] || VIBE_SELECTORS.nature;
+    if (state.answers.vibe === "nature" && state.answers.water === "yes") {
+      selectors = [...selectors, 'natural~"water|beach|spring"', 'waterway="waterfall"'];
+    }
     const parts = selectors.map(sel =>
       `node[${sel}](around:${radiusM},${lat},${lon});way[${sel}](around:${radiusM},${lat},${lon});`
     ).join("");
@@ -1126,6 +1182,9 @@ function placeHTML(p, rank) {
           <span class="tag">${budgetTag}</span>
           <span class="tag">${settingTag}</span>
           <span class="tag">📍 ~${p.km} ק"מ מהמרכז</span>
+          ${p.water !== undefined ? `<span class="tag">${p.water ? "💧 עם מים" : "🌵 בלי מים"}</span>` : ""}
+          ${p.difficulty ? `<span class="tag">${p.difficulty === "easy" ? "🚶 קל" : "🥾 בינוני"}</span>` : ""}
+          ${p.route ? `<span class="tag">${p.route === "loop" ? "🔄 מעגלי" : "↔️ הלוך-חזור"}</span>` : ""}
         </div>
         <a class="maps-link" href="${mapsURL}" target="_blank" rel="noopener">📍 פתיחה במפות</a>
       </div>
