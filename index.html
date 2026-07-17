@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>שישי בבוקר בפתח תקווה 🌅</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #fdf6ec;
+    --card: #ffffff;
+    --primary: #e07a3f;
+    --primary-dark: #c9642c;
+    --accent: #2f7d6d;
+    --text: #2d2a26;
+    --muted: #7a7369;
+    --tag-bg: #f3e9db;
+    --shadow: 0 4px 18px rgba(45, 42, 38, 0.10);
+  }
+
+  body {
+    font-family: "Segoe UI", "Assistant", "Arial Hebrew", Arial, sans-serif;
+    background: linear-gradient(160deg, #fdf6ec 0%, #f9e8d2 60%, #f5dcc0 100%);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px 48px;
+  }
+
+  header { text-align: center; margin-bottom: 24px; max-width: 640px; }
+  header h1 { font-size: 1.9rem; margin-bottom: 8px; }
+  header p { color: var(--muted); font-size: 1.05rem; }
+
+  .container { width: 100%; max-width: 640px; }
+
+  .card {
+    background: var(--card);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    padding: 24px;
+    margin-bottom: 16px;
+    animation: pop .35s ease;
+  }
+  @keyframes pop {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .progress {
+    height: 8px; background: var(--tag-bg);
+    border-radius: 99px; overflow: hidden; margin-bottom: 20px;
+  }
+  .progress > div {
+    height: 100%; background: var(--primary);
+    border-radius: 99px; transition: width .3s ease;
+  }
+
+  .question h2 { font-size: 1.3rem; margin-bottom: 16px; }
+
+  .options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 480px) { .options { grid-template-columns: 1fr; } }
+
+  .option-btn {
+    border: 2px solid var(--tag-bg);
+    background: #fffdf9;
+    border-radius: 14px;
+    padding: 16px 12px;
+    font-size: 1.05rem;
+    font-family: inherit;
+    cursor: pointer;
+    text-align: center;
+    transition: all .15s ease;
+    color: var(--text);
+  }
+  .option-btn .emoji { display: block; font-size: 1.8rem; margin-bottom: 6px; }
+  .option-btn:hover { border-color: var(--primary); transform: translateY(-2px); }
+  .option-btn:active { transform: scale(.97); }
+
+  .back-link {
+    background: none; border: none; color: var(--muted);
+    font-family: inherit; font-size: .95rem; cursor: pointer;
+    margin-top: 14px; text-decoration: underline;
+  }
+
+  /* results */
+  .result-header { text-align: center; margin-bottom: 18px; }
+  .result-header h2 { font-size: 1.4rem; margin-bottom: 6px; }
+  .result-header p { color: var(--muted); }
+
+  .place {
+    display: flex; gap: 14px; align-items: flex-start;
+    border: 1.5px solid var(--tag-bg);
+    border-radius: 16px; padding: 16px; margin-bottom: 12px;
+    background: #fffdf9;
+  }
+  .place .icon {
+    font-size: 2rem; background: var(--tag-bg);
+    border-radius: 12px; width: 56px; height: 56px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .place h3 { font-size: 1.15rem; margin-bottom: 4px; }
+  .place .desc { color: var(--muted); font-size: .95rem; line-height: 1.5; margin-bottom: 8px; }
+  .place .tip {
+    font-size: .88rem; color: var(--accent);
+    background: #e8f3f0; border-radius: 8px; padding: 6px 10px;
+    display: inline-block; margin-bottom: 8px;
+  }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag {
+    background: var(--tag-bg); color: #6b5b45;
+    font-size: .8rem; padding: 3px 10px; border-radius: 99px;
+  }
+  .maps-link {
+    display: inline-block; margin-top: 8px; font-size: .9rem;
+    color: var(--primary-dark); text-decoration: none; font-weight: 600;
+  }
+  .maps-link:hover { text-decoration: underline; }
+
+  .actions { display: flex; gap: 12px; justify-content: center; margin-top: 18px; flex-wrap: wrap; }
+  .btn {
+    font-family: inherit; font-size: 1rem; font-weight: 600;
+    border: none; border-radius: 12px; padding: 12px 22px; cursor: pointer;
+    transition: all .15s ease;
+  }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:hover { background: var(--primary-dark); }
+  .btn-secondary { background: var(--tag-bg); color: var(--text); }
+  .btn-secondary:hover { background: #eaddc9; }
+
+  footer { margin-top: 24px; color: var(--muted); font-size: .85rem; text-align: center; max-width: 640px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🌅 שישי בבוקר בפתח תקווה</h1>
+  <p>ענו על כמה שאלות קצרות ונמצא לכם את הבילוי המושלם לשישי בבוקר</p>
+</header>
+
+<div class="container" id="app"></div>
+
+<footer>
+  💡 טיפ: ביום שישי הרבה מקומות סוגרים מוקדם (בסביבות 13:00–14:00) — כדאי לצאת מוקדם ולוודא שעות פתיחה מראש.
+</footer>
+
+<script>
+const QUESTIONS = [
+  {
+    key: "who",
+    text: "עם מי יוצאים הבוקר?",
+    options: [
+      { value: "family",  label: "עם הילדים",   emoji: "👨‍👩‍👧‍👦" },
+      { value: "couple",  label: "זוגי",         emoji: "💑" },
+      { value: "friends", label: "עם חברים",     emoji: "🍻" },
+      { value: "solo",    label: "לבד, זמן איכות", emoji: "🧘" },
+    ],
+  },
+  {
+    key: "vibe",
+    text: "איזו אווירה מתחשק לכם?",
+    options: [
+      { value: "nature",  label: "טבע ואוויר פתוח", emoji: "🌳" },
+      { value: "food",    label: "אוכל וקפה",        emoji: "☕" },
+      { value: "active",  label: "משהו פעיל",        emoji: "🏃" },
+      { value: "culture", label: "תרבות ועניין",     emoji: "🎨" },
+    ],
+  },
+  {
+    key: "setting",
+    text: "בפנים או בחוץ?",
+    options: [
+      { value: "outdoor", label: "בחוץ, בשמש",     emoji: "☀️" },
+      { value: "indoor",  label: "בפנים, במזגן",   emoji: "🏠" },
+      { value: "any",     label: "לא משנה לי",     emoji: "🤷" },
+    ],
+  },
+  {
+    key: "budget",
+    text: "מה התקציב?",
+    options: [
+      { value: "free",  label: "חינם זה הכי",        emoji: "🆓" },
+      { value: "low",   label: "משהו סמלי",          emoji: "💰" },
+      { value: "any",   label: "שווה לפנק",          emoji: "💳" },
+    ],
+  },
+];
+
+// name, icon, desc, tip, who[], vibe[], setting, budget (0=free, 1=low, 2=paid)
+const PLACES = [
+  {
+    name: "הפארק הגדול של פתח תקווה",
+    icon: "🌳",
+    desc: "האגם, הברווזים, מדשאות ענק ומתקני משחקים. קלאסיקה של שישי בבוקר — מביאים שמיכה, קפה מהבית, ונותנים לילדים להשתולל.",
+    tip: "בשישי בבוקר עדיין רגוע יחסית — אחרי 10:30 מתחיל להתמלא.",
+    who: ["family", "couple", "friends", "solo"],
+    vibe: ["nature"],
+    setting: "outdoor", budget: 0,
+    query: "הפארק הגדול פתח תקווה",
+  },
+  {
+    name: "פינת החי בפארק הגדול",
+    icon: "🦜",
+    desc: "פינת חי עירונית חמודה בתוך הפארק — טווסים, עיזים, תוכים וארנבות. הילדים מתים על זה, והכניסה חינמית.",
+    tip: "משלבים עם סיבוב באגם ומגרש המשחקים הסמוך.",
+    who: ["family"],
+    vibe: ["nature"],
+    setting: "outdoor", budget: 0,
+    query: "פינת החי פתח תקווה",
+  },
+  {
+    name: "שוק העיר פתח תקווה",
+    icon: "🍅",
+    desc: "השוק בשישי בבוקר הוא חגיגה: פירות וירקות טריים, חומוס מהביל, בורקסים ומאפים לקראת שבת. אווירה תוססת ואותנטית.",
+    tip: "מגיעים רעבים ויוצאים עם שקיות מלאות. שיא העומס בין 10:00 ל-12:00.",
+    who: ["couple", "friends", "solo", "family"],
+    vibe: ["food"],
+    setting: "outdoor", budget: 1,
+    query: "שוק פתח תקווה",
+  },
+  {
+    name: "ארוחת בוקר במתחם סגולה",
+    icon: "🍳",
+    desc: "אזור התעשייה סגולה מלא בתי קפה ומסעדות עם ארוחות בוקר שוות — שקשוקה, ג'חנון ומאפים. חניה בשפע ואווירה נינוחה.",
+    tip: "בשישי כדאי להזמין מקום מראש — המקומות הפופולריים מתמלאים.",
+    who: ["couple", "friends", "family"],
+    vibe: ["food"],
+    setting: "indoor", budget: 2,
+    query: "בתי קפה סגולה פתח תקווה",
+  },
+  {
+    name: "מוזיאון פתח תקווה לאמנות",
+    icon: "🎨",
+    desc: "מוזיאון עכשווי ומפתיע במרכז העיר, עם תערוכות מתחלפות של אמנות ישראלית. שקט, ממוזג, ומעולה לשעה-שעתיים של השראה.",
+    tip: "פתוח בשישי בבוקר; בדקו באתר אילו תערוכות מוצגות כרגע.",
+    who: ["couple", "solo", "friends"],
+    vibe: ["culture"],
+    setting: "indoor", budget: 1,
+    query: "מוזיאון פתח תקווה לאמנות",
+  },
+  {
+    name: "בית יד לבנים ומוזיאון העיר",
+    icon: "🏛️",
+    desc: "סיפורה של 'אם המושבות' — היסטוריה מקומית, תצלומים ותערוכות על ראשית ההתיישבות. מתאים לחובבי נוסטלגיה והיסטוריה.",
+    tip: "משלבים עם טיול רגלי ברחובות המושבה ההיסטוריים שמסביב.",
+    who: ["couple", "solo", "family"],
+    vibe: ["culture"],
+    setting: "indoor", budget: 0,
+    query: "יד לבנים פתח תקווה",
+  },
+  {
+    name: "טיילת נחל הירקון",
+    icon: "🚴",
+    desc: "מסלול הליכה ורכיבה לאורך הירקון, ירוק ושטוח — מושלם לריצת בוקר, רכיבה או סתם הליכה טובה עם פודקאסט.",
+    tip: "יוצאים מוקדם לפני החום; אפשר להמשיך מערבה עד תל אביב.",
+    who: ["solo", "couple", "friends"],
+    vibe: ["active", "nature"],
+    setting: "outdoor", budget: 0,
+    query: "פארק הירקון מקורות הירקון",
+  },
+  {
+    name: "גן לאומי מקורות הירקון (תל אפק)",
+    icon: "🏞️",
+    desc: "עשר דקות נסיעה מהעיר: מבצר עות'מאני, אגם עם נופרים ומדשאות פיקניק ענקיות. טבע אמיתי ממש ליד הבית.",
+    tip: "כניסה בתשלום סמלי; מגיעים מוקדם לתפוס פינת פיקניק מוצלת.",
+    who: ["family", "couple", "friends"],
+    vibe: ["nature"],
+    setting: "outdoor", budget: 1,
+    query: "גן לאומי מקורות הירקון",
+  },
+  {
+    name: "קפה ומאפה במושבה הגרמנית של פ\"ת",
+    icon: "☕",
+    desc: "בתי קפה שכונתיים ברחובות השקטים של מרכז העיר הוותיק — קרואסון, הפוך ועיתון של שישי. פשוט ומדויק.",
+    tip: "אחרי הקפה שווה סיבוב רגלי ברחוב חובבי ציון ההיסטורי.",
+    who: ["solo", "couple"],
+    vibe: ["food"],
+    setting: "indoor", budget: 1,
+    query: "בית קפה מרכז פתח תקווה",
+  },
+  {
+    name: "הקניון הגדול פתח תקווה",
+    icon: "🛍️",
+    desc: "שופינג של שישי בבוקר במזגן: חנויות, בתי קפה ופינות ישיבה. בשישי בבוקר עדיין נעים לפני שהעומס מתחיל.",
+    tip: "רוב החנויות נסגרות בסביבות 14:30 בשישי — מתחילים מוקדם.",
+    who: ["friends", "couple", "family"],
+    vibe: ["food", "culture"],
+    setting: "indoor", budget: 2,
+    query: "הקניון הגדול פתח תקווה",
+  },
+  {
+    name: "ג'ימבורי ומתחמי קפיצה לילדים",
+    icon: "🤸",
+    desc: "מתחמי טרמפולינות וג'ימבורי ממוזגים בעיר — הילדים שורפים אנרגיה וההורים שותים קפה בשקט. מנצח בימים חמים.",
+    tip: "בשישי בבוקר פחות עמוס מאשר בשבת; גרביים חובה!",
+    who: ["family"],
+    vibe: ["active"],
+    setting: "indoor", budget: 2,
+    query: "ג'ימבורי פתח תקווה",
+  },
+  {
+    name: "בוקר ספורטיבי בפארק — מתקני כושר ומגרשים",
+    icon: "🏀",
+    desc: "מתקני כושר פתוחים, מגרשי כדורסל ומסלולי ריצה בפארק הגדול ובגנים השכונתיים. מרימים דופק ומתחילים את הסופ\"ש חזק.",
+    tip: "בשישי בבוקר יש אווירת קהילה — קבוצות ריצה ומשחקי כדורסל פתוחים.",
+    who: ["solo", "friends"],
+    vibe: ["active"],
+    setting: "outdoor", budget: 0,
+    query: "הפארק הגדול פתח תקווה מתקני כושר",
+  },
+  {
+    name: "בריכה / קאנטרי עירוני",
+    icon: "🏊",
+    desc: "שחיית בוקר מרעננת באחד הקאנטרי קלאב בעיר. מתחילים את השישי במים ויוצאים אדם חדש.",
+    tip: "בדקו מראש שעות קבלת קהל למי שאינו מנוי.",
+    who: ["solo", "couple", "family"],
+    vibe: ["active"],
+    setting: "outdoor", budget: 2,
+    query: "קאנטרי פתח תקווה",
+  },
+  {
+    name: "פיקניק ומשחקי קופסה במדשאות",
+    icon: "🧺",
+    desc: "מביאים מחצלת, פירות, קלפים ומשחקי קופסה למדשאות הפארק הגדול. בילוי חינמי לגמרי שתמיד עובד.",
+    tip: "תחנת קפה בדרך + מאפייה = פיקניק מושלם בלי הכנות.",
+    who: ["friends", "family", "couple"],
+    vibe: ["nature", "food"],
+    setting: "outdoor", budget: 0,
+    query: "הפארק הגדול פתח תקווה",
+  },
+];
+
+const state = { step: 0, answers: {} };
+const app = document.getElementById("app");
+
+function render() {
+  if (state.step < QUESTIONS.length) renderQuestion();
+  else renderResults();
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[state.step];
+  const pct = (state.step / QUESTIONS.length) * 100;
+  app.innerHTML = `
+    <div class="card question">
+      <div class="progress"><div style="width:${pct}%"></div></div>
+      <h2>${q.text}</h2>
+      <div class="options">
+        ${q.options.map(o => `
+          <button class="option-btn" data-value="${o.value}">
+            <span class="emoji">${o.emoji}</span>${o.label}
+          </button>`).join("")}
+      </div>
+      ${state.step > 0 ? `<button class="back-link" id="back">→ חזרה לשאלה הקודמת</button>` : ""}
+    </div>`;
+
+  app.querySelectorAll(".option-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      state.answers[q.key] = btn.dataset.value;
+      state.step++;
+      render();
+    });
+  });
+  const back = document.getElementById("back");
+  if (back) back.addEventListener("click", () => { state.step--; render(); });
+}
+
+function scorePlace(p) {
+  const a = state.answers;
+  let score = 0;
+  if (p.who.includes(a.who)) score += 3; else return -1;
+  if (p.vibe.includes(a.vibe)) score += 3;
+  if (a.setting === "any" || p.setting === a.setting) score += 2;
+  if (a.budget === "any") score += 1;
+  else if (a.budget === "free" && p.budget === 0) score += 2;
+  else if (a.budget === "low" && p.budget <= 1) score += 2;
+  else if (a.budget !== "any" && p.budget === 2) score -= 2;
+  return score;
+}
+
+function renderResults() {
+  const scored = PLACES
+    .map(p => ({ p, s: scorePlace(p) }))
+    .filter(x => x.s >= 0)
+    .sort((a, b) => b.s - a.s);
+
+  const top = scored.slice(0, 3).map(x => x.p);
+
+  app.innerHTML = `
+    <div class="card">
+      <div class="result-header">
+        <h2>✨ הנה ההצעות שלנו לשישי הקרוב</h2>
+        <p>נבחרו במיוחד לפי התשובות שלכם</p>
+      </div>
+      ${top.map(placeHTML).join("")}
+      <div class="actions">
+        <button class="btn btn-primary" id="surprise">🎲 הפתיעו אותי</button>
+        <button class="btn btn-secondary" id="restart">🔄 להתחיל מחדש</button>
+      </div>
+    </div>`;
+
+  document.getElementById("restart").addEventListener("click", () => {
+    state.step = 0; state.answers = {}; render();
+  });
+  document.getElementById("surprise").addEventListener("click", renderSurprise);
+}
+
+function renderSurprise() {
+  const pick = PLACES[Math.floor(Math.random() * PLACES.length)];
+  app.innerHTML = `
+    <div class="card">
+      <div class="result-header">
+        <h2>🎲 ההגרלה בחרה בשבילכם:</h2>
+      </div>
+      ${placeHTML(pick)}
+      <div class="actions">
+        <button class="btn btn-primary" id="surprise-again">🎲 עוד פעם</button>
+        <button class="btn btn-secondary" id="restart2">🔄 להתחיל מחדש</button>
+      </div>
+    </div>`;
+  document.getElementById("surprise-again").addEventListener("click", renderSurprise);
+  document.getElementById("restart2").addEventListener("click", () => {
+    state.step = 0; state.answers = {}; render();
+  });
+}
+
+function placeHTML(p) {
+  const budgetTag = p.budget === 0 ? "חינם" : p.budget === 1 ? "עלות סמלית" : "בתשלום";
+  const settingTag = p.setting === "outdoor" ? "בחוץ" : "בפנים";
+  const mapsURL = "https://www.google.com/maps/search/" + encodeURIComponent(p.query);
+  return `
+    <div class="place">
+      <div class="icon">${p.icon}</div>
+      <div>
+        <h3>${p.name}</h3>
+        <p class="desc">${p.desc}</p>
+        <span class="tip">💡 ${p.tip}</span>
+        <div class="tags">
+          <span class="tag">${budgetTag}</span>
+          <span class="tag">${settingTag}</span>
+        </div>
+        <a class="maps-link" href="${mapsURL}" target="_blank" rel="noopener">📍 פתיחה במפות</a>
+      </div>
+    </div>`;
+}
+
+render();
+</script>
+</body>
+</html>
