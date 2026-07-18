@@ -294,6 +294,26 @@
   }
 
   footer { margin-top: 24px; color: var(--muted); font-size: .85rem; text-align: center; max-width: 720px; }
+
+  /* install instructions modal */
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(45, 42, 38, .55);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px; z-index: 50;
+  }
+  .modal {
+    background: var(--card); border-radius: 20px; box-shadow: var(--shadow-lift);
+    max-width: 420px; width: 100%; padding: 24px; animation: pop .25s ease;
+    max-height: 85vh; overflow-y: auto;
+  }
+  .modal h3 { font-size: 1.2rem; margin-bottom: 12px; }
+  .modal ol { padding-inline-start: 20px; margin-bottom: 14px; }
+  .modal li { margin-bottom: 10px; line-height: 1.55; }
+  .modal li b { color: var(--primary-dark); }
+  .modal .note {
+    font-size: .88rem; color: var(--accent); background: var(--accent-bg);
+    border-radius: 8px; padding: 8px 10px; margin-bottom: 14px;
+  }
 </style>
 </head>
 <body>
@@ -301,7 +321,7 @@
 <div class="topbar">
   <h1>🌅 שישי בבוקר</h1>
   <p class="sub">בוחרים עיר למעלה — ומוצאים את הבילוי המושלם לשישי בבוקר</p>
-  <button class="btn btn-live install-btn" id="install-btn" hidden>📲 התקנת האפליקציה למסך הבית</button>
+  <button class="btn btn-live install-btn" id="install-btn">📲 התקנת האפליקציה למסך הבית</button>
   <nav class="city-bar" id="city-bar" aria-label="בחירת עיר"></nav>
 </div>
 
@@ -1335,19 +1355,65 @@ if ("serviceWorker" in navigator) {
 
 let deferredInstall = null;
 const installBtn = document.getElementById("install-btn");
+
+// already running as an installed app? no need for the button
+const isStandalone = window.matchMedia("(display-mode: standalone)").matches
+  || window.navigator.standalone === true;
+if (isStandalone) installBtn.hidden = true;
+
 window.addEventListener("beforeinstallprompt", e => {
   e.preventDefault();
   deferredInstall = e;
-  installBtn.hidden = false;
 });
+
 installBtn.addEventListener("click", async () => {
-  if (!deferredInstall) return;
-  deferredInstall.prompt();
-  await deferredInstall.userChoice;
-  deferredInstall = null;
-  installBtn.hidden = true;
+  if (deferredInstall) {
+    deferredInstall.prompt();
+    const choice = await deferredInstall.userChoice;
+    if (choice.outcome === "accepted") installBtn.hidden = true;
+    deferredInstall = null;
+    return;
+  }
+  showInstallGuide();
 });
 window.addEventListener("appinstalled", () => { installBtn.hidden = true; });
+
+function showInstallGuide() {
+  const ua = navigator.userAgent;
+  const isIOS = /iPhone|iPad|iPod/.test(ua);
+  const isSamsung = /SamsungBrowser/.test(ua);
+  let steps;
+  if (isIOS) {
+    steps = `
+      <li>למטה במסך, לחצו על כפתור <b>השיתוף</b> (ריבוע עם חץ למעלה ⬆️)</li>
+      <li>גללו ובחרו <b>"הוסף למסך הבית"</b></li>
+      <li>לחצו <b>"הוסף"</b> למעלה</li>`;
+  } else if (isSamsung) {
+    steps = `
+      <li>לחצו על תפריט <b>≡</b> (שלושה קווים למטה)</li>
+      <li>בחרו <b>"הוסף דף אל"</b></li>
+      <li>בחרו <b>"מסך הבית"</b> ואשרו</li>`;
+  } else {
+    steps = `
+      <li>לחצו על תפריט <b>⋮</b> (שלוש נקודות למעלה)</li>
+      <li>בחרו <b>"הוספה למסך הבית"</b> או <b>"התקנת אפליקציה"</b></li>
+      <li>אשרו עם <b>"התקנה"</b> / <b>"הוספה"</b></li>`;
+  }
+  const backdrop = document.createElement("div");
+  backdrop.className = "modal-backdrop";
+  backdrop.innerHTML = `
+    <div class="modal" role="dialog" aria-label="הוראות התקנה">
+      <h3>📲 ככה מתקינים את האפליקציה</h3>
+      <div class="note">אחרי ההתקנה יופיע אייקון 🌅 "שישי בבוקר" במסך הבית — והאפליקציה תיפתח במסך מלא, גם בלי אינטרנט.</div>
+      <ol>${steps}</ol>
+      <div class="actions">
+        <button class="btn btn-primary" id="close-guide">הבנתי!</button>
+      </div>
+    </div>`;
+  document.body.appendChild(backdrop);
+  backdrop.addEventListener("click", e => { if (e.target === backdrop) backdrop.remove(); });
+  backdrop.querySelector("#close-guide").addEventListener("click", () => backdrop.remove());
+}
 </script>
 </body>
 </html>
