@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>שישי בבוקר 🌅 מוצאים בילוי בכל עיר</title>
+<meta name="theme-color" content="#e07a3f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="שישי בבוקר">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -118,6 +125,8 @@
     cursor: pointer;
   }
   .chip-input button:hover { background: var(--primary-soft); }
+
+  .install-btn { margin-bottom: 14px; font-size: .95rem; padding: 10px 18px; }
 
   .container { width: 100%; max-width: 720px; }
 
@@ -292,6 +301,7 @@
 <div class="topbar">
   <h1>🌅 שישי בבוקר</h1>
   <p class="sub">בוחרים עיר למעלה — ומוצאים את הבילוי המושלם לשישי בבוקר</p>
+  <button class="btn btn-live install-btn" id="install-btn" hidden>📲 התקנת האפליקציה למסך הבית</button>
   <nav class="city-bar" id="city-bar" aria-label="בחירת עיר"></nav>
 </div>
 
@@ -1317,6 +1327,27 @@ function placeHTML(p, rank) {
 
 renderCityBar();
 render();
+
+/* ---------- PWA: installable app ---------- */
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js").catch(() => {});
+}
+
+let deferredInstall = null;
+const installBtn = document.getElementById("install-btn");
+window.addEventListener("beforeinstallprompt", e => {
+  e.preventDefault();
+  deferredInstall = e;
+  installBtn.hidden = false;
+});
+installBtn.addEventListener("click", async () => {
+  if (!deferredInstall) return;
+  deferredInstall.prompt();
+  await deferredInstall.userChoice;
+  deferredInstall = null;
+  installBtn.hidden = true;
+});
+window.addEventListener("appinstalled", () => { installBtn.hidden = true; });
 </script>
 </body>
 </html>
