@@ -3,11 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>שישי בבוקר 🌅 מוצאים בילוי בכל עיר</title>
-<meta name="theme-color" content="#e07a3f">
+<title>בין הזמנים 🌄 מוצאים את הבילוי המשפחתי הבא</title>
+<meta name="description" content="מתכננים יום בימי בין הזמנים לפי גיל הילדים, תקציב, מרחק, מים, קושי וסגנון בילוי">
+<meta name="theme-color" content="#315b7c">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="שישי בבוקר">
+<meta name="apple-mobile-web-app-title" content="בין הזמנים">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -15,15 +16,15 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   :root {
-    --bg-a: #fdf6ec;
-    --bg-b: #f5dcc0;
+    --bg-a: #eef8f7;
+    --bg-b: #dcebed;
     --card: #ffffff;
     --card-inner: #fffdf9;
-    --primary: #e07a3f;
-    --primary-dark: #c9642c;
-    --primary-soft: #fbe9dc;
-    --accent: #2f7d6d;
-    --accent-bg: #e8f3f0;
+    --primary: #3b7f78;
+    --primary-dark: #315b7c;
+    --primary-soft: #dff1ee;
+    --accent: #a65b2a;
+    --accent-bg: #fff0e3;
     --text: #2d2a26;
     --muted: #7a7369;
     --tag-bg: #f3e9db;
@@ -37,8 +38,8 @@
   body {
     font-family: "Segoe UI", "Assistant", "Arial Hebrew", Arial, sans-serif;
     background:
-      radial-gradient(1200px 500px at 85% -10%, rgba(224, 122, 63, .14), transparent 60%),
-      linear-gradient(160deg, var(--bg-a) 0%, #f9e8d2 60%, var(--bg-b) 100%);
+      radial-gradient(1200px 500px at 85% -10%, rgba(59, 127, 120, .18), transparent 60%),
+      linear-gradient(160deg, var(--bg-a) 0%, #f8fbf6 58%, var(--bg-b) 100%);
     background-attachment: fixed;
     color: var(--text);
     min-height: 100vh;
@@ -61,6 +62,12 @@
     margin-bottom: 4px;
   }
   .topbar .sub { color: var(--muted); font-size: 1rem; margin-bottom: 16px; }
+  .season-badge {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: rgba(255,255,255,.8); color: var(--primary-dark);
+    border: 1px solid rgba(49,91,124,.16); border-radius: 99px;
+    padding: 7px 13px; margin-bottom: 10px; font-size: .88rem; font-weight: 800;
+  }
 
   .city-bar {
     display: flex;
@@ -288,6 +295,20 @@
   }
 
   .live-note { text-align: center; color: var(--muted); font-size: .88rem; margin: 8px 0 4px; }
+  .trip-summary {
+    display: flex; flex-wrap: wrap; gap: 7px; justify-content: center;
+    margin-top: 12px;
+  }
+  .trip-summary span {
+    background: var(--primary-soft); color: var(--primary-dark);
+    border-radius: 99px; padding: 5px 10px; font-size: .82rem; font-weight: 700;
+  }
+  .checklist {
+    background: linear-gradient(135deg, #f2faf8, #fffaf3);
+    border: 1px solid #d8e9e5; border-radius: 14px;
+    padding: 13px 15px; margin: 16px 0; color: var(--muted);
+    font-size: .9rem; line-height: 1.65;
+  }
   .error-box {
     text-align: center; color: #a4443a; background: #fbeae8;
     border-radius: 12px; padding: 14px; margin-top: 10px; font-size: .95rem;
@@ -319,8 +340,9 @@
 <body>
 
 <div class="topbar">
-  <h1>🌅 שישי בבוקר</h1>
-  <p class="sub">בוחרים עיר למעלה — ומוצאים את הבילוי המושלם לשישי בבוקר</p>
+  <div class="season-badge">☀️ חופשת בין הזמנים · מתכננים חכם ויוצאים</div>
+  <h1>🌄 בין הזמנים</h1>
+  <p class="sub">בוחרים נקודת יציאה, עונים על שאלון קצר ומקבלים יום בילוי שמתאים בדיוק למשפחה</p>
   <button class="btn btn-live install-btn" id="install-btn">📲 התקנת האפליקציה למסך הבית</button>
   <nav class="city-bar" id="city-bar" aria-label="בחירת עיר"></nav>
 </div>
@@ -328,37 +350,59 @@
 <div class="container" id="app"></div>
 
 <footer>
-  💡 טיפ: ביום שישי הרבה מקומות סוגרים מוקדם (בסביבות 13:00–14:00) — כדאי לצאת מוקדם ולוודא שעות פתיחה מראש.
-  <br>נתונים חיים: OpenStreetMap / Overpass.
+  ⚠️ לפני היציאה: בודקים שעות פתיחה, עומס, מזג אוויר, מצב מסלולים, צורך בהרשמה וכשרות עדכנית.
+  <br>באתרי מים יש לבדוק בטיחות, איכות מים והסדרי רחצה נפרדת. נתונים חיים: OpenStreetMap / Overpass.
 </footer>
 
 <script>
 const CITIES = [
   { id: "petah-tikva", label: "פתח תקווה", emoji: "🌳", lat: 32.0871, lon: 34.8875 },
-  { id: "tel-aviv",    label: "תל אביב",   emoji: "🏖️", lat: 32.0809, lon: 34.7806 },
+  { id: "bnei-brak",    label: "בני ברק",   emoji: "🏙️", lat: 32.0849, lon: 34.8352 },
+  { id: "beit-shemesh", label: "בית שמש",   emoji: "🌲", lat: 31.7470, lon: 34.9881 },
   { id: "jerusalem",   label: "ירושלים",   emoji: "🕍", lat: 31.7788, lon: 35.2258 },
   { id: "haifa",       label: "חיפה",      emoji: "⛰️", lat: 32.7940, lon: 34.9896 },
+  { id: "tiberias",    label: "טבריה",     emoji: "🌊", lat: 32.7940, lon: 35.5312 },
 ];
 
 const QUESTIONS = [
   {
     key: "who",
-    text: "עם מי יוצאים הבוקר?",
+    text: "עם מי יוצאים בימי בין הזמנים?",
     options: [
       { value: "family",  label: "עם הילדים",   emoji: "👨‍👩‍👧‍👦" },
       { value: "couple",  label: "זוגי",         emoji: "💑" },
-      { value: "friends", label: "עם חברים",     emoji: "🍻" },
+      { value: "friends", label: "עם חברים",     emoji: "🧑‍🤝‍🧑" },
       { value: "solo",    label: "לבד, זמן איכות", emoji: "🧘" },
     ],
   },
   {
+    key: "ages",
+    familyOnly: true,
+    text: "מה גיל הילדים?",
+    options: [
+      { value: "toddlers", label: "פעוטות, עד גיל 5", emoji: "🧸" },
+      { value: "kids",     label: "ילדים, 6–11",      emoji: "🛝" },
+      { value: "teens",    label: "נוער, 12 ומעלה",   emoji: "🧗" },
+      { value: "mixed",    label: "כמה גילאים יחד",   emoji: "👨‍👩‍👧‍👦" },
+    ],
+  },
+  {
     key: "vibe",
-    text: "איזו אווירה מתחשק לכם?",
+    text: "איזה יום אתם רוצים לבנות?",
     options: [
       { value: "nature",  label: "טבע ואוויר פתוח", emoji: "🌳" },
-      { value: "food",    label: "אוכל וקפה",        emoji: "☕" },
-      { value: "active",  label: "משהו פעיל",        emoji: "🏃" },
-      { value: "culture", label: "תרבות ועניין",     emoji: "🎨" },
+      { value: "food",    label: "אוכל כשר ובילוי עירוני", emoji: "🥘" },
+      { value: "active",  label: "אטרקציה ופעילות",        emoji: "🎢" },
+      { value: "culture", label: "מורשת, מדע ועניין",      emoji: "🏛️" },
+    ],
+  },
+  {
+    key: "duration",
+    text: "כמה זמן עומד לרשותכם?",
+    options: [
+      { value: "short", label: "שעתיים–שלוש", emoji: "⏱️" },
+      { value: "half",  label: "חצי יום",      emoji: "🌤️" },
+      { value: "full",  label: "יום מלא",      emoji: "☀️" },
     ],
   },
   {
@@ -368,6 +412,15 @@ const QUESTIONS = [
       { value: "outdoor", label: "בחוץ, בשמש",     emoji: "☀️" },
       { value: "indoor",  label: "בפנים, במזגן",   emoji: "🏠" },
       { value: "any",     label: "לא משנה לי",     emoji: "🤷" },
+    ],
+  },
+  {
+    key: "transport",
+    text: "איך מגיעים?",
+    options: [
+      { value: "car",     label: "רכב פרטי",       emoji: "🚗" },
+      { value: "public",  label: "תחבורה ציבורית", emoji: "🚌" },
+      { value: "either",  label: "שתי האפשרויות",  emoji: "🧭" },
     ],
   },
   {
@@ -383,9 +436,9 @@ const QUESTIONS = [
     key: "radius",
     text: "באיזה רדיוס מחפשים?",
     options: [
-      { value: "3",  label: "קרוב קרוב (עד ~3 ק\"מ)",      emoji: "🚶" },
-      { value: "10", label: "בעיר והסביבה (עד ~10 ק\"מ)",  emoji: "🚗" },
-      { value: "99", label: "מוכנים לנסוע — בלי הגבלה",     emoji: "🛣️" },
+      { value: "10", label: "קרוב — עד כ־10 ק\"מ",      emoji: "🚶" },
+      { value: "30", label: "עד כחצי שעה נסיעה",        emoji: "🚗" },
+      { value: "99", label: "יום טיול — מוכנים להתרחק", emoji: "🛣️" },
     ],
   },
 ];
@@ -397,7 +450,7 @@ const PLACES_BY_CITY = {
       name: "המפל הנסתר (נחל הירקון)",
       icon: "💦",
       desc: "פנינה מקומית ליד ראש העין: מפל קטן ובריכת טבילה צלולה על יובל הירקון, מוקף ירוק. עשר דקות נסיעה וכבר בטבע אמיתי.",
-      tip: "מגיעים מוקדם בשישי — אחרי 10:00 מתחיל להתמלא. נעלי מים מומלצות.",
+      tip: "מגיעים מוקדם בימי בין הזמנים — אחרי 10:00 מתחיל להתמלא. נעלי מים מומלצות.",
       who: ["family", "couple", "friends", "solo"], vibe: ["nature"],
       setting: "outdoor", budget: 0, km: 7, water: true, difficulty: "easy", route: "line", dip: true,
       query: "המפל הנסתר ראש העין",
@@ -415,7 +468,7 @@ const PLACES_BY_CITY = {
       name: "עין חניה (הרי ירושלים)",
       icon: "⛲",
       desc: "מעיין עם בריכת טבילה גדולה בנחל רפאים, ליד עצי פרי וחורבות עתיקות. שווה את הנסיעה כשרוצים טבילת מעיין אמיתית.",
-      tip: "בשישי בבוקר עוד רגוע יחסית; מביאים מים ונעלי מים.",
+      tip: "בימי בין הזמנים עוד רגוע יחסית; מביאים מים ונעלי מים.",
       who: ["family", "couple", "friends", "solo"], vibe: ["nature"],
       setting: "outdoor", budget: 0, km: 45, water: true, difficulty: "medium", route: "line", dip: true,
       query: "עין חניה",
@@ -423,8 +476,8 @@ const PLACES_BY_CITY = {
     {
       name: "הפארק הגדול של פתח תקווה",
       icon: "🌳",
-      desc: "האגם, הברווזים, מדשאות ענק ומתקני משחקים. קלאסיקה של שישי בבוקר — מביאים שמיכה, קפה מהבית, ונותנים לילדים להשתולל.",
-      tip: "בשישי בבוקר עדיין רגוע יחסית — אחרי 10:30 מתחיל להתמלא.",
+      desc: "האגם, הברווזים, מדשאות ענק ומתקני משחקים. קלאסיקה של בין הזמנים — מביאים שמיכה, קפה מהבית, ונותנים לילדים להשתולל.",
+      tip: "בימי בין הזמנים עדיין רגוע יחסית — אחרי 10:30 מתחיל להתמלא.",
       who: ["family", "couple", "friends", "solo"], vibe: ["nature"],
       setting: "outdoor", budget: 0, km: 2, water: true, difficulty: "easy", route: "loop", query: "הפארק הגדול פתח תקווה",
     },
@@ -439,7 +492,7 @@ const PLACES_BY_CITY = {
     {
       name: "שוק העיר פתח תקווה",
       icon: "🍅",
-      desc: "השוק בשישי בבוקר הוא חגיגה: פירות וירקות טריים, חומוס מהביל, בורקסים ומאפים לקראת שבת. אווירה תוססת ואותנטית.",
+      desc: "השוק בימי בין הזמנים הוא חגיגה: פירות וירקות טריים, חומוס מהביל, בורקסים ומאפים לקראת שבת. אווירה תוססת ואותנטית.",
       tip: "מגיעים רעבים ויוצאים עם שקיות מלאות. שיא העומס בין 10:00 ל-12:00.",
       who: ["couple", "friends", "solo", "family"], vibe: ["food"],
       setting: "outdoor", budget: 1, km: 1, query: "שוק פתח תקווה",
@@ -448,7 +501,7 @@ const PLACES_BY_CITY = {
       name: "ארוחת בוקר במתחם סגולה",
       icon: "🍳",
       desc: "אזור התעשייה סגולה מלא בתי קפה ומסעדות עם ארוחות בוקר שוות — שקשוקה, ג'חנון ומאפים. חניה בשפע ואווירה נינוחה.",
-      tip: "בשישי כדאי להזמין מקום מראש — המקומות הפופולריים מתמלאים.",
+      tip: "בימי בין הזמנים כדאי להזמין מקום מראש — המקומות הפופולריים מתמלאים.",
       who: ["couple", "friends", "family"], vibe: ["food"],
       setting: "indoor", budget: 2, km: 4, query: "בתי קפה סגולה פתח תקווה",
     },
@@ -456,7 +509,7 @@ const PLACES_BY_CITY = {
       name: "מוזיאון פתח תקווה לאמנות",
       icon: "🎨",
       desc: "מוזיאון עכשווי ומפתיע במרכז העיר, עם תערוכות מתחלפות של אמנות ישראלית. שקט, ממוזג, ומעולה לשעה-שעתיים של השראה.",
-      tip: "פתוח בשישי בבוקר; בדקו באתר אילו תערוכות מוצגות כרגע.",
+      tip: "פתוח בימי בין הזמנים; בדקו באתר אילו תערוכות מוצגות כרגע.",
       who: ["couple", "solo", "friends"], vibe: ["culture"],
       setting: "indoor", budget: 1, km: 1, query: "מוזיאון פתח תקווה לאמנות",
     },
@@ -487,7 +540,7 @@ const PLACES_BY_CITY = {
     {
       name: "קפה ומאפה במושבה הוותיקה של פ\"ת",
       icon: "☕",
-      desc: "בתי קפה שכונתיים ברחובות השקטים של מרכז העיר הוותיק — קרואסון, הפוך ועיתון של שישי. פשוט ומדויק.",
+      desc: "בתי קפה שכונתיים ברחובות השקטים של מרכז העיר הוותיק — קרואסון, הפוך ועיתון של החופשה. פשוט ומדויק.",
       tip: "אחרי הקפה שווה סיבוב רגלי ברחוב חובבי ציון ההיסטורי.",
       who: ["solo", "couple"], vibe: ["food"],
       setting: "indoor", budget: 1, km: 1, query: "בית קפה מרכז פתח תקווה",
@@ -495,8 +548,8 @@ const PLACES_BY_CITY = {
     {
       name: "הקניון הגדול פתח תקווה",
       icon: "🛍️",
-      desc: "שופינג של שישי בבוקר במזגן: חנויות, בתי קפה ופינות ישיבה. בשישי בבוקר עדיין נעים לפני שהעומס מתחיל.",
-      tip: "רוב החנויות נסגרות בסביבות 14:30 בשישי — מתחילים מוקדם.",
+      desc: "שופינג של בין הזמנים במזגן: חנויות, בתי קפה ופינות ישיבה. בימי בין הזמנים עדיין נעים לפני שהעומס מתחיל.",
+      tip: "רוב החנויות נסגרות בסביבות 14:30 בימי בין הזמנים — מתחילים מוקדם.",
       who: ["friends", "couple", "family"], vibe: ["food", "culture"],
       setting: "indoor", budget: 2, km: 3, query: "הקניון הגדול פתח תקווה",
     },
@@ -504,7 +557,7 @@ const PLACES_BY_CITY = {
       name: "ג'ימבורי ומתחמי קפיצה לילדים",
       icon: "🤸",
       desc: "מתחמי טרמפולינות וג'ימבורי ממוזגים בעיר — הילדים שורפים אנרגיה וההורים שותים קפה בשקט. מנצח בימים חמים.",
-      tip: "בשישי בבוקר פחות עמוס מאשר בשבת; גרביים חובה!",
+      tip: "בימי בין הזמנים פחות עמוס מאשר בשבת; גרביים חובה!",
       who: ["family"], vibe: ["active"],
       setting: "indoor", budget: 2, km: 3, query: "ג'ימבורי פתח תקווה",
     },
@@ -512,14 +565,14 @@ const PLACES_BY_CITY = {
       name: "בוקר ספורטיבי בפארק — מתקני כושר ומגרשים",
       icon: "🏀",
       desc: "מתקני כושר פתוחים, מגרשי כדורסל ומסלולי ריצה בפארק הגדול ובגנים השכונתיים. מרימים דופק ומתחילים את הסופ\"ש חזק.",
-      tip: "בשישי בבוקר יש אווירת קהילה — קבוצות ריצה ומשחקי כדורסל פתוחים.",
+      tip: "בימי בין הזמנים יש אווירת קהילה — קבוצות ריצה ומשחקי כדורסל פתוחים.",
       who: ["solo", "friends"], vibe: ["active"],
       setting: "outdoor", budget: 0, km: 2, query: "הפארק הגדול פתח תקווה מתקני כושר",
     },
     {
       name: "בריכה / קאנטרי עירוני",
       icon: "🏊",
-      desc: "שחיית בוקר מרעננת באחד הקאנטרי קלאב בעיר. מתחילים את השישי במים ויוצאים אדם חדש.",
+      desc: "שחיית בוקר מרעננת באחד הקאנטרי קלאב בעיר. מתחילים את החופשה במים ויוצאים אדם חדש.",
       tip: "בדקו מראש שעות קבלת קהל למי שאינו מנוי.",
       who: ["solo", "couple", "family"], vibe: ["active"],
       setting: "outdoor", budget: 2, km: 3, query: "קאנטרי פתח תקווה",
@@ -539,7 +592,7 @@ const PLACES_BY_CITY = {
       name: "המפל הנסתר (נחל הירקון)",
       icon: "💦",
       desc: "הסוד הכי פתוח של המרכז: מפל קטן ובריכת טבילה על יובל הירקון ליד ראש העין. חצי שעה מהעיר ומרגיש כמו צפון.",
-      tip: "מגיעים מוקדם בשישי — המקום קטן ומתמלא מהר. נעלי מים מומלצות.",
+      tip: "מגיעים מוקדם בימי בין הזמנים — המקום קטן ומתמלא מהר. נעלי מים מומלצות.",
       who: ["family", "couple", "friends", "solo"], vibe: ["nature"],
       setting: "outdoor", budget: 0, km: 20, water: true, difficulty: "easy", route: "line", dip: true,
       query: "המפל הנסתר ראש העין",
@@ -556,7 +609,7 @@ const PLACES_BY_CITY = {
     {
       name: "פארק הירקון (גני יהושע)",
       icon: "🌳",
-      desc: "הריאה הירוקה של תל אביב: מדשאות אינסופיות, אגם עם סירות, פינות פיקניק ומתקני משחקים. שישי בבוקר קלאסי.",
+      desc: "הריאה הירוקה של תל אביב: מדשאות אינסופיות, אגם עם סירות, פינות פיקניק ומתקני משחקים. בין הזמנים קלאסי.",
       tip: "אפשר לשכור סירות פדלים באגם או ג'ימבורי פתוח לילדים בגני יהושע.",
       who: ["family", "couple", "friends", "solo"], vibe: ["nature"],
       setting: "outdoor", budget: 0, km: 3, water: true, difficulty: "easy", route: "loop", query: "פארק הירקון תל אביב",
@@ -564,7 +617,7 @@ const PLACES_BY_CITY = {
     {
       name: "שוק הכרמל",
       icon: "🍅",
-      desc: "השוק הכי מפורסם בעיר בשיא של שישי: דוכני פירות, ג'וסים, מאפים, אוכל רחוב ודוכני טעימות. חוויה של צבעים וריחות.",
+      desc: "השוק הכי מפורסם בעיר בשיא של החופשה: דוכני פירות, ג'וסים, מאפים, אוכל רחוב ודוכני טעימות. חוויה של צבעים וריחות.",
       tip: "נכנסים גם לסמטאות הצדדיות של כרם התימנים — שם החומוס הכי טוב.",
       who: ["couple", "friends", "solo"], vibe: ["food"],
       setting: "outdoor", budget: 1, km: 1, query: "שוק הכרמל תל אביב",
@@ -573,7 +626,7 @@ const PLACES_BY_CITY = {
       name: "נמל תל אביב",
       icon: "⚓",
       desc: "רחבת עץ על הים, שוק הנמל עם דוכני אוכל איכותיים, בתי קפה מול הגלים ומרחב בטוח לילדים על האופניים.",
-      tip: "שוק האיכרים בנמל פעיל בשישי בבוקר — תוצרת טרייה ישר מהחקלאים.",
+      tip: "שוק האיכרים בנמל פעיל בימי בין הזמנים — תוצרת טרייה ישר מהחקלאים.",
       who: ["family", "couple", "friends"], vibe: ["food", "nature"],
       setting: "outdoor", budget: 2, km: 4, water: true, difficulty: "easy", route: "line", query: "נמל תל אביב",
     },
@@ -581,7 +634,7 @@ const PLACES_BY_CITY = {
       name: "טיילת וחופי תל אביב",
       icon: "🏖️",
       desc: "הליכת בוקר על הטיילת מיפו ועד הנמל, שחייה בים או פשוט קפה מול הגלים. הבילוי החינמי הכי טוב בעיר.",
-      tip: "בשישי בבוקר הים בדרך כלל רגוע והחופים עוד ריקים יחסית — עד 11:00.",
+      tip: "בימי בין הזמנים הים בדרך כלל רגוע והחופים עוד ריקים יחסית — עד 11:00.",
       who: ["solo", "couple", "friends", "family"], vibe: ["nature", "active"],
       setting: "outdoor", budget: 0, km: 2, water: true, difficulty: "easy", route: "line", dip: true, query: "טיילת תל אביב",
     },
@@ -589,14 +642,14 @@ const PLACES_BY_CITY = {
       name: "מוזיאון תל אביב לאמנות",
       icon: "🎨",
       desc: "המוזיאון הגדול בעיר: אמנות ישראלית ובינלאומית, אדריכלות מרהיבה באגף החדש ותערוכות מתחלפות ברמה עולמית.",
-      tip: "פתוח בשישי בבוקר; מומלץ להקדים כי בצהריים מתמלא.",
+      tip: "פתוח בימי בין הזמנים; מומלץ להקדים כי בצהריים מתמלא.",
       who: ["couple", "solo", "friends"], vibe: ["culture"],
       setting: "indoor", budget: 2, km: 2, query: "מוזיאון תל אביב לאמנות",
     },
     {
       name: "שוק הפשפשים ביפו",
       icon: "🪞",
-      desc: "וינטג', עתיקות, בגדים יד שנייה ובתי קפה מגניבים בסמטאות יפו. שישי בבוקר הוא הזמן הכי טוב לחפש אוצרות.",
+      desc: "וינטג', עתיקות, בגדים יד שנייה ובתי קפה מגניבים בסמטאות יפו. בין הזמנים הוא הזמן הכי טוב לחפש אוצרות.",
       tip: "מתמקחים בכיף, ואחר כך עולים לגן הפסגה לתצפית על כל החוף.",
       who: ["couple", "friends", "solo"], vibe: ["culture", "food"],
       setting: "outdoor", budget: 1, km: 4, query: "שוק הפשפשים יפו",
@@ -604,7 +657,7 @@ const PLACES_BY_CITY = {
     {
       name: "שדרות רוטשילד ובתי הקפה",
       icon: "☕",
-      desc: "הליכה בשדרה הכי אייקונית בעיר, עצירה בביתני הקפה, בניני באוהאוס משופצים ואווירת שישי תל אביבית אמיתית.",
+      desc: "הליכה בשדרה הכי אייקונית בעיר, עצירה בביתני הקפה, בניני באוהאוס משופצים ואווירה תל אביבית אמיתית.",
       tip: "משכירים אופניים עירוניים ועושים את כל השדרה עד הבימה.",
       who: ["couple", "solo", "friends"], vibe: ["food", "culture"],
       setting: "outdoor", budget: 1, km: 1, query: "שדרות רוטשילד תל אביב",
@@ -613,15 +666,15 @@ const PLACES_BY_CITY = {
       name: "ספורטק תל אביב",
       icon: "🏀",
       desc: "מתחם הספורט הפתוח הגדול בישראל: מגרשי כדורסל, קיר טיפוס, סקייטפארק ומסלולי ריצה על גדות הירקון.",
-      tip: "בשישי בבוקר מתארגנים משחקי כדורסל פתוחים — פשוט מצטרפים.",
+      tip: "בימי בין הזמנים מתארגנים משחקי כדורסל פתוחים — פשוט מצטרפים.",
       who: ["friends", "solo"], vibe: ["active"],
       setting: "outdoor", budget: 0, km: 3, query: "ספורטק תל אביב",
     },
     {
       name: "מתחם דיזנגוף סנטר",
       icon: "🛍️",
-      desc: "הקניון הכי תל אביבי שיש — חנויות מקומיות, שוק אוכל בשישי, חנויות ספרים ואופנה. מבוך שכיף ללכת בו לאיבוד.",
-      tip: "בשישי מתקיים שוק האוכל המפורסם — דוכני שף במחירים שווים.",
+      desc: "הקניון הכי תל אביבי שיש — חנויות מקומיות, שוק אוכל בימי בין הזמנים, חנויות ספרים ואופנה. מבוך שכיף ללכת בו לאיבוד.",
+      tip: "בימי בין הזמנים מתקיים שוק האוכל המפורסם — דוכני שף במחירים שווים.",
       who: ["friends", "couple"], vibe: ["food", "culture"],
       setting: "indoor", budget: 2, km: 1, query: "דיזנגוף סנטר תל אביב",
     },
@@ -640,7 +693,7 @@ const PLACES_BY_CITY = {
       name: "עין לבן (פארק בגין)",
       icon: "💦",
       desc: "מעיין טבילה פופולרי בשולי העיר עם בריכה מקורה בצל, מבט על נחל רפאים ומסלול הליכה קצר. הטבילה הקרובה ביותר לירושלמים.",
-      tip: "בשישי בבוקר מגיעות משפחות — מקדימים כדי לתפוס את הבריכה רגועה.",
+      tip: "בימי בין הזמנים מגיעות משפחות — מקדימים כדי לתפוס את הבריכה רגועה.",
       who: ["family", "couple", "friends", "solo"], vibe: ["nature"],
       setting: "outdoor", budget: 0, km: 7, water: true, difficulty: "easy", route: "loop", dip: true,
       query: "עין לבן ירושלים",
@@ -667,7 +720,7 @@ const PLACES_BY_CITY = {
       name: "עין פרת (נחל פרת)",
       icon: "🌅",
       desc: "שמורת טבע מדברית עוצרת נשימה עם מעיין ובריכות טבילה עמוקות בין צוקים. חצי שעה מהעיר ועולם אחר לגמרי.",
-      tip: "כניסה בתשלום ומגבלת מקומות בשישי — מגיעים ממש עם הפתיחה.",
+      tip: "כניסה בתשלום ומגבלת מקומות בימי בין הזמנים — מגיעים ממש עם הפתיחה.",
       who: ["family", "couple", "friends", "solo"], vibe: ["nature"],
       setting: "outdoor", budget: 1, km: 15, water: true, difficulty: "medium", route: "line", dip: true,
       query: "עין פרת שמורת טבע",
@@ -675,7 +728,7 @@ const PLACES_BY_CITY = {
     {
       name: "שוק מחנה יהודה",
       icon: "🍞",
-      desc: "השוק המפורסם בישראל בשיא של יום שישי: חלות טריות, קובה, חומוס, חלווה ותבלינים. אנרגיה שאין בשום מקום אחר.",
+      desc: "השוק המפורסם בישראל בשיא של ימי החופשה: חלות טריות, קובה, חומוס, חלווה ותבלינים. אנרגיה שאין בשום מקום אחר.",
       tip: "מגיעים עד 11:00 — אחר כך הצפיפות בשיאה. חובה לטעום קובה בסמטת השוק העיראקי.",
       who: ["couple", "friends", "solo", "family"], vibe: ["food"],
       setting: "outdoor", budget: 1, km: 1, query: "שוק מחנה יהודה ירושלים",
@@ -683,7 +736,7 @@ const PLACES_BY_CITY = {
     {
       name: "העיר העתיקה והכותל",
       icon: "🕍",
-      desc: "סמטאות בנות אלפי שנים, ארבעה רבעים, גגות מצפים והכותל המערבי. שישי בבוקר הוא זמן מיוחד במיוחד להסתובב שם.",
+      desc: "סמטאות בנות אלפי שנים, ארבעה רבעים, גגות מצפים והכותל המערבי. בין הזמנים הוא זמן מיוחד במיוחד להסתובב שם.",
       tip: "נכנסים משער יפו ועולים לטיילת הגגות — תצפית מדהימה וכמעט ריקה בבוקר.",
       who: ["couple", "solo", "friends", "family"], vibe: ["culture"],
       setting: "outdoor", budget: 0, km: 2, query: "העיר העתיקה ירושלים שער יפו",
@@ -692,7 +745,7 @@ const PLACES_BY_CITY = {
       name: "מוזיאון ישראל",
       icon: "🏛️",
       desc: "המוזיאון הגדול בישראל: מגילות ים המלח בהיכל הספר, דגם ירושלים של ימי בית שני ואוספי אמנות ברמה עולמית.",
-      tip: "פתוח בשישי בבוקר; מתחילים מהיכל הספר לפני שמגיעות הקבוצות.",
+      tip: "פתוח בימי בין הזמנים; מתחילים מהיכל הספר לפני שמגיעות הקבוצות.",
       who: ["couple", "solo", "family"], vibe: ["culture"],
       setting: "indoor", budget: 2, km: 3, query: "מוזיאון ישראל ירושלים",
     },
@@ -708,7 +761,7 @@ const PLACES_BY_CITY = {
       name: "טיילת ארמון הנציב",
       icon: "🌄",
       desc: "התצפית הכי יפה על ירושלים: העיר העתיקה, הר הזיתים ומדבר יהודה בפנורמה אחת. מקום מושלם לקפה של בוקר עם נוף.",
-      tip: "בשישי בבוקר האור הכי יפה לצילומים — ורגוע לגמרי.",
+      tip: "בימי בין הזמנים האור הכי יפה לצילומים — ורגוע לגמרי.",
       who: ["couple", "solo", "family"], vibe: ["nature"],
       setting: "outdoor", budget: 0, km: 4, water: false, difficulty: "easy", route: "line", query: "טיילת ארמון הנציב ירושלים",
     },
@@ -740,7 +793,7 @@ const PLACES_BY_CITY = {
       name: "מוזיאון המדע ע\"ש בלומפילד",
       icon: "🔬",
       desc: "מוזיאון אינטראקטיבי שכולו ידיים-על-המדע: ניסויים, תצוגות פיזיקה מטורפות והדגמות חיות. הילדים לא ירצו לצאת.",
-      tip: "בשישי בבוקר יש בדרך כלל הדגמות מדע חיות — בדקו שעות באתר.",
+      tip: "בימי בין הזמנים יש בדרך כלל הדגמות מדע חיות — בדקו שעות באתר.",
       who: ["family"], vibe: ["culture", "active"],
       setting: "indoor", budget: 2, km: 4, query: "מוזיאון המדע ירושלים",
     },
@@ -760,7 +813,7 @@ const PLACES_BY_CITY = {
       name: "נחל כזיב — עין זיו (הגליל)",
       icon: "🏞️",
       desc: "אחד מנחלי האיתן היפים בישראל: בריכות טבילה צלולות מתחת למבצר מונפורט, צמחייה ירוקה ומים זורמים כל השנה.",
-      tip: "שישי בבוקר הוא הזמן — בצהריים השבילים מתמלאים. נעלי מים חובה.",
+      tip: "בין הזמנים הוא הזמן — בצהריים השבילים מתמלאים. נעלי מים חובה.",
       who: ["family", "couple", "friends", "solo"], vibe: ["nature"],
       setting: "outdoor", budget: 0, km: 45, water: true, difficulty: "medium", route: "line", dip: true,
       query: "נחל כזיב עין זיו",
@@ -769,7 +822,7 @@ const PLACES_BY_CITY = {
       name: "גן השלושה (הסחנה)",
       icon: "🌴",
       desc: "הבריכות הטבעיות המפורסמות בישראל: מים פושרים כל השנה, מפלים, מדשאות ומתקנים. נבחר לאחד המקומות היפים בעולם.",
-      tip: "בשישי מגיעים עם הפתיחה — זה המקום הכי מבוקש בעמק. כניסה בתשלום.",
+      tip: "בימי בין הזמנים מגיעים עם הפתיחה — זה המקום הכי מבוקש בעמק. כניסה בתשלום.",
       who: ["family", "couple", "friends", "solo"], vibe: ["nature"],
       setting: "outdoor", budget: 2, km: 50, water: true, difficulty: "easy", route: "loop", dip: true,
       query: "גן השלושה סחנה",
@@ -794,14 +847,14 @@ const PLACES_BY_CITY = {
       name: "חוף דדו והטיילת",
       icon: "🏖️",
       desc: "החוף הכי מטופח בחיפה עם טיילת ארוכה, מדשאות ומתקני כושר. הליכת בוקר על קו המים או שחייה מרעננת.",
-      tip: "בשישי בבוקר מתאספות שם קבוצות מתנפנפים וגלשני רוח — כיף לצפות.",
+      tip: "בימי בין הזמנים מתאספות שם קבוצות מתנפנפים וגלשני רוח — כיף לצפות.",
       who: ["family", "couple", "solo", "friends"], vibe: ["nature", "active"],
       setting: "outdoor", budget: 0, km: 5, water: true, difficulty: "easy", route: "line", dip: true, query: "חוף דדו חיפה",
     },
     {
       name: "ואדי ניסנאס",
       icon: "🥙",
-      desc: "השכונה הערבית הוותיקה עם השוק, הפלאפל המפורסם, הכנאפה והאווירה האותנטית. סיור אוכל רגלי מושלם לשישי.",
+      desc: "השכונה הערבית הוותיקה עם השוק, הפלאפל המפורסם, הכנאפה והאווירה האותנטית. סיור אוכל רגלי מושלם לבין הזמנים.",
       tip: "חובה פלאפל במקום הוותיק בשוק וכנאפה לקינוח — מגיעים רעבים.",
       who: ["couple", "friends", "solo"], vibe: ["food", "culture"],
       setting: "outdoor", budget: 1, km: 2, query: "ואדי ניסנאס חיפה",
@@ -833,8 +886,8 @@ const PLACES_BY_CITY = {
     {
       name: "עיר תחתית ושוק תלפיות",
       icon: "🎨",
-      desc: "האזור המתחדש של חיפה: גלריות, בתי קפה היפסטריים, אוכל רחוב ושוק תלפיות ההיסטורי שקם לתחייה. שישי בבוקר תוסס.",
-      tip: "בשישי יש שוק איכרים ודוכני אוכל סביב שוק תלפיות המשופץ.",
+      desc: "האזור המתחדש של חיפה: גלריות, בתי קפה היפסטריים, אוכל רחוב ושוק תלפיות ההיסטורי שקם לתחייה. בין הזמנים תוסס.",
+      tip: "בימי בין הזמנים יש שוק איכרים ודוכני אוכל סביב שוק תלפיות המשופץ.",
       who: ["friends", "couple", "solo"], vibe: ["food", "culture"],
       setting: "outdoor", budget: 1, km: 3, query: "שוק תלפיות חיפה",
     },
@@ -863,7 +916,7 @@ const GENERIC_PLACES = [
   {
     name: "הפארק העירוני",
     icon: "🌳",
-    desc: "כמעט בכל עיר יש פארק מרכזי עם מדשאות, פינות ישיבה ומתקני משחקים — הקלאסיקה של שישי בבוקר.",
+    desc: "כמעט בכל עיר יש פארק מרכזי עם מדשאות, פינות ישיבה ומתקני משחקים — הקלאסיקה של בין הזמנים.",
     tip: "מביאים קפה, שמיכה וכדור — וזה כל מה שצריך.",
     who: ["family", "couple", "friends", "solo"], vibe: ["nature"],
     setting: "outdoor", budget: 0, km: 2, water: false, difficulty: "easy", route: "loop", query: "פארק",
@@ -871,7 +924,7 @@ const GENERIC_PLACES = [
   {
     name: "השוק המקומי",
     icon: "🍅",
-    desc: "שוק ביום שישי בבוקר זו חוויה: תוצרת טרייה, מאפים, אוכל מוכן לשבת ואווירה תוססת.",
+    desc: "שוק בבין הזמנים זו חוויה: תוצרת טרייה, מאפים, אוכל מוכן לשבת ואווירה תוססת.",
     tip: "מגיעים רעבים ולפני 11:00 — ככה נהנים בלי צפיפות.",
     who: ["couple", "friends", "solo", "family"], vibe: ["food"],
     setting: "outdoor", budget: 1, km: 2, query: "שוק",
@@ -879,16 +932,16 @@ const GENERIC_PLACES = [
   {
     name: "ארוחת בוקר בבית קפה",
     icon: "🍳",
-    desc: "שקשוקה, הפוך ועיתון של שישי — ארוחת בוקר טובה היא הדרך הכי בדוקה לפתוח את הסופ\"ש.",
-    tip: "בשישי בבוקר כדאי להזמין מקום מראש במקומות המבוקשים.",
+    desc: "שקשוקה, הפוך ועיתון של החופשה — ארוחת בוקר טובה היא הדרך הכי בדוקה לפתוח את הסופ\"ש.",
+    tip: "בימי בין הזמנים כדאי להזמין מקום מראש במקומות המבוקשים.",
     who: ["couple", "friends", "family", "solo"], vibe: ["food"],
     setting: "indoor", budget: 2, km: 1, query: "ארוחת בוקר בית קפה",
   },
   {
     name: "מוזיאון או גלריה",
     icon: "🎨",
-    desc: "שעה-שעתיים של תרבות בבוקר שקט וממוזג — רוב המוזיאונים פתוחים בשישי בבוקר ורגועים יחסית.",
-    tip: "בדקו שעות פתיחה מראש — בשישי הרבה מוזיאונים סוגרים ב-14:00.",
+    desc: "שעה-שעתיים של תרבות בבוקר שקט וממוזג — רוב המוזיאונים פתוחים בימי בין הזמנים ורגועים יחסית.",
+    tip: "בדקו שעות פתיחה מראש — בימי בין הזמנים הרבה מוזיאונים סוגרים ב-14:00.",
     who: ["couple", "solo", "friends", "family"], vibe: ["culture"],
     setting: "indoor", budget: 1, km: 3, query: "מוזיאון",
   },
@@ -904,7 +957,7 @@ const GENERIC_PLACES = [
     name: "ג'ימבורי או פארק חבלים לילדים",
     icon: "🤸",
     desc: "מקום שהילדים שורפים בו אנרגיה — טרמפולינות, מתקני טיפוס או פארק חבלים — וההורים נחים בצד.",
-    tip: "בשישי בבוקר עמוס פחות משבת; גרביים לא לשכוח.",
+    tip: "בימי בין הזמנים עמוס פחות משבת; גרביים לא לשכוח.",
     who: ["family"], vibe: ["active"],
     setting: "indoor", budget: 2, km: 5, query: "ג'ימבורי לילדים",
   },
@@ -912,14 +965,14 @@ const GENERIC_PLACES = [
     name: "אתר היסטורי או אתר טבע קרוב",
     icon: "🏞️",
     desc: "גן לאומי, שמורת טבע או אתר עתיקות במרחק נסיעה קצרה — טיול בוקר קטן שמרגיש כמו חופשה.",
-    tip: "מגיעים עם הפתיחה — מקומות כאלה מתמלאים בשישי.",
+    tip: "מגיעים עם הפתיחה — מקומות כאלה מתמלאים בימי בין הזמנים.",
     who: ["family", "couple", "friends"], vibe: ["nature", "culture"],
     setting: "outdoor", budget: 1, km: 15, water: false, difficulty: "medium", route: "loop", query: "גן לאומי שמורת טבע ליד",
   },
   {
     name: "בריכה או קאנטרי",
     icon: "🏊",
-    desc: "שחיית בוקר מרעננת בבריכה מקומית — מתחילים את השישי במים ויוצאים אדם חדש.",
+    desc: "שחיית בוקר מרעננת בבריכה מקומית — מתחילים את החופשה במים ויוצאים אדם חדש.",
     tip: "בדקו שעות קבלת קהל למי שאינו מנוי.",
     who: ["solo", "couple", "family"], vibe: ["active"],
     setting: "outdoor", budget: 2, km: 4, query: "בריכה קאנטרי",
@@ -927,7 +980,7 @@ const GENERIC_PLACES = [
   {
     name: "חוף הים או אגם קרוב",
     icon: "🏖️",
-    desc: "אם יש מקווה מים בסביבה — חוף, אגם או נחל — שישי בבוקר הוא הזמן הכי טוב: רגוע, נעים ולפני החום הגדול.",
+    desc: "אם יש מקווה מים בסביבה — חוף, אגם או נחל — בין הזמנים הוא הזמן הכי טוב: רגוע, נעים ולפני החום הגדול.",
     tip: "מגיעים מוקדם עם קפה — השקט של הבוקר שווה הכול.",
     who: ["family", "couple", "friends", "solo"], vibe: ["nature", "active"],
     setting: "outdoor", budget: 0, km: 8, water: true, difficulty: "easy", route: "line", dip: true, query: "חוף אגם",
@@ -935,7 +988,7 @@ const GENERIC_PLACES = [
   {
     name: "מדרחוב או מרכז העיר",
     icon: "🛍️",
-    desc: "סיבוב במדרחוב או ברחוב הראשי: חלונות ראווה, דוכני רחוב, אנשים ואווירת שישי. בילוי עירוני קליל שלא דורש תכנון.",
+    desc: "סיבוב במדרחוב או ברחוב הראשי: חלונות ראווה, דוכני רחוב, אנשים ואווירת חופשה. בילוי עירוני קליל שלא דורש תכנון.",
     tip: "משלבים עם קפה ומאפה באחד מבתי הקפה שבדרך.",
     who: ["friends", "couple", "solo"], vibe: ["food", "culture"],
     setting: "outdoor", budget: 1, km: 1, query: "מדרחוב מרכז העיר",
@@ -977,14 +1030,14 @@ const NATURE_QUESTIONS = [
     text: "🔄 מסלול מעגלי או הלוך-חזור?",
     options: [
       { value: "loop", label: "מעגלי — בלי לחזור באותה דרך", emoji: "🔄" },
-      { value: "line", label: "קו ישר — הלוך ותשובה",         emoji: "↔️" },
+      { value: "line", label: "קו ישר — הלוך וחזור",           emoji: "↔️" },
       { value: "any",  label: "לא משנה לי",                    emoji: "🤷" },
     ],
   },
 ];
 
 function questionList() {
-  const qs = [...QUESTIONS];
+  const qs = QUESTIONS.filter(q => !q.familyOnly || state.answers.who === "family");
   if (state.answers.vibe === "nature") {
     const vibeIdx = qs.findIndex(q => q.key === "vibe");
     qs.splice(vibeIdx + 1, 0, ...NATURE_QUESTIONS);
@@ -1084,7 +1137,7 @@ function renderQuestion() {
 }
 
 function currentPlaces() {
-  if (state.city === "custom") {
+  if (state.city === "custom" || !PLACES_BY_CITY[state.city]) {
     return GENERIC_PLACES.map(p => ({ ...p, query: `${p.query} ${state.cityLabel}` }));
   }
   return PLACES_BY_CITY[state.city];
@@ -1112,7 +1165,36 @@ function scorePlace(p) {
     if (a.difficulty && a.difficulty !== "any" && p.difficulty === a.difficulty) score += 2;
     if (a.route && a.route !== "any" && p.route === a.route) score += 2;
   }
+  if (a.ages === "toddlers") {
+    if (p.difficulty === "easy" || p.setting === "indoor") score += 2;
+    if (p.difficulty === "medium") score -= 2;
+  } else if (a.ages === "kids" && (p.vibe.includes("active") || p.difficulty === "easy")) {
+    score += 2;
+  } else if (a.ages === "teens" && (p.vibe.includes("active") || p.difficulty === "medium")) {
+    score += 2;
+  } else if (a.ages === "mixed" && p.difficulty === "easy") {
+    score += 2;
+  }
+  if (a.duration === "short" && p.km <= 10) score += 2;
+  if (a.duration === "full" && (p.vibe.includes("nature") || p.vibe.includes("active"))) score += 1;
+  if (a.transport === "public" && p.km <= 5) score += 2;
   return score;
+}
+
+function answerSummary() {
+  const a = state.answers;
+  const labels = {
+    family: "משפחה", couple: "זוג", friends: "חברים", solo: "יחיד",
+    toddlers: "פעוטות", kids: "ילדים", teens: "נוער", mixed: "גילים מעורבים",
+    nature: "טבע", food: "אוכל ובילוי", active: "אטרקציות", culture: "מורשת ועניין",
+    short: "2–3 שעות", half: "חצי יום", full: "יום מלא",
+    car: "רכב", public: "תחבורה ציבורית", either: "כל תחבורה",
+    free: "חינם", low: "תקציב מתון", any: "גמיש",
+  };
+  return ["who", "ages", "vibe", "duration", "transport", "budget"]
+    .filter(key => a[key])
+    .map(key => `<span>${escapeHTML(labels[a[key]] || a[key])}</span>`)
+    .join("");
 }
 
 function renderResults() {
@@ -1132,8 +1214,12 @@ function renderResults() {
   app.innerHTML = `
     <div class="card">
       <div class="result-header">
-        <h2>✨ הצעות לשישי בבוקר ב${escapeHTML(state.cityLabel)}</h2>
+        <h2>✨ היום שלכם בימי בין הזמנים — יוצאים מ${escapeHTML(state.cityLabel)}</h2>
         <p>${ranked.length + pad.length} אפשרויות, מדורגות לפי ההתאמה אליכם</p>
+        <div class="trip-summary">${answerSummary()}</div>
+      </div>
+      <div class="checklist">
+        <b>בדיקת דקה לפני שסוגרים:</b> שעות פעילות והרשמה · מזג אוויר ועומס חום · מצב המסלול · כשרות · חניה ותחבורה · התאמת אתר המים למשפחה.
       </div>
       <div id="curated">
         ${ranked.map((p, i) => placeHTML(p, i < 3 ? i + 1 : 0)).join("")}
@@ -1405,7 +1491,7 @@ function showInstallGuide() {
     <div class="modal" role="dialog" aria-label="הוראות התקנה">
       <h3>📲 ככה מתקינים את האפליקציה</h3>
       <div class="note">⚠️ נפתח לכם מתוך וואטסאפ, Claude או אפליקציה אחרת (יש ✕ בפינה למעלה)? דפדפן פנימי לא יכול להתקין! קודם לחצו על תפריט ⋮ ← <b>"פתח ב-Samsung Browser"</b> או <b>"פתח ב-Chrome"</b> — ואז לחצו שוב על כפתור ההתקנה.</div>
-      <div class="note">אחרי ההתקנה יופיע אייקון 🌅 "שישי בבוקר" במסך הבית — והאפליקציה תיפתח במסך מלא, גם בלי אינטרנט.</div>
+      <div class="note">אחרי ההתקנה יופיע אייקון 🌅 "בין הזמנים" במסך הבית — והאפליקציה תיפתח במסך מלא, גם בלי אינטרנט.</div>
       <ol>${steps}</ol>
       <div class="actions">
         <button class="btn btn-primary" id="close-guide">הבנתי!</button>
