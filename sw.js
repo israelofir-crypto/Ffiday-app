@@ -1,4 +1,4 @@
-const CACHE = "friday-app-v1";
+const CACHE = "bein-hazmanim-app-v2";
 const SHELL = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png"];
 
 self.addEventListener("install", e => {
