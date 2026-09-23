@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>המוסך של אופיר</title>
+<meta name="description" content="כל האפליקציות שנבנו עם Claude במקום אחד, עם סטטוס חי מ-GitHub.">
+<link rel="icon" href="../icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Secular+One&family=IBM+Plex+Sans+Hebrew:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#EDF0EE; --surface:#FFFFFF; --surface-2:#F5F7F6; --ink:#15211E; --muted:#5B6B66; --line:#D5DDDA;
+  --accent:#0E7C6B; --accent-soft:#D6EEE9; --gold:#A8730C; --gold-soft:#F7EACB;
+  --live:#1F8A4C; --live-soft:#DDF1E4; --wip:#B7791F; --wip-soft:#F8EBD3; --tool:#6B5BD6; --tool-soft:#E7E3FA; --missing:#C2412D; --missing-soft:#F8DEDA;
+  --shadow:0 1px 2px rgba(21,33,30,.06),0 6px 20px rgba(21,33,30,.06);
+  --on-accent:#fff;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#0F1614; --surface:#17211F; --surface-2:#1D2926; --ink:#E6EEEB; --muted:#98ABA5; --line:#2A3834;
+  --accent:#3CC2AA; --accent-soft:#143A33; --gold:#E6B24A; --gold-soft:#3A2F16;
+  --live:#4FCB84; --live-soft:#173826; --wip:#E3A94B; --wip-soft:#3A2D14; --tool:#A99BFF; --tool-soft:#2A2550; --missing:#F07B67; --missing-soft:#43201B;
+  --shadow:0 1px 2px rgba(0,0,0,.3); --on-accent:#062019;
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0F1614; --surface:#17211F; --surface-2:#1D2926; --ink:#E6EEEB; --muted:#98ABA5; --line:#2A3834;
+  --accent:#3CC2AA; --accent-soft:#143A33; --gold:#E6B24A; --gold-soft:#3A2F16;
+  --live:#4FCB84; --live-soft:#173826; --wip:#E3A94B; --wip-soft:#3A2D14; --tool:#A99BFF; --tool-soft:#2A2550; --missing:#F07B67; --missing-soft:#43201B;
+  --shadow:0 1px 2px rgba(0,0,0,.3); --on-accent:#062019;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans Hebrew",system-ui,"Segoe UI",Arial,sans-serif;font-size:15px;line-height:1.6;padding-inline:16px;padding-block:calc(24px + env(safe-area-inset-top,0px)) calc(48px + env(safe-area-inset-bottom,0px))}
+.wrap{max-width:1120px;margin-inline:auto;display:flex;flex-direction:column;gap:26px}
+h1,h2,h3{font-family:"Secular One","IBM Plex Sans Hebrew",sans-serif;font-weight:400;margin:0;text-wrap:balance;line-height:1.2}
+h1{font-size:clamp(30px,5vw,44px)}
+h2{font-size:22px}
+h3{font-size:19px}
+p{margin:0}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+a{color:var(--accent)}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.eyebrow{font-size:12px;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.muted{color:var(--muted)}
+
+header.top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px}
+header.top .intro{display:flex;flex-direction:column;gap:6px;max-width:62ch}
+.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:7px 14px;border-radius:10px;cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+.btn:hover{border-color:var(--accent)}
+.sync{font-size:13px;color:var(--muted);display:inline-flex;align-items:center;gap:6px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.dot.ok{background:var(--live);box-shadow:0 0 0 4px var(--live-soft)}
+.dot.busy{background:var(--wip);animation:pulse 1s infinite alternate}
+@keyframes pulse{to{opacity:.3}}
+
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:2px}
+.kpi b{font-family:"Secular One",sans-serif;font-weight:400;font-size:32px;line-height:1.1}
+.kpi span{color:var(--muted);font-size:13px}
+
+.row{display:grid;grid-template-columns:1.6fr 1fr;gap:16px}
+.row>*{min-width:0}
+@media (max-width:820px){.row{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:14px;box-shadow:var(--shadow)}
+.hint{color:var(--muted);font-size:13px}
+.svgbox{overflow-x:auto}
+svg text{font-family:"IBM Plex Sans Hebrew",sans-serif;paint-order:stroke;stroke:var(--surface);stroke-width:5px;stroke-linejoin:round}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:13px;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-inline-end:6px;vertical-align:middle}
+.statuslist{display:grid;grid-template-columns:auto 1fr;gap:8px 12px;margin:0;font-size:14px;align-items:center}
+.statuslist dd{margin:0}
+
+.controls{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px}
+.filters{display:flex;flex-wrap:wrap;gap:8px}
+.filters button{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:6px 14px;border-radius:999px;cursor:pointer}
+.filters button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.filters button .n{opacity:.6;margin-inline-start:4px}
+.search{display:flex;gap:8px;flex-wrap:wrap}
+.search input,.search select{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:6px 12px;border-radius:10px;min-width:0}
+.search input{width:200px;max-width:100%}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:16px}
+@media (max-width:360px){.grid{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:12px;box-shadow:var(--shadow)}
+@media (prefers-reduced-motion:no-preference){.card{transition:transform .15s ease,border-color .15s}.card:hover{transform:translateY(-2px);border-color:var(--accent)}}
+.card .head{display:flex;gap:12px;align-items:flex-start}
+.card .title{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0}
+.card .title-row{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.glyph{flex:none;width:52px;height:52px;border-radius:12px;display:grid;place-items:center}
+.glyph svg{width:30px;height:30px}
+.sub{color:var(--muted);font-size:13.5px}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px;white-space:nowrap}
+.pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.s-live{background:var(--live-soft);color:var(--live)}
+.s-wip{background:var(--wip-soft);color:var(--wip)}
+.s-tool{background:var(--tool-soft);color:var(--tool)}
+.s-missing{background:var(--missing-soft);color:var(--missing)}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:12px;background:var(--surface-2);border:1px solid var(--line);padding:2px 8px;border-radius:6px;color:var(--muted)}
+dl.meta{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0;font-size:13.5px}
+dl.meta dt{color:var(--muted)}
+dl.meta dd{margin:0}
+.fresh{font-size:12px;padding:1px 8px;border-radius:6px;margin-inline-start:6px}
+.live-badge{font-size:11px;color:var(--live);margin-inline-start:6px}
+.meter{height:8px;border-radius:99px;background:var(--surface-2);border:1px solid var(--line);overflow:hidden}
+.meter>div{height:100%;border-radius:99px;transition:width .8s ease}
+.next{background:var(--gold-soft);border-radius:10px;padding:10px 12px;font-size:13.5px}
+.next b{color:var(--gold)}
+.links{display:flex;flex-wrap:wrap;gap:8px;margin-top:auto}
+.links a{font-size:13px;text-decoration:none;border:1px solid var(--line);padding:6px 12px;border-radius:8px;color:var(--ink);background:var(--surface-2)}
+.links a.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.links a:hover{border-color:var(--accent)}
+.empty{padding:32px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:14px}
+
+.tablebox{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:620px}
+th,td{text-align:start;padding:9px 10px;border-bottom:1px solid var(--line)}
+th{font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.04em}
+.bars{display:inline-flex;gap:3px;vertical-align:middle}
+.bars i{width:6px;height:14px;border-radius:2px;background:var(--line)}
+.bars i.on{background:var(--gold)}
+footer{color:var(--muted);font-size:12.5px;display:flex;flex-direction:column;gap:4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="intro">
+    <span class="eyebrow" id="today">תיק פרויקטים</span>
+    <h1>המוסך של אופיר</h1>
+    <p class="muted">כל מה שנבנה עם Claude במקום אחד. הסטטוס של המאגרים הציבוריים נמשך מ-GitHub בכל פתיחה של הדף.</p>
+  </div>
+  <div class="toolbar">
+    <span class="sync"><span class="dot" id="syncDot"></span><span id="syncText">טוען נתונים…</span></span>
+    <button class="btn" id="refresh" type="button">רענון</button>
+    <button class="btn" id="theme" type="button" aria-label="החלפת ערכת צבעים">מצב כהה</button>
+  </div>
+</header>
+
+<section class="kpis" id="kpis" aria-label="סיכום"></section>
+
+<div class="row">
+  <section class="panel" aria-labelledby="tl-h">
+    <h2 id="tl-h">ציר הזמן</h2>
+    <p class="hint">מתי כל פרויקט התחיל. גודל הנקודה משקף את הבשלות</p>
+    <div class="svgbox" id="timeline"></div>
+    <div class="legend" id="legend"></div>
+  </section>
+  <section class="panel" aria-labelledby="mix-h">
+    <h2 id="mix-h">איפה כל דבר עומד</h2>
+    <p class="hint">הפרויקטים לפי סטטוס</p>
+    <div id="donut" style="align-self:center"></div>
+    <dl class="statuslist" id="statuslist"></dl>
+  </section>
+</div>
+
+<section style="display:flex;flex-direction:column;gap:14px" aria-labelledby="apps-h">
+  <div class="controls">
+    <h2 id="apps-h">הפרויקטים</h2>
+    <div class="search">
+      <label class="muted" for="q" hidden>חיפוש</label>
+      <input id="q" type="search" placeholder="חיפוש פרויקט או טכנולוגיה">
+      <label for="sort" hidden>מיון</label>
+      <select id="sort">
+        <option value="updated">עודכן לאחרונה</option>
+        <option value="progress">בשלות</option>
+        <option value="business">פוטנציאל עסקי</option>
+        <option value="started">תאריך התחלה</option>
+      </select>
+    </div>
+  </div>
+  <div class="filters" id="filters" role="group" aria-label="סינון לפי סטטוס"></div>
+  <div class="grid" id="grid"></div>
+</section>
+
+<section class="panel" aria-labelledby="cmp-h">
+  <h2 id="cmp-h">השוואה מהירה</h2>
+  <div class="tablebox"><table id="table"></table></div>
+</section>
+
+<footer>
+  <span>הרשימה עצמה נמצאת בקובץ <span class="mono">hub/apps.js</span>. מוסיפים שם פרויקט והוא מופיע כאן אוטומטית.</span>
+  <span>אחוזי הבשלות הם הערכה לפי מה שנשאר ברשימת המשימות של כל פרויקט.</span>
+</footer>
+</div>
+
+<script src="apps.js"></script>
+<script>
+(function(){
+  "use strict";
+  var APPS = (window.APPS || []).map(function(a){ return Object.assign({}, a); });
+  var STATUS = {
+    live:    { label:"חי ברשת",      short:"חי",          color:"--live" },
+    wip:     { label:"כמעט מוכן",    short:"כמעט",        color:"--wip" },
+    tool:    { label:"כלי או עמוד",   short:"כלי",         color:"--tool" },
+    missing: { label:"אין קוד בענן",  short:"חסר",         color:"--missing" }
+  };
+  var ICONS = {
+    sun:'<circle cx="16" cy="18" r="6"/><path d="M4 26h24M16 5v4M6 10l3 3M26 10l-3 3"/>',
+    shield:'<path d="M16 4l10 4v7c0 7-5 11-10 13-5-2-10-6-10-13V8z"/><path d="M11 16l4 4 6-7"/>',
+    page:'<rect x="4" y="6" width="24" height="20" rx="2"/><path d="M4 11h24M9 16h8M9 20h12"/>',
+    star:'<path d="M16 4l3 8h7l-6 5 2 9-6-5-6 5 2-9-6-5h7z"/>',
+    people:'<circle cx="11" cy="11" r="4"/><circle cx="22" cy="11" r="4"/><path d="M4 26c0-4 3-7 7-7s7 3 7 7M15 26c0-4 3-7 7-7s7 3 7 7"/>',
+    cap:'<path d="M4 8l12-4 12 4-12 4z"/><path d="M9 10v8c0 2 3 4 7 4s7-2 7-4v-8M28 8v8"/>'
+  };
+  var DAY = 864e5;
+  var today = new Date(); today.setHours(0,0,0,0);
+  var state = { filter:"all", q:"", sort:"updated" };
+
+  function $(id){ return document.getElementById(id); }
+  function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+  function d(s){ var x = new Date(s); x.setHours(0,0,0,0); return x; }
+  function fmt(s){ var x = new Date(s); return String(x.getDate()).padStart(2,"0")+"."+String(x.getMonth()+1).padStart(2,"0")+"."+x.getFullYear(); }
+  function ago(s){
+    var n = Math.round((today - d(s)) / DAY);
+    if (n <= 0) return "היום"; if (n === 1) return "אתמול";
+    if (n < 30) return "לפני " + n + " ימים";
+    var m = Math.round(n / 30); return m === 1 ? "לפני חודש" : "לפני " + m + " חודשים";
+  }
+  function freshness(s){
+    var n = (today - d(s)) / DAY;
+    if (n <= 14) return { t:"פעיל", c:"s-live" };
+    if (n <= 45) return { t:"שקט", c:"s-wip" };
+    return { t:"רדום", c:"s-missing" };
+  }
+  function store(k, v){ try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch(e){ return null; } }
+
+  $("today").textContent = "תיק פרויקטים · " + today.toLocaleDateString("he-IL", { weekday:"long", day:"numeric", month:"long", year:"numeric" });
+
+  // ---------- theme ----------
+  function applyTheme(t){
+    if (t) document.documentElement.setAttribute("data-theme", t);
+    var dark = t ? t === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+    $("theme").textContent = dark ? "מצב בהיר" : "מצב כהה";
+  }
+  applyTheme(store("hub-theme"));
+  $("theme").addEventListener("click", function(){
+    var cur = document.documentElement.getAttribute("data-theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    var nt = cur === "dark" ? "light" : "dark"; store("hub-theme", nt); applyTheme(nt);
+  });
+
+  // ---------- KPIs ----------
+  function renderKpis(){
+    var c = count();
+    var first = APPS.reduce(function(m,a){ return d(a.started) < m ? d(a.started) : m; }, today);
+    var weeks = Math.max(1, Math.round((today - first) / (7*DAY)));
+    var commits = APPS.reduce(function(s,a){ return s + (a.gh && a.gh.commits || 0); }, 0);
+    var items = [
+      [APPS.length, "פרויקטים שנבנו", ""],
+      [c.live || 0, "חיים ברשת", "--live"],
+      [c.wip || 0, "קרובים לסיום", "--wip"],
+      [commits ? commits : "—", "קומיטים במאגרים הציבוריים", ""],
+      [weeks, "שבועות מהפרויקט הראשון", ""]
+    ];
+    $("kpis").innerHTML = items.map(function(k){
+      return '<div class="kpi"><b class="mono"' + (k[2] ? ' style="color:var(' + k[2] + ')"' : "") + '>' + esc(k[0]) + '</b><span>' + esc(k[1]) + '</span></div>';
+    }).join("");
+  }
+  function count(){ var c = {}; APPS.forEach(function(a){ c[a.status] = (c[a.status] || 0) + 1; }); return c; }
+
+  // ---------- timeline ----------
+  function renderTimeline(){
+    var W = 660, H = 270, L = 40, R = 620, base = 220;
+    var starts = APPS.map(function(a){ return d(a.started); });
+    var min = new Date(Math.min.apply(null, starts) - 5*DAY), max = new Date(today.getTime() + 3*DAY);
+    function x(t){ return R - (t - min) / (max - min) * (R - L); } // RTL: early dates on the right
+    var out = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" role="img" aria-label="ציר זמן של הפרויקטים" style="min-width:540px">';
+    out += '<line x1="' + L + '" y1="' + base + '" x2="' + R + '" y2="' + base + '" stroke="var(--line)" stroke-width="2"/>';
+    // month ticks
+    var m = new Date(min.getFullYear(), min.getMonth() + 1, 1);
+    while (m <= max){
+      var mx = x(m);
+      out += '<line x1="' + mx + '" y1="' + (base-5) + '" x2="' + mx + '" y2="' + (base+5) + '" stroke="var(--muted)"/>';
+      out += '<text x="' + mx + '" y="' + (base+22) + '" text-anchor="middle" font-size="12" fill="var(--muted)">' + m.toLocaleDateString("he-IL",{month:"long"}) + '</text>';
+      m = new Date(m.getFullYear(), m.getMonth() + 1, 1);
+    }
+    // stagger labels to avoid overlap
+    var sorted = APPS.slice().sort(function(a,b){ return d(a.started) - d(b.started); });
+    var levels = [], lastX = [];
+    sorted.forEach(function(a){
+      var ax = x(d(a.started)), lvl = 0;
+      while (lastX[lvl] !== undefined && Math.abs(lastX[lvl] - ax) < 110) lvl++;
+      lastX[lvl] = ax; levels.push([a, ax, lvl]);
+    });
+    levels.forEach(function(it){
+      var a = it[0], ax = it[1], ly = base - 40 - it[2] * 46, col = "var(" + STATUS[a.status].color + ")";
+      var r = 5 + Math.round((a.progress || 40) / 25);
+      out += '<line x1="' + ax + '" y1="' + base + '" x2="' + ax + '" y2="' + (ly + 6) + '" stroke="' + col + '" stroke-dasharray="3 3"/>';
+      out += '<circle cx="' + ax + '" cy="' + base + '" r="' + r + '" fill="' + col + '" stroke="var(--surface)" stroke-width="2"><title>' + esc(a.name) + '</title></circle>';
+      // the page is RTL, so "start" grows leftward and "end" grows rightward
+      var anchor = ax < L + 50 ? "end" : ax > R - 50 ? "start" : "middle";
+      out += '<text x="' + ax + '" y="' + ly + '" text-anchor="' + anchor + '" font-size="12.5" fill="var(--ink)">' + esc(a.name.split(",")[0]) + '</text>';
+      out += '<text x="' + ax + '" y="' + (ly - 15) + '" text-anchor="' + anchor + '" font-size="11" fill="var(--muted)" class="mono">' + fmt(a.started).slice(0,5) + '</text>';
+    });
+    var tx = x(today);
+    out += '<circle cx="' + tx + '" cy="' + base + '" r="5" fill="var(--surface)" stroke="var(--accent)" stroke-width="2"/>';
+    out += '<text x="' + tx + '" y="' + (base+22) + '" text-anchor="end" font-size="11" fill="var(--accent)">היום</text>';
+    $("timeline").innerHTML = out + '</svg>';
+    $("legend").innerHTML = Object.keys(STATUS).map(function(k){ return '<span><i style="background:var(' + STATUS[k].color + ')"></i>' + STATUS[k].label + '</span>'; }).join("");
+  }
+
+  // ---------- donut ----------
+  function renderDonut(){
+    var c = count(), total = APPS.length, r = 70, C = 2 * Math.PI * r, off = 0, gap = 2;
+    var out = '<svg viewBox="0 0 200 200" width="180" height="180" role="img" aria-label="התפלגות סטטוס"><g transform="rotate(-90 100 100)" fill="none" stroke-width="26">';
+    Object.keys(STATUS).forEach(function(k){
+      if (!c[k]) return;
+      var len = c[k] / total * C;
+      out += '<circle cx="100" cy="100" r="' + r + '" stroke="var(' + STATUS[k].color + ')" stroke-dasharray="' + (len-gap) + ' ' + (C-len+gap) + '" stroke-dashoffset="' + (-off) + '"><title>' + STATUS[k].label + ': ' + c[k] + '</title></circle>';
+      off += len;
+    });
+    out += '</g><text x="100" y="100" text-anchor="middle" font-size="36" fill="var(--ink)" font-family="Secular One,sans-serif">' + total + '</text>';
+    out += '<text x="100" y="124" text-anchor="middle" font-size="13" fill="var(--muted)">פרויקטים</text></svg>';
+    $("donut").innerHTML = out;
+    $("statuslist").innerHTML = Object.keys(STATUS).map(function(k){
+      var names = APPS.filter(function(a){ return a.status === k; }).map(function(a){ return a.name.split(",")[0]; });
+      return names.length ? '<dt><span class="pill s-' + k + '">' + STATUS[k].short + ' · ' + names.length + '</span></dt><dd>' + esc(names.join(", ")) + '</dd>' : "";
+    }).join("");
+  }
+
+  // ---------- filters ----------
+  function renderFilters(){
+    var c = count();
+    var opts = [["all","הכול",APPS.length]].concat(Object.keys(STATUS).filter(function(k){ return c[k]; }).map(function(k){ return [k, STATUS[k].label, c[k]]; }));
+    $("filters").innerHTML = opts.map(function(o){
+      return '<button type="button" data-f="' + o[0] + '" aria-pressed="' + (state.filter === o[0]) + '">' + esc(o[1]) + '<span class="n mono">' + o[2] + '</span></button>';
+    }).join("");
+  }
+  $("filters").addEventListener("click", function(e){
+    var b = e.target.closest("button"); if (!b) return;
+    state.filter = b.dataset.f; store("hub-filter", state.filter); renderFilters(); renderCards();
+  });
+  $("q").addEventListener("input", function(e){ state.q = e.target.value.trim().toLowerCase(); renderCards(); });
+  $("sort").addEventListener("change", function(e){ state.sort = e.target.value; store("hub-sort", state.sort); renderCards(); });
+
+  // ---------- cards ----------
+  function sorter(a, b){
+    if (state.sort === "progress") return (b.progress || 0) - (a.progress || 0);
+    if (state.sort === "business") return (b.business || 0) - (a.business || 0);
+    if (state.sort === "started") return d(b.started) - d(a.started);
+    return d(b.updated) - d(a.updated);
+  }
+  function renderCards(){
+    var list = APPS.filter(function(a){
+      if (state.filter !== "all" && a.status !== state.filter) return false;
+      if (!state.q) return true;
+      return [a.name, a.tagline, a.kind].concat(a.stack || []).join(" ").toLowerCase().indexOf(state.q) !== -1;
+    }).sort(sorter);
+    if (!list.length){ $("grid").innerHTML = '<div class="empty">אין פרויקט שמתאים לחיפוש הזה.</div>'; return; }
+    $("grid").innerHTML = list.map(function(a){
+      var st = STATUS[a.status], col = "var(" + st.color + ")", fr = freshness(a.updated);
+      var meta = '';
+      if (a.repo) meta += '<dt>מאגר</dt><dd class="mono">' + esc(a.repo.split("/")[1]) + (a.private ? " · פרטי" : " · ציבורי") + '</dd>';
+      if (a.facts) meta += '<dt>היקף</dt><dd>' + esc(a.facts) + '</dd>';
+      if (a.gh) meta += '<dt>GitHub</dt><dd><span class="mono">' + a.gh.commits + '</span> קומיטים' + (a.gh.prs ? ' · <span class="mono">' + a.gh.prs + '</span> PR פתוחים' : '') + '<span class="live-badge">● חי</span></dd>';
+      meta += '<dt>' + (a.repo ? 'עדכון אחרון' : 'פורסם') + '</dt><dd><span class="mono">' + fmt(a.updated) + '</span> <span class="muted">(' + ago(a.updated) + ')</span>' + (a.repo ? '<span class="fresh ' + fr.c + '">' + fr.t + '</span>' : '') + '</dd>';
+      return '<article class="card">' +
+        '<div class="head"><div class="glyph" style="background:var(' + st.color + '-soft);color:' + col + '"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">' + (ICONS[a.icon] || ICONS.star) + '</svg></div>' +
+        '<div class="title"><div class="title-row"><h3>' + esc(a.name) + '</h3><span class="pill s-' + a.status + '">' + esc(st.label) + '</span></div><p class="sub">' + esc(a.tagline) + '</p></div></div>' +
+        '<div class="tags">' + (a.stack || []).map(function(t){ return '<span class="tag">' + esc(t) + '</span>'; }).join("") + '</div>' +
+        '<dl class="meta">' + meta + '</dl>' +
+        (a.progress != null ? '<div><div class="eyebrow" style="margin-bottom:4px">בשלות · <span class="mono">' + a.progress + '%</span></div><div class="meter"><div style="width:' + a.progress + '%;background:' + col + '"></div></div></div>' : '') +
+        (a.next ? '<p class="next"><b>הצעד הבא:</b> ' + esc(a.next) + '</p>' : '') +
+        '<div class="links">' + (a.links || []).map(function(l){ return '<a href="' + esc(l.url) + '" target="_blank" rel="noopener"' + (l.primary ? ' class="primary"' : '') + '>' + esc(l.label) + '</a>'; }).join("") + '</div>' +
+        '</article>';
+    }).join("");
+  }
+
+  // ---------- table ----------
+  function renderTable(){
+    var rows = APPS.slice().sort(function(a,b){ return (b.business||0) - (a.business||0); });
+    $("table").innerHTML = '<thead><tr><th>פרויקט</th><th>סוג</th><th>סטטוס</th><th>קוד ב-GitHub</th><th>עדכון אחרון</th><th>פוטנציאל עסקי</th></tr></thead><tbody>' +
+      rows.map(function(a){
+        var bars = '<span class="bars" aria-label="' + (a.business||0) + ' מתוך 3">' + [1,2,3].map(function(i){ return '<i class="' + (i <= (a.business||0) ? "on" : "") + '"></i>'; }).join("") + '</span>';
+        return '<tr><td>' + esc(a.name.split(",")[0]) + '</td><td>' + esc(a.kind) + '</td><td><span class="pill s-' + a.status + '">' + STATUS[a.status].short + '</span></td><td>' + (a.repo ? (a.private ? "כן, פרטי" : "כן") : "לא") + '</td><td class="mono">' + fmt(a.updated) + '</td><td>' + bars + '</td></tr>';
+      }).join("") + '</tbody>';
+  }
+
+  function renderAll(){ renderKpis(); renderTimeline(); renderDonut(); renderFilters(); renderCards(); renderTable(); }
+
+  // ---------- live GitHub data (public repos only, no token) ----------
+  function sync(){
+    $("syncDot").className = "dot busy"; $("syncText").textContent = "מושך נתונים מ-GitHub…";
+    var jobs = APPS.filter(function(a){ return a.repo && !a.private; }).map(function(a){
+      var base = "https://api.github.com/repos/" + a.repo;
+      return Promise.all([
+        fetch(base).then(function(r){ if (!r.ok) throw r; return r.json(); }),
+        fetch(base + "/commits?per_page=1").then(function(r){
+          if (!r.ok) throw r;
+          var m = /page=(\d+)>; rel="last"/.exec(r.headers.get("Link") || "");
+          return m ? +m[1] : 1;
+        }),
+        fetch(base + "/pulls?state=open&per_page=100").then(function(r){ if (!r.ok) throw r; return r.json(); })
+      ]).then(function(res){
+        a.gh = { commits: res[1], prs: res[2].length };
+        if (res[0].pushed_at && d(res[0].pushed_at) > d(a.updated)) a.updated = res[0].pushed_at;
+        return true;
+      }).catch(function(){ return false; });
+    });
+    Promise.all(jobs).then(function(ok){
+      var good = ok.filter(Boolean).length;
+      $("syncDot").className = good ? "dot ok" : "dot";
+      $("syncText").textContent = good
+        ? "סונכרן מ-GitHub · " + new Date().toLocaleTimeString("he-IL", { hour:"2-digit", minute:"2-digit" })
+        : "אין חיבור ל-GitHub, מוצגים נתונים שמורים";
+      renderAll();
+    });
+  }
+  $("refresh").addEventListener("click", sync);
+
+  state.filter = store("hub-filter") || "all";
+  state.sort = store("hub-sort") || "updated";
+  $("sort").value = state.sort;
+  renderAll();
+  sync();
+})();
+</script>
+</body>
+</html>

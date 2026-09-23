@@ -4,6 +4,9 @@
 
 🌐 **גרסה חיה:** https://israelofir-crypto.github.io/Ffiday-app/
 
+🧰 **כל הפרויקטים במקום אחד:** https://israelofir-crypto.github.io/Ffiday-app/hub/
+(הפורטל נמצא בתיקייה `hub/`. הרשימה מוגדרת ב-`hub/apps.js`.)
+
 ## איך זה עובד?
 
 בוחרים עיר — פתח תקווה, תל אביב, ירושלים או חיפה (עם מאגר אטרקציות
