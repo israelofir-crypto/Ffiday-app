@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>קורס AI</title>
+<meta name="theme-color" content="#5b4bdb">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #f5f4fb;
+    --card: #ffffff;
+    --border: #e4e1f3;
+    --text: #1f1b33;
+    --muted: #6b6785;
+    --primary: #5b4bdb;
+    --primary-dark: #4636c2;
+    --primary-soft: #ece9ff;
+    --planned: #8a86a3;
+    --progress: #e0912f;
+    --done: #2e9b6c;
+    --shadow: 0 4px 18px rgba(31, 27, 51, .08);
+  }
+
+  body {
+    font-family: "Segoe UI", "Assistant", "Arial Hebrew", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  header {
+    background: linear-gradient(135deg, #5b4bdb, #8a4fd8 60%, #c05bbf);
+    color: #fff;
+    padding: 32px 16px 72px;
+    text-align: center;
+  }
+  header h1 { font-size: 2rem; }
+  header p { opacity: .9; margin-top: 6px; }
+
+  main { max-width: 1040px; margin: -48px auto 40px; padding: 0 16px; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 20px;
+    margin-bottom: 18px;
+  }
+
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .stat { text-align: center; padding: 16px 8px; }
+  .stat b { display: block; font-size: 1.9rem; }
+  .stat span { color: var(--muted); font-size: .9rem; }
+  .stat.planned b { color: var(--planned); }
+  .stat.progress b { color: var(--progress); }
+  .stat.done b { color: var(--done); }
+
+  .bar { display: flex; height: 10px; border-radius: 6px; overflow: hidden; background: var(--primary-soft); margin-top: 14px; }
+  .bar div { transition: width .3s; }
+
+  .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .toolbar input, .toolbar select { flex: 1 1 160px; }
+
+  input, select, textarea {
+    font: inherit;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: #fff;
+    color: var(--text);
+    width: 100%;
+  }
+  textarea { resize: vertical; min-height: 70px; }
+
+  button {
+    font: inherit;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 16px;
+    cursor: pointer;
+    background: var(--primary);
+    color: #fff;
+    font-weight: 600;
+  }
+  button:hover { background: var(--primary-dark); }
+  button.ghost { background: var(--primary-soft); color: var(--primary-dark); }
+  button.ghost:hover { background: #ddd8ff; }
+
+  h2 { font-size: 1.15rem; margin-bottom: 14px; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+
+  .course { display: flex; flex-direction: column; gap: 8px; margin: 0; }
+  .course h3 { font-size: 1.05rem; }
+  .course h3 a { color: inherit; text-decoration: none; }
+  .course h3 a:hover { color: var(--primary); }
+  .course .meta { color: var(--muted); font-size: .88rem; }
+  .course .notes { font-size: .92rem; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { background: var(--primary-soft); color: var(--primary-dark); border-radius: 999px; padding: 3px 10px; font-size: .8rem; }
+  .course footer { display: flex; gap: 8px; align-items: center; margin-top: auto; padding-top: 8px; }
+  .course footer select { flex: 1; padding: 6px 10px; }
+  .course footer button { padding: 6px 10px; font-size: .85rem; }
+  .status-dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+
+  .empty { text-align: center; color: var(--muted); padding: 36px 12px; }
+  .empty .big { font-size: 2.6rem; }
+
+  form .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  form label { display: block; font-size: .88rem; color: var(--muted); margin-bottom: 4px; }
+  form .full { grid-column: 1 / -1; }
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  .search-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .search-links a {
+    text-decoration: none; background: var(--primary-soft); color: var(--primary-dark);
+    padding: 8px 14px; border-radius: 10px; font-weight: 600; font-size: .9rem;
+  }
+  .search-links a:hover { background: #ddd8ff; }
+
+  details summary { cursor: pointer; font-weight: 700; font-size: 1.15rem; list-style: none; }
+  details summary::before { content: "➕ "; }
+  details[open] summary::before { content: "➖ "; }
+  details[open] summary { margin-bottom: 14px; }
+
+  .back { color: #fff; opacity: .85; font-size: .88rem; }
+
+  @media (max-width: 640px) {
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    form .row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🤖 קורס AI</h1>
+  <p>הקורסים שבחרתי בבינה מלאכותית — במקום אחד</p>
+</header>
+
+<main>
+  <section class="card">
+    <div class="stats">
+      <div class="stat"><b id="s-total">0</b><span>קורסים</span></div>
+      <div class="stat planned"><b id="s-planned">0</b><span>מתוכננים</span></div>
+      <div class="stat progress"><b id="s-progress">0</b><span>בתהליך</span></div>
+      <div class="stat done"><b id="s-done">0</b><span>הושלמו</span></div>
+    </div>
+    <div class="bar" id="bar"></div>
+  </section>
+
+  <section class="card">
+    <div class="toolbar">
+      <input id="q" type="search" placeholder="🔍 חיפוש בקורסים שלי…">
+      <select id="f-topic"><option value="">כל הנושאים</option></select>
+      <select id="f-level">
+        <option value="">כל הרמות</option>
+        <option>מתחילים</option><option>בינוני</option><option>מתקדמים</option>
+      </select>
+      <select id="f-status">
+        <option value="">כל הסטטוסים</option>
+        <option>מתוכנן</option><option>בתהליך</option><option>הושלם</option>
+      </select>
+    </div>
+  </section>
+
+  <section id="list" class="grid"></section>
+
+  <section class="card" style="margin-top:18px">
+    <details id="add-box">
+      <summary>הוספת קורס</summary>
+      <form id="add-form">
+        <div class="row">
+          <div class="full"><label for="a-title">שם הקורס *</label><input id="a-title" required></div>
+          <div><label for="a-provider">ספק / פלטפורמה</label><input id="a-provider" placeholder="Coursera, Udemy, YouTube…"></div>
+          <div><label for="a-url">קישור</label><input id="a-url" type="url" placeholder="https://"></div>
+          <div><label for="a-topic">נושא</label><input id="a-topic" list="topics" placeholder="LLM, פרומפטים, אוטומציה…"></div>
+          <div><label for="a-language">שפה</label>
+            <select id="a-language"><option>עברית</option><option>אנגלית</option><option>אחר</option></select></div>
+          <div><label for="a-level">רמה</label>
+            <select id="a-level"><option>מתחילים</option><option>בינוני</option><option>מתקדמים</option></select></div>
+          <div><label for="a-status">סטטוס</label>
+            <select id="a-status"><option>מתוכנן</option><option>בתהליך</option><option>הושלם</option></select></div>
+          <div class="full"><label for="a-notes">הערות</label><textarea id="a-notes"></textarea></div>
+        </div>
+        <div class="actions"><button type="submit">שמירת קורס</button></div>
+      </form>
+      <datalist id="topics"></datalist>
+    </details>
+  </section>
+
+  <section class="card">
+    <h2>🔎 חיפוש קורסים חדשים</h2>
+    <div class="toolbar">
+      <input id="ext-q" placeholder="למשל: prompt engineering, סוכני AI, Claude…">
+    </div>
+    <div class="search-links" id="ext-links"></div>
+  </section>
+
+  <section class="card">
+    <h2>💾 גיבוי והעברה</h2>
+    <div class="actions">
+      <button class="ghost" id="export">ייצוא לקובץ JSON</button>
+      <button class="ghost" id="import-btn">ייבוא מקובץ JSON</button>
+      <input type="file" id="import" accept="application/json" hidden>
+    </div>
+  </section>
+
+  <p style="text-align:center"><a class="back" style="color:var(--muted)" href="../">← חזרה לשישי בבוקר</a></p>
+</main>
+
+<script>
+const STORE_KEY = "ai-course:v1";
+const STATUS_COLOR = { "מתוכנן": "var(--planned)", "בתהליך": "var(--progress)", "הושלם": "var(--done)" };
+
+let baseCourses = [];
+let local = loadLocal(); // { added: [], status: {id: status}, removed: [] }
+
+function loadLocal() {
+  try {
+    const v = JSON.parse(localStorage.getItem(STORE_KEY));
+    if (v && Array.isArray(v.added)) return { status: {}, removed: [], ...v };
+  } catch (e) {}
+  return { added: [], status: {}, removed: [] };
+}
+function saveLocal() {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(local)); } catch (e) {}
+}
+
+function allCourses() {
+  return [...baseCourses, ...local.added]
+    .filter(c => !local.removed.includes(c.id))
+    .map(c => ({ ...c, status: local.status[c.id] || c.status || "מתוכנן" }));
+}
+
+const esc = s => String(s ?? "").replace(/[&<>"']/g, ch =>
+  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+const safeUrl = u => /^https?:\/\//i.test(u || "") ? u : "";
+
+function render() {
+  const courses = allCourses();
+  const q = document.getElementById("q").value.trim().toLowerCase();
+  const ft = document.getElementById("f-topic").value;
+  const fl = document.getElementById("f-level").value;
+  const fs = document.getElementById("f-status").value;
+
+  // Stats
+  const count = s => courses.filter(c => c.status === s).length;
+  const total = courses.length, p = count("מתוכנן"), g = count("בתהליך"), d = count("הושלם");
+  document.getElementById("s-total").textContent = total;
+  document.getElementById("s-planned").textContent = p;
+  document.getElementById("s-progress").textContent = g;
+  document.getElementById("s-done").textContent = d;
+  document.getElementById("bar").innerHTML = total ? [
+    [d, "var(--done)"], [g, "var(--progress)"], [p, "var(--planned)"]
+  ].map(([n, c]) => `<div style="width:${n / total * 100}%;background:${c}"></div>`).join("") : "";
+
+  // Topic filter + datalist
+  const topics = [...new Set(courses.map(c => c.topic).filter(Boolean))].sort();
+  const sel = document.getElementById("f-topic");
+  sel.innerHTML = `<option value="">כל הנושאים</option>` +
+    topics.map(t => `<option ${t === ft ? "selected" : ""}>${esc(t)}</option>`).join("");
+  document.getElementById("topics").innerHTML = topics.map(t => `<option value="${esc(t)}">`).join("");
+
+  const shown = courses.filter(c =>
+    (!ft || c.topic === ft) && (!fl || c.level === fl) && (!fs || c.status === fs) &&
+    (!q || [c.title, c.provider, c.topic, c.notes].join(" ").toLowerCase().includes(q)));
+
+  const list = document.getElementById("list");
+  if (!shown.length) {
+    list.innerHTML = `<div class="card empty" style="grid-column:1/-1">
+      <div class="big">📚</div>
+      <p>${total ? "אין קורסים שמתאימים לסינון" : "עוד אין קורסים — הוסיפו את הראשון למטה"}</p></div>`;
+    return;
+  }
+  list.innerHTML = shown.map(c => {
+    const url = safeUrl(c.url);
+    const title = url ? `<a href="${esc(url)}" target="_blank" rel="noopener">${esc(c.title)} ↗</a>` : esc(c.title);
+    return `<article class="card course">
+      <h3>${title}</h3>
+      ${c.provider ? `<div class="meta">${esc(c.provider)}</div>` : ""}
+      <div class="tags">
+        ${c.topic ? `<span class="tag">${esc(c.topic)}</span>` : ""}
+        ${c.level ? `<span class="tag">${esc(c.level)}</span>` : ""}
+        ${c.language ? `<span class="tag">${esc(c.language)}</span>` : ""}
+      </div>
+      ${c.notes ? `<p class="notes">${esc(c.notes)}</p>` : ""}
+      <footer>
+        <span class="status-dot" style="background:${STATUS_COLOR[c.status]}"></span>
+        <select data-status="${esc(c.id)}" aria-label="סטטוס">
+          ${["מתוכנן", "בתהליך", "הושלם"].map(s => `<option ${s === c.status ? "selected" : ""}>${s}</option>`).join("")}
+        </select>
+        <button class="ghost" data-remove="${esc(c.id)}" title="הסרה">🗑</button>
+      </footer>
+    </article>`;
+  }).join("");
+}
+
+// Filters
+["q", "f-topic", "f-level", "f-status"].forEach(id =>
+  document.getElementById(id).addEventListener("input", render));
+
+// Status change / remove
+document.getElementById("list").addEventListener("change", e => {
+  const id = e.target.dataset.status;
+  if (!id) return;
+  local.status[id] = e.target.value;
+  saveLocal(); render();
+});
+document.getElementById("list").addEventListener("click", e => {
+  const id = e.target.dataset.remove;
+  if (!id || !confirm("להסיר את הקורס מהרשימה?")) return;
+  const i = local.added.findIndex(c => c.id === id);
+  if (i >= 0) local.added.splice(i, 1); else local.removed.push(id);
+  delete local.status[id];
+  saveLocal(); render();
+});
+
+// Add course
+document.getElementById("add-form").addEventListener("submit", e => {
+  e.preventDefault();
+  const v = id => document.getElementById(id).value.trim();
+  local.added.push({
+    id: "c-" + Date.now().toString(36),
+    title: v("a-title"), provider: v("a-provider"), url: v("a-url"),
+    topic: v("a-topic"), level: v("a-level"), status: v("a-status"),
+    language: v("a-language"), notes: v("a-notes"),
+    added: new Date().toISOString().slice(0, 10)
+  });
+  saveLocal();
+  e.target.reset();
+  render();
+});
+
+// External search
+const PROVIDERS = [
+  ["Coursera", q => `https://www.coursera.org/search?query=${q}`],
+  ["Udemy", q => `https://www.udemy.com/courses/search/?q=${q}`],
+  ["YouTube", q => `https://www.youtube.com/results?search_query=${q}`],
+  ["edX", q => `https://www.edx.org/search?q=${q}`],
+  ["Google", q => `https://www.google.com/search?q=${q}`]
+];
+function renderExt() {
+  const raw = document.getElementById("ext-q").value.trim() || "AI";
+  const q = encodeURIComponent(raw + " course");
+  document.getElementById("ext-links").innerHTML = PROVIDERS
+    .map(([name, f]) => `<a href="${f(q)}" target="_blank" rel="noopener">${name} ↗</a>`).join("");
+}
+document.getElementById("ext-q").addEventListener("input", renderExt);
+
+// Export / import
+document.getElementById("export").addEventListener("click", () => {
+  const data = { updated: new Date().toISOString().slice(0, 10), courses: allCourses() };
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }));
+  a.download = "courses.json";
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+document.getElementById("import-btn").addEventListener("click", () => document.getElementById("import").click());
+document.getElementById("import").addEventListener("change", async e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  try {
+    const data = JSON.parse(await file.text());
+    const incoming = Array.isArray(data) ? data : data.courses;
+    if (!Array.isArray(incoming)) throw new Error();
+    const known = new Set(allCourses().map(c => c.id));
+    const fresh = incoming.filter(c => c && c.title && !known.has(c.id))
+      .map(c => ({ ...c, id: c.id || "c-" + Math.random().toString(36).slice(2, 9) }));
+    local.added.push(...fresh);
+    saveLocal(); render();
+    alert(`יובאו ${fresh.length} קורסים חדשים`);
+  } catch (err) {
+    alert("הקובץ אינו קובץ קורסים תקין");
+  }
+  e.target.value = "";
+});
+
+// Load base list
+fetch("courses.json", { cache: "no-store" })
+  .then(r => r.ok ? r.json() : { courses: [] })
+  .then(d => { baseCourses = Array.isArray(d.courses) ? d.courses : []; })
+  .catch(() => {})
+  .finally(() => { render(); renderExt(); });
+</script>
+</body>
+</html>
