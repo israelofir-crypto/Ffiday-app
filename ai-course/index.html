@@ -3,339 +3,588 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>קורס AI</title>
-<meta name="theme-color" content="#5b4bdb">
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  :root {
-    --bg: #f5f4fb;
-    --card: #ffffff;
-    --border: #e4e1f3;
-    --text: #1f1b33;
-    --muted: #6b6785;
-    --primary: #5b4bdb;
-    --primary-dark: #4636c2;
-    --primary-soft: #ece9ff;
-    --planned: #8a86a3;
-    --progress: #e0912f;
-    --done: #2e9b6c;
-    --shadow: 0 4px 18px rgba(31, 27, 51, .08);
-  }
-
-  body {
-    font-family: "Segoe UI", "Assistant", "Arial Hebrew", Arial, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-  }
-
-  header {
-    background: linear-gradient(135deg, #5b4bdb, #8a4fd8 60%, #c05bbf);
-    color: #fff;
-    padding: 32px 16px 72px;
-    text-align: center;
-  }
-  header h1 { font-size: 2rem; }
-  header p { opacity: .9; margin-top: 6px; }
-
-  main { max-width: 1040px; margin: -48px auto 40px; padding: 0 16px; }
-
-  .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    box-shadow: var(--shadow);
-    padding: 20px;
-    margin-bottom: 18px;
-  }
-
-  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-  .stat { text-align: center; padding: 16px 8px; }
-  .stat b { display: block; font-size: 1.9rem; }
-  .stat span { color: var(--muted); font-size: .9rem; }
-  .stat.planned b { color: var(--planned); }
-  .stat.progress b { color: var(--progress); }
-  .stat.done b { color: var(--done); }
-
-  .bar { display: flex; height: 10px; border-radius: 6px; overflow: hidden; background: var(--primary-soft); margin-top: 14px; }
-  .bar div { transition: width .3s; }
-
-  .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-  .toolbar input, .toolbar select { flex: 1 1 160px; }
-
-  input, select, textarea {
-    font: inherit;
-    padding: 10px 12px;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    background: #fff;
-    color: var(--text);
-    width: 100%;
-  }
-  textarea { resize: vertical; min-height: 70px; }
-
-  button {
-    font: inherit;
-    border: none;
-    border-radius: 10px;
-    padding: 10px 16px;
-    cursor: pointer;
-    background: var(--primary);
-    color: #fff;
-    font-weight: 600;
-  }
-  button:hover { background: var(--primary-dark); }
-  button.ghost { background: var(--primary-soft); color: var(--primary-dark); }
-  button.ghost:hover { background: #ddd8ff; }
-
-  h2 { font-size: 1.15rem; margin-bottom: 14px; }
-
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
-
-  .course { display: flex; flex-direction: column; gap: 8px; margin: 0; }
-  .course h3 { font-size: 1.05rem; }
-  .course h3 a { color: inherit; text-decoration: none; }
-  .course h3 a:hover { color: var(--primary); }
-  .course .meta { color: var(--muted); font-size: .88rem; }
-  .course .notes { font-size: .92rem; }
-  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
-  .tag { background: var(--primary-soft); color: var(--primary-dark); border-radius: 999px; padding: 3px 10px; font-size: .8rem; }
-  .course footer { display: flex; gap: 8px; align-items: center; margin-top: auto; padding-top: 8px; }
-  .course footer select { flex: 1; padding: 6px 10px; }
-  .course footer button { padding: 6px 10px; font-size: .85rem; }
-  .status-dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
-
-  .empty { text-align: center; color: var(--muted); padding: 36px 12px; }
-  .empty .big { font-size: 2.6rem; }
-
-  form .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
-  form label { display: block; font-size: .88rem; color: var(--muted); margin-bottom: 4px; }
-  form .full { grid-column: 1 / -1; }
-  .actions { display: flex; gap: 10px; flex-wrap: wrap; }
-
-  .search-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-  .search-links a {
-    text-decoration: none; background: var(--primary-soft); color: var(--primary-dark);
-    padding: 8px 14px; border-radius: 10px; font-weight: 600; font-size: .9rem;
-  }
-  .search-links a:hover { background: #ddd8ff; }
-
-  details summary { cursor: pointer; font-weight: 700; font-size: 1.15rem; list-style: none; }
-  details summary::before { content: "➕ "; }
-  details[open] summary::before { content: "➖ "; }
-  details[open] summary { margin-bottom: 14px; }
-
-  .back { color: #fff; opacity: .85; font-size: .88rem; }
-
-  @media (max-width: 640px) {
-    .stats { grid-template-columns: repeat(2, 1fr); }
-    form .row { grid-template-columns: 1fr; }
-  }
-</style>
 </head>
 <body>
+<script>
+/* Standalone mode: course data is embedded; changes are saved in this browser (localStorage). */
+(function(){
+  const SEED = {"technion-nocode": {"title": "No-Code with GenAI Hands-On", "provider": "הטכניון – בית הספר ללימודי המשך", "url": "", "topic": "No-Code ואוטומציה", "level": "בינוני", "language": "עברית", "status": "מתוכנן", "score": 5, "why": "הכי מקיף לשלוש המטרות שלך: אוטומציות וסוכנים, Claude Code ו-Lovable, BI ו-RAG. שים לב: יש ראיון קבלה ודרישה לרקע אקדמי רלוונטי", "notes": "200 שעות · כ-7 חודשים · פתיחה 2.11.2026 · ימי ב' 16:30–21:30 · שרונה ת\"א + 6 מפגשים דיגיטליים · 15,700 ₪ + 480 ₪ רישום", "added": "2026-09-24T10:04:00Z", "facts": {"hours": "200 שעות אקדמיות", "duration": "כ-7 חודשים", "start": "2.11.2026", "schedule": "ימי שני 16:30–21:30", "format": "24 מפגשים בקמפוס שרונה ת\"א + 6 מפגשים דיגיטליים", "price": "15,700 ₪ + 480 ₪ דמי רישום", "cert": "תעודת גמר של בית הספר ללימודי המשך של הטכניון", "prereq": "רקע אקדמי במערכות מידע, הנדסה, כלכלה, מנהל עסקים, ראיית חשבון, סטטיסטיקה או תחום דאטה · ראיון קבלה · אנגלית טכנית"}, "tools": ["Zapier", "Make", "n8n", "Telegram", "SQL", "Supabase", "Airtable", "Google Sheets", "Power BI", "Tableau", "Excel + AI", "Claude (Chat, Cowork, Code)", "Codex", "Lovable", "GitHub", "Vercel", "Netlify", "pgvector", "MCP"], "financeOutcomes": ["לבנות תהליך שקולט חשבוניות ספקים מהמייל, מחלץ נתונים ומעביר לאישור", "לכתוב שאילתות SQL להתאמות בנקים ולסיכום הוצאות לפי מרכז עלות", "לבנות ב-Power BI דשבורד תקציב מול ביצוע ותזרים מזומנים עם DAX", "לנתח גיליונות Excel בשפה טבעית עם Claude, ChatGPT ו-Copilot", "לבנות אפליקציה פנימית לבקשות רכש ואישור הוצאות ולפרוס אותה לאוויר", "להקים בוט שעונה על שאלות מתוך נהלי הכספים וחוזי הספקים"], "pros": ["הכיסוי הרחב ביותר מבין ארבעת הקורסים", "40 שעות BI, שמתאימות מאוד לעבודה בכספים", "פרויקט אישי לתיק עבודות וסביבות תרגול מוכנות לכל מודול", "הסמכה של הטכניון"], "cons": ["הקורס הארוך והיקר מבין הארבעה", "קבלה דרך ראיון, עם דרישה לרקע אקדמי רלוונטי", "כמעט בלי ניהול שינוי או מדידת ROI בארגון", "המנויים לכלים עצמם בתשלום נפרד של הסטודנט"], "modules": [{"name": "יסודות No-Code ו-GenAI", "hours": 12, "finance": 2, "learn": ["הרצף No-Code → Low-Code → Vibe Coding → Pro-Code, ומתי כל גישה מתאימה", "אוריינות תפעולית לעומת תכנות", "התפקיד של GenAI בבניית תהליכי עבודה ואוטומציה", "קטגוריות הכלים: אוטומציה, דאטה, ויזואליזציה, בוני אפליקציות, סוכנים ו-Document AI", "יסודות כתיבת פרומפטים אפקטיביים", "MCP: הפרוטוקול שמחבר כלי AI לאפליקציות, למסדי נתונים ולפלטפורמות"], "example": "ממפים את תהליכי הכספים לפי הכלי שמתאים לכל אחד: התאמות בנקים ← אוטומציה, תקציב מול ביצוע ← BI, אישור הוצאות ← אפליקציה. ופרומפט מובנה לניתוח סטיות: \"אתה כלכלן בכיר. הנה טבלת תקציב מול ביצוע לרבעון. סמן כל סטייה מעל 10% והצע הסבר אפשרי לכל אחת.\""}, {"name": "אוטומציה ובוני סוכנים", "hours": 45, "finance": 3, "learn": ["Zapier: תהליכים רב-שלביים עם טריגרים, פילטרים ופעולות", "Zapier: צעדי AI לסיכום, תיוג וסיווג, יחד עם לוגים וטיפול בשגיאות", "Make: תהליכים ויזואליים עם הסתעפויות, תנאים וטרנספורמציות מידע", "Make: קריאות API ותרחישים ארגוניים של קליטה ← עיבוד ← התראה ← דיווח", "Make: סוכני AI שמכוונים למטרה ומסתגלים תוך כדי ריצה", "n8n: אוטומציות בקוד פתוח עם חיבור ל-APIs, מסדי נתונים וכלי SaaS", "n8n: לולאות, משתנים וצמתי AI (LLM chains, embeddings, vector store, tools agent)", "n8n: סוכן שיחה שעונה ממאגר ידע ומחובר לטלגרם, ופריסה מקומית או בענן"], "example": "חשבונית ספק מגיעה למייל. n8n מחלץ ממנה ספק, סכום, מע\"מ ותאריך פירעון ובודק אותה מול הזמנת הרכש. כשהכול תואם, הוא רושם אותה בטבלת הזכאים. כשיש פער של יותר מ-2%, הוא שולח לחשב הודעת טלגרם עם כפתורי אישור ודחייה. תהליך נוסף ב-Zapier מסווג כל קבלה שעובד מעלה לסעיף הוצאה (נסיעות, כיבוד, ציוד) ומסמן חריגות מהנוהל."}, {"name": "מסדי נתונים וניהול מידע", "hours": 25, "finance": 3, "learn": ["יסודות: טבלאות, שורות, עמודות וסכמות", "SQL: יצירה ושינוי של טבלאות (DDL), עדכון נתונים (DML) ושאילתות SELECT, WHERE, JOIN, GROUP BY", "Supabase: מסד נתונים, הרשאות ואחסון מממשק ויזואלי", "Supabase: קשרים בין טבלאות, הרשאות ברמת שורה (RLS) וחיפוש וקטורי (pgvector)", "חיבור Supabase ל-n8n, ל-Claude Code ול-Lovable", "Airtable: טבלאות מקושרות, אוטומציות ושדות AI", "Google Sheets כמקור מידע לאוטומציות, מחובר ל-Supabase ול-Airtable", "APIs: בקשה, תשובה, endpoints ומפתחות, ובדיקה עם Postman, n8n ו-Make"], "example": "שאילתת JOIN בין תנועות הבנק לכרטסת הספקים שמחזירה רק תנועות בלי התאמה, ושאילתת GROUP BY שמסכמת הוצאות לפי מרכז עלות וחודש. הרשאות ברמת שורה ב-Supabase מאפשרות לכל מנהל מחלקה לראות רק את התקציב שלו. חיבור API לבנק ישראל מושך את שער הדולר היומי לשערוך יתרות."}, {"name": "ויזואליזציה ו-BI", "hours": 40, "finance": 3, "learn": ["Power BI: טעינה וניקוי נתונים ב-Power Query", "Power BI: דשבורדים עם ויזואלים, slicers ופילטרים", "Power BI: נוסחאות DAX לעמודות מחושבות ולמדדים, ושאילתות DAX", "Power BI: Copilot לתובנות ולשאלות בשפה טבעית, וחיבור Claude דרך MCP", "Power BI Service: פרסום, רענון ושיתוף דוחות", "Tableau: חיבור כמה מקורות, דשבורדים אינטראקטיביים ו-Tableau Agent", "Excel: Claude for Excel, ChatGPT for Excel ו-Copilot, בהשוואה ביניהם", "Google Sheets עם AI: סינון בשפה טבעית, נוסחאות, ניקוי וניתוח"], "example": "דשבורד תקציב מול ביצוע ב-Power BI, עם מדד DAX לסטייה באחוזים ולשינוי מול השנה הקודמת, סינון לפי מרכז עלות ותחזית תזרים ל-13 שבועות קדימה. שאלה ל-Copilot: \"למה הוצאות האחזקה ברבעון 3 גבוהות ב-18%?\". ב-Excel מבקשים מ-Claude טבלת ציר של הוצאות לפי ספק ורבעון, עם סימון של ספקים שהגדילו את החיוב ביותר מ-20%."}, {"name": "בוני אפליקציות", "hours": 55, "finance": 3, "learn": ["Claude: המודלים Opus, Sonnet ו-Haiku ומתי להשתמש בכל אחד, המסלולים והממשקים", "שלושת המצבים של Claude: Chat, Cowork ו-Code", "Projects עם הוראות קבועות ומסמכים, זיכרון וסגנונות פלט", "מחברים ו-MCP (Google Drive, Supabase, Power BI, Notion), ו-Skills ליצירת Word, Excel, PowerPoint ו-PDF", "Claude Code Desktop: מפרומפט לאפליקציה, סקירת השינויים, חיבור Supabase, GitHub ופריסה ל-Vercel", "Cowork למשימות ארוכות: עיבוד קבצים, מחקר על פני מסמכים ודוחות חוזרים", "Codex: אפליקציית דסקטופ, זיכרון, Supabase ו-Vercel, ומשימות ברקע ב-Codex Cloud", "Lovable: אפליקציה מפרומפט עם Supabase מובנה, לאב-טיפוס ו-MVP", "פריסה: Git ו-GitHub, Vercel, Netlify, משתני סביבה וסודות, והשוואה בין שלושת הכלים"], "example": "אפליקציה פנימית לבקשות רכש: עובד ממלא בקשה, המערכת בודקת שיש יתרה בתקציב המחלקה, שולחת לאישור המנהל ואחר כך לכספים, והכול נשמר ב-Supabase ומוצג בדשבורד. בנוסף, Project ב-Claude עם נוהל ההוצאות, נוהל הרכש וחוזרי המס, שכל אנשי הכספים שואלים אותו, ו-Skill שמפיק כל חודש דוח סגירה ב-Word בתבנית קבועה."}, {"name": "Document ו-Knowledge AI", "hours": 18, "finance": 3, "learn": ["ההבדל בין \"לשוחח עם PDF\" לבין שכבת ידע שאפליקציות ואוטומציות יכולות לתשאל", "RAG: איך AI עונה מתוך המסמכים שלך ולא מתוך מה שלמד באימון", "embeddings, חיפוש וקטורי ואיך pgvector עובד", "העלאת מסמכים ל-Projects של Claude ושל ChatGPT כנקודת התחלה פשוטה", "צינור RAG ב-n8n: קליטה ← embedding ← אחסון ב-Supabase ← תשובה של המודל", "חיבור שכבת הידע לטלגרם ולאפליקציה", "הזנה אוטומטית של המאגר מ-Google Sheets או Airtable דרך Make"], "example": "בוט טלגרם בשם \"שאל את הכספים\". עובד שואל \"מה התקרה להחזר לינה בחו\"ל?\" או \"מה תנאי התשלום מול ספק X?\", והבוט עונה מתוך הנהלים והחוזים עם הפניה לסעיף. כל חוזה ספק חדש שנשמר בתיקייה נכנס למאגר אוטומטית."}, {"name": "ממשל ואחריות", "hours": 5, "finance": 3, "learn": ["מפתחות API וסודות: איך שומרים אותם ומה קורה כשהם דולפים", "פרטיות: אילו נתונים הכלים שולחים לספקי ה-AI ואיפה הם נשמרים", "דיוק והזיות, ולמה צריך בדיקה אנושית", "מתי לבחור No-Code, Vibe Coding או אוטומציה, ומתי להעביר למפתח"], "example": "מדיניות למחלקה: נתוני שכר, פרטי חשבונות בנק ומספרי ת\"ז לא נשלחים לכלי ציבורי. מספר שהופק ב-AI נכנס לדוח רק אחרי התאמה לספרים. מפתח ה-API של מערכת הנהלת החשבונות נשמר כמשתנה סביבה ולא בתוך הקוד."}]}, "barilan-claude-code": {"title": "קורס Claude Code: בניית עסק מבוסס AI וסוכני AI", "provider": "אוניברסיטת בר-אילן – בית הספר להייטק וסייבר", "url": "", "topic": "Claude Code וסוכנים", "level": "מתחילים", "language": "עברית", "status": "מתוכנן", "score": 4, "why": "ההתחלה המהירה והזולה ביותר, בלי רקע בתכנות, וממוקד בדיוק בבניית עסק עם סוכנים. חלש יותר בהובלה ארגונית ובפיתוח עמוק", "notes": "60 שעות · 3 חודשים · פתיחה 20.10.2026 · ימי ג' 17:30–21:30 · קמפוס ר\"ג + זום · 5,370 ₪ + 480 ₪ רישום", "added": "2026-09-24T10:03:00Z", "inferred": true, "facts": {"hours": "60 שעות אקדמיות", "duration": "3 חודשים", "start": "20.10.2026", "schedule": "ימי שלישי 17:30–21:30", "format": "היברידי: קמפוס רמת גן וזום", "price": "5,370 ₪ + 480 ₪ דמי רישום", "cert": "תעודת Certified Claude Code Operations Specialist, בר-אילן", "prereq": "ללא רקע בתכנות"}, "tools": ["Claude Code", "CLAUDE.md", "Skills", "סוכנים ותת-סוכנים", "Vibe Coding"], "financeOutcomes": ["לכתוב ל-Claude תדריך ברור למשימות כספים ולבדוק את התוצר", "להגדיר ל-Claude את \"מחלקת הכספים\": תוכנית חשבונות, מרכזי עלות, ספים ופורמטים", "להפוך את נוהל סגירת החודש לרשימת צעדים ש-Claude מריץ", "לבנות כלי פנימי קטן, כמו טופס הוצאות או מחשבון", "להפעיל סוכן שבודק כל יום תנועות בנק מול חשבוניות פתוחות"], "pros": ["נפתח ראשון (20.10) וקצר", "הזול מבין הארבעה", "לא דורש רקע טכני", "ממוקד ב-Claude Code, כלי שנלמד לעומק", "בנוי כ\"חברה\" עם מחלקות, כולל ניתוח נתונים ונהלים"], "cons": ["60 שעות: פחות עומק מהאחרים", "אין BI, SQL או מסדי נתונים לפי הפלאייר", "כמעט בלי ניהול שינוי בארגון", "הפלאייר מפרט רק את שמות הנושאים, בלי תוכן מפורט"], "modules": [{"name": "יום הייסוד: חברת ה-AI שלך מתחילה", "finance": 2, "learn": ["היכרות עם Claude Code והגישה של עסק שמופעל עם AI", "הקמת סביבת העבודה", "הגדרת העסק או המחלקה שבונים לאורך הקורס"], "example": "מגדירים \"מחלקת כספים וירטואלית\" עם תחומי אחריות: זכאים, חייבים, תקציב ודיווח. זה הפרויקט שילווה את כל הקורס."}, {"name": "מיומנות התדריך: איך להאציל ל-Claude", "finance": 3, "learn": ["איך כותבים תדריך: מטרה, הקשר, קבצים, פורמט התוצר וקריטריון הצלחה", "פירוק משימה גדולה לשלבים", "בדיקת התוצר ותיקון"], "example": "תדריך: \"קח את קובץ הכרטסת של ספטמבר, מצא כפילויות ותשלומים בלי חשבונית, והחזר קובץ Excel עם עמודת הסבר לכל שורה חריגה.\""}, {"name": "מטה החברה: קליטת Claude לעבודה", "finance": 3, "learn": ["קובץ CLAUDE.md: הקשר קבוע שהעסק נותן ל-Claude", "מבנה תיקיות, נהלים והרשאות", "איך Claude \"זוכר\" את כללי הבית"], "example": "קובץ CLAUDE.md לכספים: תוכנית החשבונות, מרכזי העלות, סף אישור הוצאות, פורמט הדוחות וכללי הניסוח. מרגע שהוא קיים, כל משימה מתחילה מההקשר הנכון."}, {"name": "הדלפק הקדמי: תקשורת עם לקוחות", "finance": 2, "learn": ["מענה למיילים ולפניות", "תבניות תשובה", "סיווג פניות וניתובן"], "example": "מענה לפניות לקוחות על יתרות חוב, והפקת מכתבי גבייה מדורגים לפי גיל החוב: תזכורת, התראה ומכתב אחרון."}, {"name": "מחלקת השיווק", "finance": 1, "learn": ["יצירת תוכן וקמפיינים", "מחקר קהל"], "example": "ניתוח עלות רכישת לקוח (CAC) והחזר ההשקעה של קמפיינים מתוך נתוני ההוצאה."}, {"name": "מנהל משאבי האנוש: גיוס וניהול עובדים", "finance": 2, "learn": ["ניסוח מודעות דרושים וסינון קורות חיים", "תהליכי קליטה וניהול עובדים"], "example": "חישוב עלות מעביד מלאה למשרה חדשה ובדיקת ההשפעה שלה על תקציב כוח האדם."}, {"name": "האנליסט והחוקר: מספרים ושווקים", "finance": 3, "learn": ["ניתוח נתונים עם Claude", "מחקר שוק ומתחרים", "הפקת דוחות"], "example": "ניתוח רווח והפסד חודשי והשוואה לתקציב ולשנה הקודמת, מחקר מתחרים מתוך דוחות כספיים פומביים ותחזית תזרים."}, {"name": "מנהל התפעול: נהלים ו-SOPs", "finance": 3, "learn": ["כתיבת נהלי עבודה", "תיעוד תהליכים", "רשימות תיוג"], "example": "נוהל סגירת חודש בתור SOP ש-Claude מריץ צעד אחרי צעד: התאמות בנק, הפרשות, שערוך ובדיקת חריגות, עם דוח מסכם בסוף."}, {"name": "מחלקת הכלים: Vibe Coding", "finance": 3, "learn": ["בניית כלים פנימיים בשפה טבעית", "שיפור הכלי דרך שיחה"], "example": "כלי ווב קטן לאישור הוצאות, או מחשבון פריסת תשלומים והצמדה למדד."}, {"name": "כוח העבודה של הסוכנים: AI Agents", "finance": 3, "learn": ["סוכנים ותת-סוכנים", "חלוקת עבודה בין סוכנים", "הפעלה אוטומטית של משימות חוזרות"], "example": "סוכן שבודק כל בוקר את תנועות הבנק החדשות, מתאים אותן לחשבוניות פתוחות ומדווח מה נשאר פתוח ומה דורש בירור."}, {"name": "מעבדה עסקית: הרכבת חברת ה-AI", "finance": 2, "learn": ["חיבור כל המחלקות לעסק אחד", "זרימת עבודה בין המחלקות"], "example": "חיבור מחלקת הכספים הווירטואלית לשאר העסק: הזמנה ← חשבונית ← גבייה ← דיווח."}, {"name": "יום הצגת החברה", "finance": 1, "learn": ["הצגת הפרויקט המסכם"], "example": "הצגה של מחלקת הכספים שבנית, עם הדגמה של תהליך מלא."}]}, "tafnit-ai-leaders": {"title": "מובילי AI: הכשרת מטמיעי בינה מלאכותית בארגונים", "provider": "האוניברסיטה הפתוחה – בית ספר תפנית", "url": "https://www.openu.ac.il/tafnit", "topic": "הטמעה בארגון", "level": "מתחילים", "language": "עברית", "status": "מתוכנן", "score": 4, "why": "הכי חזק למטרת הובלת AI בארגון: ניהול שינוי, ROI ופרויקט מלווה, ונוגע גם ב-Claude Code, n8n ו-Lovable. פחות מתאים להסבה לפיתוח", "notes": "150 שעות (125 + 25 פרקטיקום) · מפגש שבועי של 5 שעות, היברידי · קורס 86067 · מחיר ותאריך פתיחה לא צוינו בחוברת", "added": "2026-09-24T10:02:00Z", "facts": {"hours": "150 שעות אקדמיות (125 לימוד + 25 פרקטיקום)", "duration": "לא צוין (מפגש שבועי של 5 שעות)", "start": "לא צוין", "schedule": "פעם בשבוע, 5 שעות אקדמיות", "format": "היברידי: פרונטלי ומקוון", "price": "לא צוין", "cert": "תעודה מטעם לימודי החוץ של האוניברסיטה הפתוחה", "prereq": "ללא רקע טכנולוגי · 80% נוכחות · הגשת פרויקט AI מעשי"}, "tools": ["ChatGPT", "Claude", "Gemini", "Microsoft Copilot", "Custom GPTs", "Gems", "Make", "n8n", "Zapier", "Lovable", "Base44", "Copilot Studio", "Claude Code", "MCP", "Gamma", "Midjourney", "NotebookLM"], "financeOutcomes": ["להוביל הטמעת AI במחלקת הכספים מול ההנהלה והעובדים", "לדרג רעיונות לפי תועלת וסיכון ולהחליט מה לאשר", "לחשב ולהציג ROI של פרויקט AI בשעות ובכסף", "לבנות עוזרים מותאמים (GPTs, Gems, Projects) לנהלי הכספים", "לבנות אוטומציה לקליטת חשבוניות ולהתראות", "להשלים פרויקט AI אמיתי מהארגון שלך עם ליווי אישי"], "pros": ["היחיד שמלמד ניהול שינוי, התנגדויות ועבודה מול הנהלה", "מטריצת החלטות ומדדי ROI", "פרויקט מהארגון שלך עם חניכה אחד-על-אחד", "מקרי בוחן מהתחום של המשתתפים, כולל משרדי רואי חשבון", "סגל מרצים שמובילים הטמעה בפועל (AT&T, משרד החינוך, מכון וולקני)"], "cons": ["מחיר ותאריך פתיחה לא מופיעים בחוברת", "רשימת כלים ארוכה, ולכן כל כלי מקבל פחות עומק", "אין BI או SQL", "פחות מתאים למי שרוצה לפתח בעצמו"], "modules": [{"name": "יסודות מודלי השפה: מבנה, יתרונות ומגבלות", "finance": 2, "learn": ["איך כלי ה-AI המובילים בנויים", "מה הם יודעים ומה לא", "ציפיות ריאליות מהטכנולוגיה"], "example": "להבין למה מודל שפה עלול \"להמציא\" מספר, ולכן כל חישוב נעשה בכלי חישוב (Excel או קוד) ולא בטקסט חופשי."}, {"name": "שיטות עבודה מתקדמות לעבודה יומיומית עם AI", "finance": 3, "learn": ["תרגול שוטף ואינטנסיבי עם הכלים", "שילוב AI בשגרת העבודה"], "example": "שגרה יומית: סיכום מיילים מספקים, ניסוח תשובות לרואה החשבון המבקר והכנת טיוטה של הדוח החודשי."}, {"name": "ניהול שינוי והובלת הטמעה", "finance": 3, "learn": ["עבודה מול דרגי הניהול", "סדרי עדיפויות", "התמודדות עם חששות והתנגדויות של עובדים", "פוליטיקה ארגונית ו\"אמיתות ארגוניות\""], "example": "הצגת תוכנית הטמעה ל-CFO, התמודדות עם החשש של הנהלת החשבונות ש-\"AI יחליף אותנו\", והתחלה בפיילוט בצוות אחד."}, {"name": "מטריצה לקבלת החלטות: מתי לאשר פרויקט AI ומתי לסרב", "finance": 3, "learn": ["דירוג פרויקטים לפי תועלת, מאמץ וסיכון", "קריטריונים לאישור ולסירוב"], "example": "התאמת בנקים אוטומטית (תועלת גבוהה, סיכון נמוך) ← לאשר. סוכן שמבצע תשלומים לבד (סיכון גבוה) ← לסרב, או להוסיף אישור אנושי ותקרת סכום."}, {"name": "יצירת ערך מדיד ו-ROI", "finance": 3, "learn": ["גישת Problem-First: להתחיל מהבעיה ולא מהכלי", "בחירת פרויקטים עם חיסכון מהיר במאמץ נמוך", "מעבר ממדדי ראווה למדדים תפעוליים"], "example": "חישוב החיסכון: סגירת החודש ירדה מ-40 שעות ל-15, כפול עלות שעה, פחות עלות הרישיונות. זה המספר שמציגים להנהלה."}, {"name": "אסטרטגיית AI ארגונית", "finance": 2, "learn": ["בניית תשתית ליוזמות ארוכות טווח", "יתרון תחרותי שנשמר לאורך זמן"], "example": "מפת דרכים לשנה במחלקת הכספים: רבעון 1 אוטומציות קליטה, רבעון 2 דשבורדים, רבעון 3 סוכנים."}, {"name": "פלטפורמות LLM: ChatGPT, Claude, Gemini ו-Copilot", "finance": 3, "learn": ["עבודה מתקדמת עם פרומפטים", "Projects ובסיסי ידע", "עוזרים מותאמים אישית: Custom GPTs ו-Gems"], "example": "GPT מותאם בשם \"יועץ נוהל הוצאות\" שעונה לעובדים, ו-Copilot ב-Excel לניתוח סטיות תקציב."}, {"name": "אוטומציה וחיבור מערכות: Make, n8n ו-Zapier", "finance": 3, "learn": ["בניית תהליכים אוטומטיים", "חיבור ה-AI למערכות שכבר קיימות בארגון", "מערך סוכנים שמבצעים משימות מקצה לקצה"], "example": "קליטת חשבוניות ספקים מהמייל אל מערכת הנהלת החשבונות, והתראה על חשבוניות שמועד התשלום שלהן מתקרב."}, {"name": "Vibe Coding: Lovable, Base44 ו-Copilot Studio", "finance": 2, "learn": ["אפליקציות וכלים פנים-ארגוניים בשפה טבעית", "דשבורדים, כלי עבודה מחלקתיים ו-MVP בתוך שעות או ימים", "צ'אטבוטים ועוזרים בסביבת Microsoft עם Copilot Studio"], "example": "צ'אטבוט ב-Copilot Studio בתוך Teams שעונה למנהלים על יתרות התקציב שלהם."}, {"name": "פיתוח אג'נטי עם Claude Code", "finance": 2, "learn": ["Claude Code בטרמינל, ב-VS Code וב-JetBrains, בדסקטופ, בדפדפן ובנייד", "סוכנים ותת-סוכנים לעבודה במקביל", "Skills, hooks וחיבור כלים דרך MCP"], "example": "Skill שמריץ את בדיקות סגירת החודש לפי אותו סדר בכל פעם."}, {"name": "יצירת תוכן ומדיה", "finance": 1, "learn": ["טקסט, תמונות, וידאו, קול ומצגות", "Gamma, Midjourney ועוד"], "example": "מצגת תוצאות רבעוניות להנהלה שנבנית ב-Gamma מתוך סיכום הנתונים."}, {"name": "ניתוח מסמכים, ידע ונתונים", "finance": 3, "learn": ["סיכום וחקר ידע עם NotebookLM", "ניתוח נתונים בעזרת AI"], "example": "טוענים ל-NotebookLM את הדוחות הכספיים של שלוש שנים ושואלים על מגמות ברווחיות ובהוצאות."}, {"name": "פרויקט מעשי מלווה (25 שעות פרקטיקום)", "finance": 3, "learn": ["פרויקט AI מהארגון שלך או כיוזמה אישית, מהרעיון ועד מוצר עובד", "חניכה אישית, מפגשי אחד-על-אחד ופידבק מסוכן AI"], "example": "פרויקט \"סגירת חודש מהירה\" מהארגון שלך, עם מדד חיסכון בשעות שמוצג בסוף הקורס."}]}, "huji-ai-developer": {"title": "AI Developer – AI Coder Track", "provider": "האוניברסיטה העברית", "url": "", "topic": "פיתוח מוצרי AI", "level": "מתקדמים", "language": "אנגלית", "status": "מתוכנן", "score": 3, "why": "הכי מתאים להסבה לפיתוח מוצרי AI: ענן, אבטחה, RAG, סוכנים ו-MCP. בלי רקע טכני זה תלול, ולכן מומלץ כשלב שני אחרי קורס בסיס", "notes": "122 שעות · 18 מודולים · היברידי (כיתה + זום) · הסילבוס באנגלית · מחיר ותאריך פתיחה לא צוינו בקובץ", "added": "2026-09-24T10:01:00Z", "facts": {"hours": "122 שעות", "duration": "לא צוין", "start": "לא צוין", "schedule": "לא צוין", "format": "היברידי: פרונטלי וזום", "price": "לא צוין", "cert": "הגשה: הצגה חיה, הקלטת מסך של 10–15 דקות ללא AI ומאגר GitHub", "prereq": "ללא תכנות קודם · נוחות בהתקנת תוכנה ועבודה עם קבצים · הוראות טכניות באנגלית"}, "tools": ["Claude Code", "VS Code", "Python", "FastAPI", "Supabase", "GitHub", "GitHub Actions", "Railway", "Google Cloud Run", "Docker", "Cloudflare", "Anthropic SDK", "OpenAI SDK", "pgvector", "MCP", "Claude Agent SDK", "YOLO"], "financeOutcomes": ["לקרוא ולהבין סקריפט Python שמעבד כרטסת או קובץ בנק", "לבנות מסד נתונים של תקציבים שבו כל מנהל רואה רק את שלו", "לחלץ שדות מחשבונית לפלט מובנה עם בדיקה שהסכומים מסתכמים", "לבנות מערכת שאלות על נהלים וחוזרי מס שמכבדת הרשאות", "לבנות סוכן גבייה עם אישור אנושי, תקרות ולוג לכל פעולה", "לזהות סיכוני אבטחה כמו חשבונית זדונית שמנסה להפעיל את הסוכן"], "pros": ["העומק הטכני הגדול ביותר", "פרויקט אחד שנבנה מקצה לקצה לאורך כל הקורס", "אבטחה ואבחון תקלות בכל מודול", "שלושה אתגרים בלי AI שמוכיחים הבנה אמיתית", "רלוונטי מאוד להסבה מקצועית"], "cons": ["תלול למי שבלי רקע טכני", "הסילבוס באנגלית", "מחיר ותאריך פתיחה לא מופיעים בקובץ", "חלק מהמודולים (Docker, CI, YOLO) רחוקים מעבודת הכספים היומיומית"], "modules": [{"name": "פתיחת התוכנית", "hours": 4, "finance": 1, "learn": ["מה זה AI ואיך הגענו לכאן: מבינה סימבולית ועד עידן מודלי השפה", "איך LLM עובד: טוקנים, חלון הקשר, temperature", "למה הזיות הן חלק מהמנגנון", "מה עושה AI Coder: לתאר ← לייצר ← לקרוא ← לשאול ← לאמת ← לשחרר", "אתיקה, זכויות יוצרים ושימוש אחראי בקוד שנוצר"], "example": "מבינים למה מודל שמסכם דוח כספי עלול לשנות ספרה, ואיך בונים בדיקה שתתפוס את זה."}, {"name": "אפיון וארכיטקטורת תוכנה", "hours": 4, "finance": 2, "learn": ["מהרעיון לאפיון: בעיה, משתמשים, user stories, מה לא נכלל וחיתוך ל-MVP", "קריטריוני הצלחה ושרטוט מודל נתונים", "שכבות המערכת, חוזי API ואיפה שמים ולידציה והרשאות", "תיעוד החלטות ארכיטקטורה (ADR)", "תרגיל: לבקר ולדחות ארכיטקטורה ש-Claude הציע"], "example": "אפיון של מערכת אישור הוצאות: מי מגיש, מי מאשר, מה סף האישור ואילו טבלאות צריך."}, {"name": "Claude Code: לולאת העבודה", "hours": 4, "finance": 2, "learn": ["התקנה, הטרמינל ב-VS Code והזדהות", "מה המודל רואה: תיקיית העבודה, חלון ההקשר ו-CLAUDE.md", "מצבי הרשאה: ידני, אוטומטי ותכנון", "הלולאה: פרומפט ← תוכנית ← קריאת השינוי ← הרצה ← בדיקה ← commit", "מתי להגיד לא: הנדסת-יתר, APIs מומצאים והתרחבות של המשימה"], "example": "Claude מציע שינוי בסקריפט שמחשב עמלות. קוראים את השינוי ובודקים שהוא לא משנה את נוסחת העיגול לפני שמאשרים."}, {"name": "Python: לקרוא, להבין ולכוון", "hours": 16, "finance": 3, "learn": ["מספרים, מחרוזות, רשימות ומילונים, תנאים, לולאות ופונקציות", "JSON, קריאה וכתיבה של קבצים, חריגות", "קריאת stack trace ושימוש ב-debugger", "מודולים, סביבות מבודדות, מחלקות ומודלי Pydantic", "בדיקות עם pytest ו-ruff, ורשימת ביקורת לקוד שנוצר ב-AI", "אתגר ללא AI: לתקן סקריפט שבור רק מתוך הודעת השגיאה"], "example": "סקריפט שקורא קובץ CSV של כרטסת, מסכם לפי חשבון ומסמן תנועות כפולות. המטרה היא להבין כל שורה בו, לא רק להריץ אותו."}, {"name": "Git ו-GitHub: ניהול גרסאות", "hours": 4, "finance": 1, "learn": ["commits, staging, HEAD וענפים", "קריאת שינוי עם diff", ".gitignore והכלל שאסור להעלות סודות", "remote, push, pull וביטול שינויים בבטחה"], "example": "היסטוריה מלאה של כל שינוי בסקריפט חישוב העמלות, כדי לדעת מה השתנה ומתי."}, {"name": "יסודות תשתית ו-VPS", "hours": 8, "finance": 1, "learn": ["פריסה ידנית של הפרויקט לשרת שכור", "איך האינטרנט מגיש אפליקציה: IP, DNS, HTTP וקודי סטטוס", "APIs ו-JSON עם curl ו-Postman", "תהליכים, פורטים, לוגים ומשתני סביבה, Linux ו-SSH", "VPS, PaaS ו-serverless, גיבויים ומודלי עלות"], "example": "הבנה בסיסית שעוזרת לשוחח עם מחלקת ה-IT על אחסון מערכת כספית פנימית ועל העלויות שלה."}, {"name": "Backend, מסד נתונים, הרשאות ופריסה ראשונה", "hours": 12, "finance": 3, "learn": ["טבלאות, מפתחות, קשרים ואילוצים", "migrations, טרנזקציות, גיבויים ותרגיל שחזור", "Supabase Auth, JWT, והבדל בין אימות להרשאה", "הרשאות ברמת שורה (RLS) שנבדקות משני משתמשים שונים", "FastAPI לפי שכבות ופריסה ל-Railway", "אתגר ללא AI: לאבחן endpoint שנכשל מתוך לוגים וקודי סטטוס"], "example": "מסד נתונים של תקציבים עם הרשאות ברמת שורה: מנהל מחלקה רואה רק את התקציב שלו והכספים רואים הכול. בנוסף, תרגול של שחזור מגיבוי, כמו ביום שבו מישהו מחק נתונים בטעות."}, {"name": "Frontend וארכיטקטורת ווב", "hours": 4, "finance": 1, "learn": ["HTML, CSS, JavaScript ו-DOM, טפסים ו-fetch", "כלי הפיתוח של הדפדפן", "תרגיל אבחון: האם התקלה ב-CSS, ב-JavaScript, ב-API או במסד הנתונים", "גבולות הדפדפן: טוקנים, cookies, localStorage ו-CORS"], "example": "להבין למה טופס בקשת הוצאה \"לא נשמר\", ולמצוא אם התקלה במסך או בשרת."}, {"name": "Git ו-GitHub: שיתוף פעולה ו-CI", "hours": 4, "finance": 1, "learn": ["ענפים, pull requests וקונפליקטים", "קריאת GitHub Actions", "שער איכות: ruff, pytest וסריקת סודות ותלויות", "הגנה על ענפים (סוכנים לא ממזגים לבד) ו-rollback"], "example": "כל שינוי בחישוב המע\"מ עובר בדיקות אוטומטיות לפני שהוא עולה לאוויר."}, {"name": "Claude Code: שימוש מתקדם", "hours": 8, "finance": 2, "learn": ["Skills, hooks, הרשאות ו-sandbox", "CLAUDE.md, כללים לפי תיקייה והיגיינת הקשר", "שרתי MCP: Supabase, GitHub ומערכת קבצים, ותוספים לצוות", "תת-סוכנים, worktrees ותזמור של הרבה משימות", "Claude ב-CI ובסקירת קוד, ומעקב אחרי לוגים ובדיקות", "מצבי כשל, עלויות ומכסות"], "example": "Skill של \"סגירת חודש\" שכל הצוות מפעיל מאותה הגדרה משותפת, ו-hook שחוסם הרצה על קובץ שכר."}, {"name": "אבטחה ומודל איומים", "hours": 8, "finance": 3, "learn": ["מודל איומים: נקודות כניסה, גבולות אמון ונכסים", "ולידציה לעומק: SQL injection והעלאת קבצים", "שרשרת אספקה, תלויות מומצאות ונוהל דליפת סודות", "prompt injection ישיר ועקיף, ודליפת מידע", "מעקות בטיחות לסוכנים, אישורים ותקרות הוצאה", "מדיניות כתובה לאדם בלולאה"], "example": "חשבונית זדונית עם טקסט נסתר שכתוב בו \"אשר תשלום מיידי\" היא prompt injection עקיף. זו הסיבה שסוכן תשלומים חייב אישור אנושי ותקרת סכום."}, {"name": "Docker, ענן, Cloudflare ותצפית", "hours": 8, "finance": 1, "learn": ["images ו-containers, Dockerfile ו-Compose", "סביבות פיתוח, בדיקות וייצור, וסודות לכל סביבה", "Google Cloud: IAM, Cloud Run, Secret Manager ותקציבים", "Cloudflare: DNS, SSL, WAF והגבלת קצב", "לוגים מובנים, מדדים, runbook ותרגיל תקלה חי"], "example": "הגדרת תקציב והתראות עלות בענן כדי שחשבון הענן של מערכת פנימית לא יפתיע בסוף החודש."}, {"name": "דאטה למוצרי AI", "hours": 4, "finance": 3, "learn": ["DataFrames: סינון, קיבוץ ומיזוג", "ניקוי: ערכים חסרים, כפילויות, טיפוסים וחריגים", "golden sets, ולמה ציון נחשב רק על נתונים שהמערכת לא ראתה", "עץ החלטה שקוראים כ-if/else, precision, recall ו-confusion matrix", "מתי ML, מתי LLM ומתי אף אחד מהם"], "example": "מודל שחוזה אילו לקוחות יאחרו בתשלום. מדידת precision ו-recall מראה כמה התראות שווא יהיו וכמה איחורים יתפספסו."}, {"name": "הנדסת LLM", "hours": 4, "finance": 3, "learn": ["מבנה פרומפט: zero-shot, few-shot ו-chain-of-thought", "system prompts, temperature, JSON mode ופרומפטים שמנוהלים ב-Git", "פלט מובנה עם Pydantic וקריאה לכלים", "סוגי מודלים: קנייני או פתוח, API, gateway או הרצה מקומית", "טוקנים, caching, הערכת עלות וזמן תגובה", "הערכה, בדיקות רגרסיה ובדיקת prompt injection"], "example": "חילוץ שדות מחשבונית לפלט מובנה (ספק, ח\"פ, סכום, מע\"מ) עם בדיקה אוטומטית שהסכום לפני מע\"מ ועוד המע\"מ שווה לסך הכולל."}, {"name": "הנדסת RAG", "hours": 8, "finance": 3, "learn": ["מה אחזור פותר ומה לא", "embeddings, דמיון ואסטרטגיות חלוקה למקטעים", "pgvector ב-Supabase: טבלה, אינדקס ושאילתת דמיון", "קליטה של PDF, HTML ו-Markdown", "הערכה: golden set, faithfulness ו-recall@k", "הרשאות באחזור: האינדקס יורש את הרשאות המוצר"], "example": "מערכת שאלות על חוזרי מס ונהלים פנימיים. עובד שואל ומקבל תשובה רק מתוך מסמכים שמותר לו לראות. חוזים של הנהלה בכירה לא יופיעו לו."}, {"name": "סוכנים ו-MCP", "hours": 12, "finance": 3, "learn": ["לולאת הסוכן: מודל ← קריאה לכלי ← תוצאה ← מודל ← עצירה", "tool use עם ה-SDK של Anthropic ושל OpenAI, ומתי לא להשתמש בסוכן", "Claude Agent SDK ו-OpenAI Agents SDK", "פרוטוקול MCP ושרת MCP שחושף את נתוני המוצר", "מעקות בטיחות: מגבלת איטרציות, timeouts, רשימות מותרות ואישורים", "עלות, לוג לכל כלי והערכת סוכנים", "אתגר ללא AI: לאתר את התקלה בריצה כושלת של סוכן"], "example": "סוכן גבייה שבודק יתרות, מנסח תזכורת ומחכה לאישור לפני שליחה, ושרת MCP שחושף ל-Claude את נתוני התקציב כדי שאפשר יהיה לשאול עליהם בשפה טבעית."}, {"name": "ראייה ממוחשבת עם YOLO", "hours": 2, "finance": 1, "learn": ["זיהוי אובייקטים במצלמה ובתמונה", "ספירה ומעקב", "זיהוי תנוחה, סגמנטציה וסיווג", "טשטוש פנים ופרטיות"], "example": "רלוונטיות נמוכה לכספים. שימוש אפשרי: ספירת מלאי במחסן מתוך צילום לצורך ספירת סוף שנה."}, {"name": "בנייה מקצה לקצה בשידור חי", "hours": 8, "finance": 2, "learn": ["המרצה בונה מוצר שלם בשידור חי וקורא כל קובץ שנוצר", "רטרוספקטיבה: מה נוצר, מה נדחה ולמה", "הצגת המערכות של המשתתפים", "הגשה: הקלטת מסך ללא AI שעוקבת אחרי בקשה מהדפדפן ועד מסד הנתונים"], "example": "הפרויקט המסכם יכול להיות מערכת כספים קטנה: אישור הוצאות עם הרשאות, חילוץ חשבוניות ובוט נהלים."}]}}, FIN = {"courses": [{"id": "technion-nocode", "short": "טכניון"}, {"id": "barilan-claude-code", "short": "בר-אילן"}, {"id": "tafnit-ai-leaders", "short": "תפנית"}, {"id": "huji-ai-developer", "short": "העברית"}], "rows": [{"useCase": "קליטת חשבוניות ספקים אוטומטית", "levels": [2, 1, 2, 1], "note": "טכניון: n8n, Make ו-Zapier לעומק · תפנית: Make, n8n ו-Zapier ברמת הטמעה"}, {"useCase": "התאמות בנקים ושאילתות SQL", "levels": [2, 1, 1, 2], "note": "טכניון: 25 שעות מסדי נתונים ו-SQL · העברית: טבלאות, קשרים ו-DataFrames"}, {"useCase": "דשבורד תקציב מול ביצוע ותזרים", "levels": [2, 1, 0, 0], "note": "רק בטכניון יש BI מלא: Power BI, DAX ו-Tableau (40 שעות)"}, {"useCase": "ניתוח Excel בשפה טבעית", "levels": [2, 1, 1, 0], "note": "טכניון: Claude, ChatGPT ו-Copilot ב-Excel זה מול זה"}, {"useCase": "מאגר ידע לנהלים וחוזים (RAG)", "levels": [2, 0, 1, 2], "note": "טכניון: צינור RAG ב-n8n ובוט טלגרם · העברית: RAG עם הרשאות והערכה"}, {"useCase": "סוכנים עם אישור אנושי", "levels": [2, 2, 1, 2], "note": "בר-אילן: מודול סוכנים ייעודי · העברית: מעקות בטיחות, תקרות ולוג לכל כלי"}, {"useCase": "אפליקציה פנימית (אישור הוצאות, בקשות רכש)", "levels": [2, 2, 1, 2], "note": "טכניון: Claude Code, Codex ו-Lovable עם פריסה · העברית: מערכת מלאה עם הרשאות"}, {"useCase": "ניהול שינוי, הנהלה ו-ROI", "levels": [0, 0, 2, 0], "note": "רק תפנית מלמד ניהול שינוי, מטריצת החלטות ומדידת ROI"}, {"useCase": "אבטחה ופרטיות של מידע פיננסי", "levels": [1, 0, 1, 2], "note": "העברית: מודל איומים ו-prompt injection · טכניון: 5 שעות ממשל"}, {"useCase": "חיזוי וניתוח נתונים", "levels": [1, 1, 1, 2], "note": "העברית: מודל חיזוי עם precision ו-recall · בר-אילן: מודול האנליסט"}, {"useCase": "נוהל סגירת חודש כתהליך ש-AI מריץ", "levels": [1, 2, 1, 1], "note": "בר-אילן: מודול נהלים ו-SOPs וקובץ CLAUDE.md למחלקה"}]}, KEY = "ai-course-standalone:v1";
+  let store;
+  try { store = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
+  if (!store || !store.courses) store = { courses: SEED };
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) {} };
+  const listeners = [];
+  const snap = () => ({ docs: Object.entries(store.courses)
+      .sort((a, b) => String(b[1].added || "").localeCompare(String(a[1].added || "")))
+      .map(([id, d]) => ({ id, exists: true, data: () => d })) });
+  const emit = () => { save(); listeners.forEach(fn => fn(snap())); };
+  const db = {
+    collection: () => ({
+      orderBy: () => ({ onSnapshot: fn => { listeners.push(fn); setTimeout(() => fn(snap()), 0); return () => {}; } }),
+      add: async data => { store.courses["c-" + Date.now().toString(36)] = data; emit(); }
+    }),
+    doc: path => {
+      const id = path.split("/")[1];
+      return {
+        onSnapshot: fn => { setTimeout(() => fn({ exists: true, data: () => FIN }), 0); return () => {}; },
+        update: async data => { if (store.courses[id]) { Object.assign(store.courses[id], data); emit(); } },
+        delete: async () => { delete store.courses[id]; emit(); }
+      };
+    }
+  };
+  window.claude = { use: async () => db };
+})();
+</script>
+<title>קורס AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700&family=Heebo:wght@400;500;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+  :root {
+    --bg: #eef2f3;
+    --surface: #ffffff;
+    --surface-2: #f5f8f9;
+    --line: #d6e0e3;
+    --ink: #13232b;
+    --muted: #5d6f77;
+    --accent: #0f7c74;
+    --accent-ink: #ffffff;
+    --accent-soft: #dcefec;
+    --planned: #6f838c;
+    --progress: #c47a12;
+    --done: #2f8a4f;
+    --danger: #b23a3a;
+    --fin: #1f5fa8;
+    --fin-soft: #e3edf8;
+    --shadow: 0 1px 2px rgba(19, 35, 43, .06), 0 6px 20px rgba(19, 35, 43, .06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #0f1a1f; --surface: #16252c; --surface-2: #1b2d35; --line: #2a3f48;
+      --ink: #e4eef1; --muted: #93a8b0; --accent: #3cc2b4; --accent-ink: #062321;
+      --accent-soft: #173b3a; --planned: #8fa3ab; --progress: #e3a13e; --done: #5cc27f;
+      --danger: #e27272; --fin: #7fb2ec; --fin-soft: #1a2f45;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0f1a1f; --surface: #16252c; --surface-2: #1b2d35; --line: #2a3f48;
+    --ink: #e4eef1; --muted: #93a8b0; --accent: #3cc2b4; --accent-ink: #062321;
+    --accent-soft: #173b3a; --planned: #8fa3ab; --progress: #e3a13e; --done: #5cc27f;
+    --danger: #e27272; --fin: #7fb2ec; --fin-soft: #1a2f45;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25);
+  }
 
-<header>
-  <h1>🤖 קורס AI</h1>
-  <p>הקורסים שבחרתי בבינה מלאכותית — במקום אחד</p>
-</header>
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font: 15px/1.6 "Heebo", "Segoe UI", Arial, sans-serif;
+    padding-inline: 16px; padding-block: 28px 48px;
+  }
+  .wrap { max-width: 1080px; margin-inline: auto; display: grid; gap: 20px; }
+  h1, h2, h3 { font-family: "Rubik", "Heebo", sans-serif; margin: 0; text-wrap: balance; }
+  h1 { font-size: 1.9rem; letter-spacing: -.01em; }
+  h2 { font-size: 1.1rem; }
+  .num { font-family: "IBM Plex Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+  ul { margin: 0; padding-inline-start: 1.2em; }
+  li + li { margin-top: 3px; }
 
-<main>
-  <section class="card">
-    <div class="stats">
-      <div class="stat"><b id="s-total">0</b><span>קורסים</span></div>
-      <div class="stat planned"><b id="s-planned">0</b><span>מתוכננים</span></div>
-      <div class="stat progress"><b id="s-progress">0</b><span>בתהליך</span></div>
-      <div class="stat done"><b id="s-done">0</b><span>הושלמו</span></div>
+  .top { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 16px; }
+  .top p { margin: 4px 0 0; color: var(--muted); }
+  .sync { font-size: .82rem; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+  .sync i { width: 8px; height: 8px; border-radius: 50%; background: var(--planned); display: inline-block; }
+  .sync.on i { background: var(--done); }
+
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .tab {
+    background: none; color: var(--muted); border: 0; border-bottom: 3px solid transparent;
+    border-radius: 0; padding: 8px 14px; font-weight: 600;
+  }
+  .tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+  .tab:hover { filter: none; color: var(--ink); }
+
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); padding: 18px 20px; }
+  .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  .stat { display: grid; gap: 2px; }
+  .stat b { font-size: 1.7rem; line-height: 1.1; }
+  .stat span { color: var(--muted); font-size: .85rem; }
+  .stat.planned b { color: var(--planned); } .stat.progress b { color: var(--progress); } .stat.done b { color: var(--done); }
+  .meter { display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: var(--surface-2); margin-top: 16px; }
+  .meter div { transition: width .35s ease; }
+  .topics { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+
+  .cols { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 20px; align-items: start; }
+  .side { display: grid; gap: 20px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); }
+
+  .filters { display: grid; grid-template-columns: 2fr repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+  input, select, textarea {
+    font: inherit; color: var(--ink); background: var(--surface);
+    border: 1px solid var(--line); border-radius: 10px; padding: 9px 11px; width: 100%;
+  }
+  textarea { resize: vertical; min-height: 64px; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  label { display: grid; gap: 4px; font-size: .82rem; color: var(--muted); }
+
+  button {
+    font: inherit; font-weight: 600; cursor: pointer; border: 1px solid transparent;
+    border-radius: 10px; padding: 9px 14px; background: var(--accent); color: var(--accent-ink);
+  }
+  button:hover { filter: brightness(1.08); }
+  button.quiet { background: transparent; color: var(--muted); border-color: var(--line); padding: 5px 10px; font-size: .85rem; }
+  button.quiet:hover { color: var(--ink); }
+  button.danger { background: var(--danger); color: #fff; padding: 5px 10px; font-size: .85rem; }
+  button.link { background: none; color: var(--accent); padding: 0; border: 0; text-align: start; }
+  button.link:hover { text-decoration: underline; filter: none; }
+  button:disabled { opacity: .5; cursor: default; }
+
+  .list { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; }
+  .course {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+    padding: 14px 16px; display: grid; gap: 8px; align-content: start;
+    border-inline-start: 4px solid var(--c, var(--planned));
+  }
+  .course h3 { font-size: 1rem; font-weight: 500; }
+  .course h3 a { color: inherit; text-decoration: none; }
+  .course h3 a:hover { color: var(--accent); text-decoration: underline; }
+  .course .by { color: var(--muted); font-size: .85rem; }
+  .course .notes { margin: 0; font-size: .88rem; color: var(--muted); }
+  .chips { display: flex; flex-wrap: wrap; gap: 5px; }
+  .chip { background: var(--surface-2); border: 1px solid var(--line); color: var(--muted); border-radius: 999px; padding: 1px 9px; font-size: .78rem; }
+  .chip.topic { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
+  .chip.fin { background: var(--fin-soft); color: var(--fin); border-color: transparent; }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .course .row select { flex: 1; padding: 5px 9px; font-size: .88rem; }
+  .rec { display: grid; gap: 2px; background: var(--surface-2); border-radius: 8px; padding: 6px 10px; font-size: .88rem; }
+  .stars { color: var(--progress); letter-spacing: .1em; }
+  .example-tag { font-size: .72rem; letter-spacing: .06em; color: var(--muted); border: 1px dashed var(--line); border-radius: 6px; padding: 0 6px; justify-self: start; }
+  .course.example { opacity: .75; }
+  .note { color: var(--muted); font-size: .9rem; margin: 0 0 12px; }
+
+  form { display: grid; gap: 10px; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .msg { font-size: .85rem; min-height: 1.2em; margin: 0; }
+  .msg.err { color: var(--danger); } .msg.ok { color: var(--done); }
+  .links { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .links a { text-decoration: none; color: var(--accent); background: var(--accent-soft); padding: 5px 11px; border-radius: 8px; font-size: .88rem; font-weight: 500; }
+  .links a:hover { text-decoration: underline; }
+
+  /* Detail */
+  .d-head { display: grid; gap: 10px; }
+  .d-head h2 { font-size: 1.5rem; }
+  .d-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px 18px; margin: 0; }
+  .d-grid div { display: grid; gap: 1px; }
+  .d-grid dt { font-size: .76rem; color: var(--muted); letter-spacing: .04em; }
+  .d-grid dd { margin: 0; font-weight: 500; }
+  .caveat { background: var(--surface-2); border: 1px dashed var(--line); border-radius: 10px; padding: 8px 12px; font-size: .88rem; color: var(--muted); margin: 0; }
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .outcomes li::marker { color: var(--fin); }
+  .pros li::marker { color: var(--done); }
+  .cons li::marker { color: var(--danger); }
+
+  .hours { display: grid; gap: 6px; margin-top: 12px; }
+  .hrow { display: grid; grid-template-columns: minmax(120px, 220px) 1fr 44px; gap: 10px; align-items: center; font-size: .86rem; }
+  .hrow .lbl { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .hbar { height: 14px; background: var(--surface-2); border-radius: 4px; overflow: hidden; }
+  .hbar div { height: 100%; border-radius: 4px; }
+  .hrow .num { text-align: end; color: var(--muted); }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: .8rem; color: var(--muted); margin-top: 10px; }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-inline-end: 5px; vertical-align: -1px; }
+
+  .mods { display: grid; gap: 10px; }
+  details.mod { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+  details.mod summary {
+    list-style: none; cursor: pointer; padding: 12px 16px;
+    display: grid; grid-template-columns: auto 1fr auto auto; gap: 12px; align-items: center;
+  }
+  details.mod summary::-webkit-details-marker { display: none; }
+  details.mod summary .idx { font-family: "IBM Plex Mono", monospace; color: var(--muted); font-size: .85rem; min-width: 1.6em; }
+  details.mod summary .t { font-weight: 600; }
+  details.mod summary .h { font-size: .8rem; color: var(--muted); }
+  details.mod summary .chev { color: var(--muted); transition: transform .2s; }
+  details.mod[open] summary .chev { transform: rotate(-90deg); }
+  .mod-body { padding: 0 16px 16px; display: grid; gap: 12px; }
+  .mod-body h4 { margin: 0 0 4px; font-size: .82rem; color: var(--muted); font-weight: 600; letter-spacing: .03em; }
+  .fin-box { background: var(--fin-soft); border-radius: 10px; padding: 10px 14px; border-inline-start: 3px solid var(--fin); }
+  .fin-box h4 { color: var(--fin); }
+  .fin-box p { margin: 0; }
+  .rel { display: inline-flex; gap: 3px; align-items: center; font-size: .78rem; color: var(--fin); white-space: nowrap; }
+  .rel i { width: 8px; height: 8px; border-radius: 50%; background: var(--line); display: inline-block; }
+  .rel i.on { background: var(--fin); }
+
+  /* Finance matrix */
+  .tbl-wrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; min-width: 620px; font-size: .9rem; }
+  th, td { padding: 9px 10px; border-bottom: 1px solid var(--line); text-align: start; vertical-align: top; }
+  th { font-size: .8rem; color: var(--muted); font-weight: 600; }
+  td.lvl { text-align: center; font-size: 1.05rem; width: 72px; }
+  th.lvl { text-align: center; }
+  .dot { display: inline-block; width: 14px; height: 14px; border-radius: 50%; vertical-align: -2px; }
+  .dot.d2 { background: var(--fin); }
+  .dot.d1 { border: 2px solid var(--progress); background: linear-gradient(to left, var(--progress) 50%, transparent 50%); }
+  .dot.d0 { width: 12px; height: 2px; border-radius: 1px; background: var(--line); vertical-align: 3px; }
+  td .sub { display: block; font-size: .78rem; color: var(--muted); margin-top: 2px; }
+  .score-bars { display: grid; gap: 8px; margin-top: 12px; }
+
+  @media (max-width: 860px) {
+    .cols { grid-template-columns: 1fr; }
+    .side { position: static; }
+    .split { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 560px) {
+    .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .filters { grid-template-columns: 1fr 1fr; }
+    .filters #q { grid-column: 1 / -1; }
+    .two { grid-template-columns: 1fr; }
+    .hrow { grid-template-columns: 1fr 44px; }
+    .hrow .hbar { grid-column: 1 / -1; grid-row: 2; }
+    details.mod summary { grid-template-columns: auto 1fr auto; }
+    details.mod summary .h { grid-column: 2; }
+  }
+  @media (prefers-reduced-motion: reduce) { .meter div, details.mod summary .chev { transition: none; } }
+</style>
+
+<div class="wrap" dir="rtl" lang="he">
+  <header class="top">
+    <div>
+      <h1>קורס AI</h1>
+      <p>קורסי הבינה המלאכותית שבחרתי, עם פירוק לעומק ודוגמאות ממחלקת הכספים</p>
     </div>
-    <div class="bar" id="bar"></div>
-  </section>
+    <div class="sync" id="sync"><i></i><span>נשמר בדפדפן הזה</span></div>
+  </header>
 
-  <section class="card">
-    <div class="toolbar">
-      <input id="q" type="search" placeholder="🔍 חיפוש בקורסים שלי…">
-      <select id="f-topic"><option value="">כל הנושאים</option></select>
-      <select id="f-level">
-        <option value="">כל הרמות</option>
-        <option>מתחילים</option><option>בינוני</option><option>מתקדמים</option>
-      </select>
-      <select id="f-status">
-        <option value="">כל הסטטוסים</option>
-        <option>מתוכנן</option><option>בתהליך</option><option>הושלם</option>
-      </select>
-    </div>
-  </section>
+  <nav class="tabs" role="tablist">
+    <button class="tab" role="tab" id="tab-list" aria-selected="true">הקורסים</button>
+    <button class="tab" role="tab" id="tab-fin" aria-selected="false">עדשת כספים</button>
+  </nav>
 
-  <section id="list" class="grid"></section>
+  <!-- List view -->
+  <div id="view-list" class="wrap" style="max-width:none">
+    <section class="panel" aria-label="סיכום">
+      <div class="stats">
+        <div class="stat"><b class="num" id="s-total">0</b><span>קורסים</span></div>
+        <div class="stat planned"><b class="num" id="s-planned">0</b><span>מתוכננים</span></div>
+        <div class="stat progress"><b class="num" id="s-progress">0</b><span>בלמידה</span></div>
+        <div class="stat done"><b class="num" id="s-done">0</b><span>הושלמו</span></div>
+      </div>
+      <div class="meter" id="meter" aria-hidden="true"></div>
+      <div class="topics" id="topic-chips"></div>
+    </section>
 
-  <section class="card" style="margin-top:18px">
-    <details id="add-box">
-      <summary>הוספת קורס</summary>
-      <form id="add-form">
-        <div class="row">
-          <div class="full"><label for="a-title">שם הקורס *</label><input id="a-title" required></div>
-          <div><label for="a-provider">ספק / פלטפורמה</label><input id="a-provider" placeholder="Coursera, Udemy, YouTube…"></div>
-          <div><label for="a-url">קישור</label><input id="a-url" type="url" placeholder="https://"></div>
-          <div><label for="a-topic">נושא</label><input id="a-topic" list="topics" placeholder="LLM, פרומפטים, אוטומציה…"></div>
-          <div><label for="a-language">שפה</label>
-            <select id="a-language"><option>עברית</option><option>אנגלית</option><option>אחר</option></select></div>
-          <div><label for="a-level">רמה</label>
-            <select id="a-level"><option>מתחילים</option><option>בינוני</option><option>מתקדמים</option></select></div>
-          <div><label for="a-status">סטטוס</label>
-            <select id="a-status"><option>מתוכנן</option><option>בתהליך</option><option>הושלם</option></select></div>
-          <div class="full"><label for="a-notes">הערות</label><textarea id="a-notes"></textarea></div>
+    <div class="cols">
+      <main>
+        <div class="filters">
+          <input id="q" type="search" placeholder="חיפוש בקורסים, בנושאים ובדוגמאות" aria-label="חיפוש">
+          <select id="f-topic" aria-label="נושא"><option value="">כל הנושאים</option></select>
+          <select id="f-level" aria-label="רמה">
+            <option value="">כל הרמות</option><option>מתחילים</option><option>בינוני</option><option>מתקדמים</option>
+          </select>
+          <select id="f-status" aria-label="סטטוס">
+            <option value="">כל הסטטוסים</option><option>מתוכנן</option><option>בלמידה</option><option>הושלם</option>
+          </select>
         </div>
-        <div class="actions"><button type="submit">שמירת קורס</button></div>
-      </form>
-      <datalist id="topics"></datalist>
-    </details>
-  </section>
+        <p class="note" id="list-note" hidden></p>
+        <div class="list" id="list"></div>
+      </main>
 
-  <section class="card">
-    <h2>🔎 חיפוש קורסים חדשים</h2>
-    <div class="toolbar">
-      <input id="ext-q" placeholder="למשל: prompt engineering, סוכני AI, Claude…">
+      <aside class="side">
+        <section class="panel">
+          <h2>הוספת קורס</h2>
+          <form id="add-form" style="margin-top:12px">
+            <label>שם הקורס<input id="a-title" required></label>
+            <div class="two">
+              <label>פלטפורמה<input id="a-provider" placeholder="Coursera, YouTube…"></label>
+              <label>נושא<input id="a-topic" list="topic-list" placeholder="LLM, פרומפטים…"></label>
+            </div>
+            <label>קישור<input id="a-url" type="url" placeholder="https://" dir="ltr"></label>
+            <div class="two">
+              <label>רמה<select id="a-level"><option>מתחילים</option><option>בינוני</option><option>מתקדמים</option></select></label>
+              <label>שפה<select id="a-language"><option>עברית</option><option>אנגלית</option><option>אחר</option></select></label>
+            </div>
+            <label>סטטוס<select id="a-status"><option>מתוכנן</option><option>בלמידה</option><option>הושלם</option></select></label>
+            <label>הערות<textarea id="a-notes"></textarea></label>
+            <button type="submit" id="a-submit">שמירת קורס</button>
+            <p class="msg" id="a-msg" role="status"></p>
+          </form>
+          <datalist id="topic-list"></datalist>
+        </section>
+
+        <section class="panel">
+          <h2>חיפוש קורסים חדשים</h2>
+          <input id="ext-q" style="margin-top:10px" placeholder="למשל: AI לכספים, Power BI, סוכנים" aria-label="נושא לחיפוש">
+          <div class="links" id="ext-links"></div>
+        </section>
+      </aside>
     </div>
-    <div class="search-links" id="ext-links"></div>
-  </section>
+  </div>
 
-  <section class="card">
-    <h2>💾 גיבוי והעברה</h2>
-    <div class="actions">
-      <button class="ghost" id="export">ייצוא לקובץ JSON</button>
-      <button class="ghost" id="import-btn">ייבוא מקובץ JSON</button>
-      <input type="file" id="import" accept="application/json" hidden>
-    </div>
-  </section>
+  <!-- Detail view -->
+  <div id="view-detail" class="wrap" style="max-width:none" hidden></div>
 
-  <p style="text-align:center"><a class="back" style="color:var(--muted)" href="../">← חזרה לשישי בבוקר</a></p>
-</main>
+  <!-- Finance lens -->
+  <div id="view-fin" class="wrap" style="max-width:none" hidden></div>
+</div>
 
 <script>
-const STORE_KEY = "ai-course:v1";
-const STATUS_COLOR = { "מתוכנן": "var(--planned)", "בתהליך": "var(--progress)", "הושלם": "var(--done)" };
+const STATUSES = ["מתוכנן", "בלמידה", "הושלם"];
+const STATUS_COLOR = { "מתוכנן": "var(--planned)", "בלמידה": "var(--progress)", "הושלם": "var(--done)" };
+const REL_LABEL = { 1: "רלוונטיות נמוכה לכספים", 2: "רלוונטיות בינונית לכספים", 3: "רלוונטיות גבוהה לכספים" };
+const REL_COLOR = { 1: "var(--planned)", 2: "var(--progress)", 3: "var(--fin)" };
+const EXAMPLES = [
+  { id: "ex1", title: "Prompt Engineering למתחילים", provider: "YouTube", topic: "פרומפטים", level: "מתחילים", language: "עברית", status: "בלמידה", score: 5, why: "בסיס חובה לכל עבודה עם AI, קצר ומעשי" },
+  { id: "ex2", title: "Building with the Claude API", provider: "Anthropic", topic: "LLM", level: "בינוני", language: "אנגלית", status: "מתוכנן" }
+];
 
-let baseCourses = [];
-let local = loadLocal(); // { added: [], status: {id: status}, removed: [] }
-
-function loadLocal() {
-  try {
-    const v = JSON.parse(localStorage.getItem(STORE_KEY));
-    if (v && Array.isArray(v.added)) return { status: {}, removed: [], ...v };
-  } catch (e) {}
-  return { added: [], status: {}, removed: [] };
-}
-function saveLocal() {
-  try { localStorage.setItem(STORE_KEY, JSON.stringify(local)); } catch (e) {}
-}
-
-function allCourses() {
-  return [...baseCourses, ...local.added]
-    .filter(c => !local.removed.includes(c.id))
-    .map(c => ({ ...c, status: local.status[c.id] || c.status || "מתוכנן" }));
-}
-
-const esc = s => String(s ?? "").replace(/[&<>"']/g, ch =>
-  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+let db = null, courses = [], finance = null, loaded = false, pendingDelete = null, view = "list", detailId = null;
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const safeUrl = u => /^https?:\/\//i.test(u || "") ? u : "";
+const stars = n => { n = Math.max(0, Math.min(5, Number(n) || 0)); return "★".repeat(n) + "☆".repeat(5 - n); };
+const rel = n => `<span class="rel" title="${REL_LABEL[n] || ""}">${[1, 2, 3].map(i => `<i class="${i <= n ? "on" : ""}"></i>`).join("")}</span>`;
 
-function render() {
-  const courses = allCourses();
-  const q = document.getElementById("q").value.trim().toLowerCase();
-  const ft = document.getElementById("f-topic").value;
-  const fl = document.getElementById("f-level").value;
-  const fs = document.getElementById("f-status").value;
+function setSync(on, text) {
+  $("sync").className = "sync" + (on ? " on" : "");
+  $("sync").querySelector("span").textContent = text;
+}
 
-  // Stats
-  const count = s => courses.filter(c => c.status === s).length;
-  const total = courses.length, p = count("מתוכנן"), g = count("בתהליך"), d = count("הושלם");
-  document.getElementById("s-total").textContent = total;
-  document.getElementById("s-planned").textContent = p;
-  document.getElementById("s-progress").textContent = g;
-  document.getElementById("s-done").textContent = d;
-  document.getElementById("bar").innerHTML = total ? [
-    [d, "var(--done)"], [g, "var(--progress)"], [p, "var(--planned)"]
-  ].map(([n, c]) => `<div style="width:${n / total * 100}%;background:${c}"></div>`).join("") : "";
+function show(v, id) {
+  view = v; detailId = id || null;
+  $("view-list").hidden = v !== "list";
+  $("view-detail").hidden = v !== "detail";
+  $("view-fin").hidden = v !== "fin";
+  $("tab-list").setAttribute("aria-selected", String(v === "list" || v === "detail"));
+  $("tab-fin").setAttribute("aria-selected", String(v === "fin"));
+  try { history.replaceState(null, "", v === "detail" ? "#" + id : v === "fin" ? "#finance" : "#"); } catch (e) {}
+  renderAll();
+  window.scrollTo({ top: 0 });
+}
+$("tab-list").addEventListener("click", () => show("list"));
+$("tab-fin").addEventListener("click", () => show("fin"));
 
-  // Topic filter + datalist
-  const topics = [...new Set(courses.map(c => c.topic).filter(Boolean))].sort();
-  const sel = document.getElementById("f-topic");
-  sel.innerHTML = `<option value="">כל הנושאים</option>` +
-    topics.map(t => `<option ${t === ft ? "selected" : ""}>${esc(t)}</option>`).join("");
-  document.getElementById("topics").innerHTML = topics.map(t => `<option value="${esc(t)}">`).join("");
+function renderAll() {
+  if (view === "list") renderList();
+  else if (view === "detail") renderDetail();
+  else renderFinance();
+}
 
-  const shown = courses.filter(c =>
-    (!ft || c.topic === ft) && (!fl || c.level === fl) && (!fs || c.status === fs) &&
-    (!q || [c.title, c.provider, c.topic, c.notes].join(" ").toLowerCase().includes(q)));
+/* ---------- List ---------- */
+function renderList() {
+  const isExample = loaded && courses.length === 0;
+  const data = isExample ? EXAMPLES : courses;
+  const count = s => data.filter(c => c.status === s).length;
+  const total = data.length, p = count("מתוכנן"), g = count("בלמידה"), d = count("הושלם");
+  $("s-total").textContent = total; $("s-planned").textContent = p;
+  $("s-progress").textContent = g; $("s-done").textContent = d;
+  $("meter").innerHTML = total ? [[d, "var(--done)"], [g, "var(--progress)"], [p, "var(--planned)"]]
+    .map(([n, c]) => `<div style="width:${n / total * 100}%;background:${c}"></div>`).join("") : "";
 
-  const list = document.getElementById("list");
-  if (!shown.length) {
-    list.innerHTML = `<div class="card empty" style="grid-column:1/-1">
-      <div class="big">📚</div>
-      <p>${total ? "אין קורסים שמתאימים לסינון" : "עוד אין קורסים — הוסיפו את הראשון למטה"}</p></div>`;
-    return;
-  }
-  list.innerHTML = shown.map(c => {
+  const byTopic = {};
+  data.forEach(c => { if (c.topic) byTopic[c.topic] = (byTopic[c.topic] || 0) + 1; });
+  const topics = Object.keys(byTopic).sort();
+  $("topic-chips").innerHTML = topics.map(t => `<span class="chip topic">${esc(t)} · <span class="num">${byTopic[t]}</span></span>`).join("");
+  const ft = $("f-topic").value;
+  $("f-topic").innerHTML = `<option value="">כל הנושאים</option>` + topics.map(t => `<option ${t === ft ? "selected" : ""}>${esc(t)}</option>`).join("");
+  $("topic-list").innerHTML = topics.map(t => `<option value="${esc(t)}">`).join("");
+
+  const q = $("q").value.trim().toLowerCase(), fl = $("f-level").value, fs = $("f-status").value;
+  const haystack = c => [c.title, c.provider, c.topic, c.notes, c.why,
+    ...(c.modules || []).flatMap(m => [m.name, m.example, ...(m.learn || [])])].join(" ").toLowerCase();
+  const shown = data.filter(c => (!ft || c.topic === ft) && (!fl || c.level === fl) && (!fs || c.status === fs) && (!q || haystack(c).includes(q)))
+    .sort((a, b) => (b.score || 0) - (a.score || 0));
+
+  const note = $("list-note");
+  if (!loaded) { note.hidden = false; note.textContent = "טוען את הרשימה…"; }
+  else if (isExample) { note.hidden = false; note.textContent = "הרשימה עדיין ריקה. אלה קורסים לדוגמה בלבד."; }
+  else if (!shown.length) { note.hidden = false; note.textContent = "אין קורסים שמתאימים לסינון."; }
+  else note.hidden = true;
+
+  $("list").innerHTML = shown.map(c => {
     const url = safeUrl(c.url);
     const title = url ? `<a href="${esc(url)}" target="_blank" rel="noopener">${esc(c.title)} ↗</a>` : esc(c.title);
-    return `<article class="card course">
+    const mods = c.modules || [];
+    const hot = mods.filter(m => m.finance === 3).length;
+    const controls = isExample ? `<span class="example-tag">דוגמה</span>` :
+      pendingDelete === c.id
+        ? `<div class="row"><span style="font-size:.85rem">להסיר?</span><button class="danger" data-confirm="${esc(c.id)}">הסרה</button><button class="quiet" data-cancel>ביטול</button></div>`
+        : `<div class="row"><select data-status="${esc(c.id)}" aria-label="סטטוס">${STATUSES.map(s => `<option ${s === c.status ? "selected" : ""}>${s}</option>`).join("")}</select><button class="quiet" data-remove="${esc(c.id)}">הסרה</button></div>`;
+    return `<article class="course${isExample ? " example" : ""}" style="--c:${STATUS_COLOR[c.status] || "var(--planned)"}">
       <h3>${title}</h3>
-      ${c.provider ? `<div class="meta">${esc(c.provider)}</div>` : ""}
-      <div class="tags">
-        ${c.topic ? `<span class="tag">${esc(c.topic)}</span>` : ""}
-        ${c.level ? `<span class="tag">${esc(c.level)}</span>` : ""}
-        ${c.language ? `<span class="tag">${esc(c.language)}</span>` : ""}
+      ${c.provider ? `<div class="by">${esc(c.provider)}</div>` : ""}
+      <div class="chips">
+        ${c.topic ? `<span class="chip topic">${esc(c.topic)}</span>` : ""}
+        ${c.level ? `<span class="chip">${esc(c.level)}</span>` : ""}
+        ${mods.length ? `<span class="chip">${mods.length} נושאים</span>` : ""}
+        ${hot ? `<span class="chip fin">${hot} רלוונטיים מאוד לכספים</span>` : ""}
       </div>
+      ${c.score ? `<div class="rec"><span class="stars" aria-label="ציון התאמה ${Number(c.score)} מתוך 5">${stars(c.score)}</span>${c.why ? `<span>${esc(c.why)}</span>` : ""}</div>` : ""}
       ${c.notes ? `<p class="notes">${esc(c.notes)}</p>` : ""}
-      <footer>
-        <span class="status-dot" style="background:${STATUS_COLOR[c.status]}"></span>
-        <select data-status="${esc(c.id)}" aria-label="סטטוס">
-          ${["מתוכנן", "בתהליך", "הושלם"].map(s => `<option ${s === c.status ? "selected" : ""}>${s}</option>`).join("")}
-        </select>
-        <button class="ghost" data-remove="${esc(c.id)}" title="הסרה">🗑</button>
-      </footer>
+      ${mods.length ? `<button class="link" data-open="${esc(c.id)}">לפירוט המלא ולדוגמאות מהכספים ←</button>` : ""}
+      ${controls}
     </article>`;
   }).join("");
 }
 
-// Filters
-["q", "f-topic", "f-level", "f-status"].forEach(id =>
-  document.getElementById(id).addEventListener("input", render));
+["q", "f-topic", "f-level", "f-status"].forEach(id => $(id).addEventListener("input", renderList));
 
-// Status change / remove
-document.getElementById("list").addEventListener("change", e => {
+$("list").addEventListener("change", async e => {
   const id = e.target.dataset.status;
-  if (!id) return;
-  local.status[id] = e.target.value;
-  saveLocal(); render();
+  if (!id || !db) return;
+  try { await db.doc("courses/" + id).update({ status: e.target.value }); }
+  catch { setSync(false, "השינוי לא נשמר. נסה שוב"); }
 });
-document.getElementById("list").addEventListener("click", e => {
-  const id = e.target.dataset.remove;
-  if (!id || !confirm("להסיר את הקורס מהרשימה?")) return;
-  const i = local.added.findIndex(c => c.id === id);
-  if (i >= 0) local.added.splice(i, 1); else local.removed.push(id);
-  delete local.status[id];
-  saveLocal(); render();
+$("list").addEventListener("click", async e => {
+  const t = e.target.closest("button");
+  if (!t) return;
+  if (t.dataset.open) show("detail", t.dataset.open);
+  else if (t.dataset.remove) { pendingDelete = t.dataset.remove; renderList(); }
+  else if (t.hasAttribute("data-cancel")) { pendingDelete = null; renderList(); }
+  else if (t.dataset.confirm && db) {
+    const id = t.dataset.confirm; pendingDelete = null;
+    try { await db.doc("courses/" + id).delete(); } catch { setSync(false, "ההסרה לא נשמרה. נסה שוב"); }
+  }
 });
 
-// Add course
-document.getElementById("add-form").addEventListener("submit", e => {
-  e.preventDefault();
-  const v = id => document.getElementById(id).value.trim();
-  local.added.push({
-    id: "c-" + Date.now().toString(36),
-    title: v("a-title"), provider: v("a-provider"), url: v("a-url"),
-    topic: v("a-topic"), level: v("a-level"), status: v("a-status"),
-    language: v("a-language"), notes: v("a-notes"),
-    added: new Date().toISOString().slice(0, 10)
+/* ---------- Detail ---------- */
+function renderDetail() {
+  const c = courses.find(x => x.id === detailId);
+  const el = $("view-detail");
+  if (!c) { el.innerHTML = `<button class="quiet" data-back>→ חזרה לקורסים</button><p class="note">${loaded ? "הקורס לא נמצא." : "טוען…"}</p>`; return; }
+  const f = c.facts || {};
+  const mods = c.modules || [];
+  const withHours = mods.filter(m => m.hours);
+  const maxH = Math.max(1, ...withHours.map(m => m.hours));
+  const totalH = withHours.reduce((s, m) => s + m.hours, 0);
+  const finH = withHours.filter(m => m.finance === 3).reduce((s, m) => s + m.hours, 0);
+  const relCount = n => mods.filter(m => m.finance === n).length;
+
+  const factRows = [["היקף", f.hours], ["משך", f.duration], ["פתיחה", f.start], ["מועד", f.schedule],
+    ["מתכונת", f.format], ["עלות", f.price], ["תעודה", f.cert], ["תנאי קבלה", f.prereq]]
+    .filter(([, v]) => v).map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("");
+
+  const chart = withHours.length ? `
+    <section class="panel">
+      <h2>איך מתחלקות השעות</h2>
+      <p class="note" style="margin:4px 0 0"><span class="num">${finH}</span> מתוך <span class="num">${totalH}</span> שעות (${Math.round(finH / totalH * 100)}%) הן בנושאים עם רלוונטיות גבוהה לכספים</p>
+      <div class="hours">${withHours.map(m => `
+        <div class="hrow"><span class="lbl" title="${esc(m.name)}">${esc(m.name)}</span>
+          <div class="hbar"><div style="width:${m.hours / maxH * 100}%;background:${REL_COLOR[m.finance] || "var(--planned)"}"></div></div>
+          <span class="num">${m.hours}</span></div>`).join("")}</div>
+      <div class="legend"><span><i style="background:var(--fin)"></i>רלוונטיות גבוהה לכספים</span><span><i style="background:var(--progress)"></i>בינונית</span><span><i style="background:var(--planned)"></i>נמוכה</span></div>
+    </section>` : mods.length ? `
+    <section class="panel">
+      <h2>רלוונטיות הנושאים לכספים</h2>
+      <p class="note" style="margin:4px 0 0">בחוברת אין חלוקת שעות לפי נושא, אז זו ספירה של הנושאים</p>
+      <div class="hours">${[3, 2, 1].map(n => `
+        <div class="hrow"><span class="lbl">${REL_LABEL[n].replace(" לכספים", "")}</span>
+          <div class="hbar"><div style="width:${relCount(n) / mods.length * 100}%;background:${REL_COLOR[n]}"></div></div>
+          <span class="num">${relCount(n)}</span></div>`).join("")}</div>
+    </section>` : "";
+
+  el.innerHTML = `
+    <div><button class="quiet" data-back>→ חזרה לקורסים</button></div>
+    <section class="panel d-head">
+      <div class="chips">${c.topic ? `<span class="chip topic">${esc(c.topic)}</span>` : ""}${c.level ? `<span class="chip">${esc(c.level)}</span>` : ""}${c.language ? `<span class="chip">${esc(c.language)}</span>` : ""}</div>
+      <h2>${esc(c.title)}</h2>
+      <div class="by" style="color:var(--muted)">${esc(c.provider)}</div>
+      ${c.score ? `<div class="rec"><span class="stars">${stars(c.score)} <span style="color:var(--muted);letter-spacing:0">ציון התאמה</span></span><span>${esc(c.why)}</span></div>` : ""}
+      ${factRows ? `<dl class="d-grid">${factRows}</dl>` : ""}
+      ${c.inferred ? `<p class="caveat">החומר של הקורס הזה מפרט רק את שמות הנושאים. את התוכן והדוגמאות בכל נושא כתבתי לפי השם, וכדאי לאמת מול הסילבוס המלא.</p>` : ""}
+    </section>
+
+    ${c.financeOutcomes ? `<section class="panel"><h2>מה תדע לעשות במחלקת הכספים בסוף הקורס</h2><ul class="outcomes" style="margin-top:10px">${c.financeOutcomes.map(x => `<li>${esc(x)}</li>`).join("")}</ul></section>` : ""}
+
+    ${chart}
+
+    ${mods.length ? `<section class="d-head">
+      <div class="row" style="justify-content:space-between"><h2>הנושאים, אחד אחד</h2>
+        <div class="row"><button class="quiet" data-expand="1">לפתוח הכול</button><button class="quiet" data-expand="0">לסגור הכול</button></div></div>
+      <div class="mods">${mods.map((m, i) => `
+        <details class="mod"${i === 0 ? " open" : ""}>
+          <summary><span class="idx">${i + 1}</span><span class="t">${esc(m.name)}</span>
+            <span class="h">${m.hours ? `<span class="num">${m.hours}</span> שעות · ` : ""}${rel(m.finance)}</span><span class="chev" aria-hidden="true">‹</span></summary>
+          <div class="mod-body">
+            <div><h4>מה לומדים</h4><ul>${(m.learn || []).map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>
+            ${m.example ? `<div class="fin-box"><h4>דוגמה ממחלקת הכספים</h4><p>${esc(m.example)}</p></div>` : ""}
+          </div>
+        </details>`).join("")}</div>
+    </section>` : ""}
+
+    ${c.tools ? `<section class="panel"><h2>הכלים שנלמדים</h2><div class="chips" style="margin-top:10px">${c.tools.map(t => `<span class="chip">${esc(t)}</span>`).join("")}</div></section>` : ""}
+
+    ${c.pros || c.cons ? `<section class="panel split">
+      <div><h2>בעד</h2><ul class="pros" style="margin-top:8px">${(c.pros || []).map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>
+      <div><h2>נגד</h2><ul class="cons" style="margin-top:8px">${(c.cons || []).map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>
+    </section>` : ""}
+  `;
+}
+$("view-detail").addEventListener("click", e => {
+  const t = e.target.closest("button");
+  if (!t) return;
+  if (t.hasAttribute("data-back")) show("list");
+  else if (t.dataset.expand) $("view-detail").querySelectorAll("details.mod").forEach(d => d.open = t.dataset.expand === "1");
+});
+
+/* ---------- Finance lens ---------- */
+function renderFinance() {
+  const el = $("view-fin");
+  if (!finance) { el.innerHTML = `<p class="note">${loaded ? "עוד אין השוואת כספים." : "טוען…"}</p>`; return; }
+  const cols = finance.courses || [], rows = finance.rows || [];
+  const sym = n => `<span class="dot d${n}" title="${n === 2 ? "נלמד לעומק" : n === 1 ? "נלמד חלקית" : "לא נלמד"}"></span>`;
+  const totals = cols.map((c, i) => rows.reduce((s, r) => s + (r.levels[i] || 0), 0));
+  const max = Math.max(1, ...totals);
+  const finHours = cols.map(c => {
+    const course = courses.find(x => x.id === c.id);
+    const mods = (course && course.modules) || [];
+    return { hot: mods.filter(m => m.finance === 3).length, all: mods.length };
   });
-  saveLocal();
-  e.target.reset();
-  render();
+
+  el.innerHTML = `
+    <section class="panel">
+      <h2>מי מלמד מה שמחלקת כספים צריכה</h2>
+      <p class="note" style="margin:4px 0 12px">${sym(2)} נלמד לעומק &nbsp; ${sym(1)} נלמד חלקית &nbsp; ${sym(0)} לא נלמד · הדירוג שלי, לפי הסילבוסים שצירפת</p>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>משימה בכספים</th>${cols.map(c => `<th class="lvl"><button class="link" data-open="${esc(c.id)}">${esc(c.short)}</button></th>`).join("")}</tr></thead>
+        <tbody>${rows.map(r => `<tr><td>${esc(r.useCase)}<span class="sub">${esc(r.note)}</span></td>${r.levels.map(l => `<td class="lvl">${sym(l)}</td>`).join("")}</tr>`).join("")}</tbody>
+      </table></div>
+    </section>
+    <section class="panel">
+      <h2>ציון כספים מצטבר</h2>
+      <p class="note" style="margin:4px 0 0">סכום הנקודות בטבלה (לעומק = 2, חלקית = 1), ומספר הנושאים בכל קורס שהרלוונטיות שלהם לכספים גבוהה</p>
+      <div class="score-bars">${cols.map((c, i) => `
+        <div class="hrow"><span class="lbl">${esc(c.short)}</span>
+          <div class="hbar"><div style="width:${totals[i] / max * 100}%;background:var(--fin)"></div></div>
+          <span class="num">${totals[i]}</span></div>
+        <div class="note" style="margin:-4px 0 4px;font-size:.8rem">${finHours[i].hot} מתוך ${finHours[i].all} נושאים ברלוונטיות גבוהה לכספים</div>`).join("")}</div>
+    </section>`;
+}
+$("view-fin").addEventListener("click", e => {
+  const t = e.target.closest("button[data-open]");
+  if (t) show("detail", t.dataset.open);
 });
 
-// External search
+/* ---------- Add + external search ---------- */
+$("add-form").addEventListener("submit", async e => {
+  e.preventDefault();
+  const msg = $("a-msg");
+  if (!db) { msg.className = "msg err"; msg.textContent = "השמירה לא זמינה בתצוגה הזו."; return; }
+  const v = id => $(id).value.trim();
+  $("a-submit").disabled = true;
+  try {
+    await db.collection("courses").add({
+      title: v("a-title"), provider: v("a-provider"), url: v("a-url"), topic: v("a-topic"),
+      level: v("a-level"), language: v("a-language"), status: v("a-status"), notes: v("a-notes"),
+      added: new Date().toISOString()
+    });
+    e.target.reset();
+    msg.className = "msg ok"; msg.textContent = "הקורס נשמר";
+  } catch (err) {
+    msg.className = "msg err";
+    msg.textContent = err && err.code === "quota_exceeded" ? "הגעת למגבלת הקורסים. הסר קורסים ישנים ונסה שוב." : "הקורס לא נשמר. נסה שוב בעוד רגע.";
+  }
+  $("a-submit").disabled = false;
+});
+
 const PROVIDERS = [
   ["Coursera", q => `https://www.coursera.org/search?query=${q}`],
   ["Udemy", q => `https://www.udemy.com/courses/search/?q=${q}`],
@@ -344,48 +593,34 @@ const PROVIDERS = [
   ["Google", q => `https://www.google.com/search?q=${q}`]
 ];
 function renderExt() {
-  const raw = document.getElementById("ext-q").value.trim() || "AI";
-  const q = encodeURIComponent(raw + " course");
-  document.getElementById("ext-links").innerHTML = PROVIDERS
-    .map(([name, f]) => `<a href="${f(q)}" target="_blank" rel="noopener">${name} ↗</a>`).join("");
+  const q = encodeURIComponent(($("ext-q").value.trim() || "AI for finance") + " course");
+  $("ext-links").innerHTML = PROVIDERS.map(([n, f]) => `<a href="${f(q)}" target="_blank" rel="noopener">${n} ↗</a>`).join("");
 }
-document.getElementById("ext-q").addEventListener("input", renderExt);
+$("ext-q").addEventListener("input", renderExt);
 
-// Export / import
-document.getElementById("export").addEventListener("click", () => {
-  const data = { updated: new Date().toISOString().slice(0, 10), courses: allCourses() };
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }));
-  a.download = "courses.json";
-  a.click();
-  URL.revokeObjectURL(a.href);
-});
-document.getElementById("import-btn").addEventListener("click", () => document.getElementById("import").click());
-document.getElementById("import").addEventListener("change", async e => {
-  const file = e.target.files[0];
-  if (!file) return;
-  try {
-    const data = JSON.parse(await file.text());
-    const incoming = Array.isArray(data) ? data : data.courses;
-    if (!Array.isArray(incoming)) throw new Error();
-    const known = new Set(allCourses().map(c => c.id));
-    const fresh = incoming.filter(c => c && c.title && !known.has(c.id))
-      .map(c => ({ ...c, id: c.id || "c-" + Math.random().toString(36).slice(2, 9) }));
-    local.added.push(...fresh);
-    saveLocal(); render();
-    alert(`יובאו ${fresh.length} קורסים חדשים`);
-  } catch (err) {
-    alert("הקובץ אינו קובץ קורסים תקין");
-  }
-  e.target.value = "";
-});
+/* ---------- Boot ---------- */
+(function initFromHash() {
+  const h = (location.hash || "").slice(1);
+  if (h === "finance") view = "fin";
+  else if (h) { view = "detail"; detailId = h; }
+  $("view-list").hidden = view !== "list";
+  $("view-detail").hidden = view !== "detail";
+  $("view-fin").hidden = view !== "fin";
+  $("tab-list").setAttribute("aria-selected", String(view !== "fin"));
+  $("tab-fin").setAttribute("aria-selected", String(view === "fin"));
+})();
+renderAll(); renderExt();
 
-// Load base list
-fetch("courses.json", { cache: "no-store" })
-  .then(r => r.ok ? r.json() : { courses: [] })
-  .then(d => { baseCourses = Array.isArray(d.courses) ? d.courses : []; })
-  .catch(() => {})
-  .finally(() => { render(); renderExt(); });
+(async () => {
+  db = window.claude ? await window.claude.use("db") : null;
+  if (!db) { loaded = true; setSync(false, "תצוגה בלבד"); $("a-submit").disabled = true; renderAll(); return; }
+  db.collection("courses").orderBy("added", "desc").onSnapshot(snap => {
+    courses = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    loaded = true; setSync(true, "נשמר בדפדפן הזה"); renderAll();
+  }, () => { loaded = true; setSync(false, "החיבור לרשימה נותק. רענן את הדף"); renderAll(); });
+  db.doc("insights/finance").onSnapshot(s => { finance = s.exists ? s.data() : null; renderAll(); }, () => {});
+})();
 </script>
+
 </body>
 </html>
