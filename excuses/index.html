@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+</head>
+<body>
+<title>אישור היעדרות</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;800&family=Heebo:wght@400;500;700&display=swap">
+<style>
+/* Layout: a single "approval slip" column — controls on top, the stamped excuse slip below, history at the bottom */
+:root{
+  --bg:#eef2f4; --paper:#ffffff; --ink:#152433; --muted:#5d6c79; --line:#d6dee4;
+  --accent:#0f7a63; --accent-soft:#e1f2ed; --stamp:#c23b2a; --chip:#f4f7f9; --warn:#b26a00; --warn-soft:#fff3df;
+  --display:"Rubik","Heebo",system-ui,sans-serif; --body:"Heebo",system-ui,"Arial Hebrew",sans-serif;
+  --shadow:0 10px 30px rgba(21,36,51,.10);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f171e; --paper:#17222c; --ink:#e7eef3; --muted:#9aabb8; --line:#2a3a47;
+  --accent:#3cc29f; --accent-soft:#163a33; --stamp:#ff6b57; --chip:#1d2a35; --warn:#f0b45a; --warn-soft:#3a2c12;
+  --shadow:0 10px 30px rgba(0,0,0,.35); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f171e; --paper:#17222c; --ink:#e7eef3; --muted:#9aabb8; --line:#2a3a47;
+  --accent:#3cc29f; --accent-soft:#163a33; --stamp:#ff6b57; --chip:#1d2a35; --warn:#f0b45a; --warn-soft:#3a2c12;
+  --shadow:0 10px 30px rgba(0,0,0,.35); color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+.wrap{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+header{display:flex;flex-direction:column;gap:4px}
+.eyebrow{font-size:.78rem;letter-spacing:.08em;color:var(--accent);font-weight:700}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(1.8rem,6vw,2.5rem);line-height:1.15;margin:0;text-wrap:balance}
+.sub{color:var(--muted);margin:0}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:16px}
+.field{display:flex;flex-direction:column;gap:8px}
+.label{font-size:.85rem;font-weight:700;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:.95rem;border:1.5px solid var(--line);background:var(--chip);color:var(--ink);border-radius:999px;padding:6px 14px;cursor:pointer;transition:.15s}
+.chip:hover{border-color:var(--accent)}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--paper);font-weight:700}
+.chip:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+input[type=text],input[type=time]{font:inherit;width:100%;padding:9px 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--chip);color:var(--ink)}
+.go{font-family:var(--display);font-weight:700;font-size:1.15rem;border:0;border-radius:12px;padding:14px;background:var(--ink);color:var(--paper);cursor:pointer;transition:transform .12s}
+.go:hover{transform:translateY(-1px)} .go:active{transform:scale(.98)}
+
+/* the slip */
+.slip{position:relative;background:var(--paper);border-radius:14px;box-shadow:var(--shadow);overflow:hidden;border:1px solid var(--line)}
+.slip-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 18px;border-bottom:1.5px dashed var(--line);font-size:.85rem;color:var(--muted);flex-wrap:wrap}
+.slip-head b{color:var(--ink);font-variant-numeric:tabular-nums}
+.slip-body{padding:18px;display:flex;flex-direction:column;gap:14px}
+.cat-tag{align-self:flex-start;background:var(--accent-soft);color:var(--accent);font-weight:700;font-size:.82rem;border-radius:6px;padding:2px 10px}
+.title{font-family:var(--display);font-weight:700;font-size:1.35rem;margin:0;line-height:1.3;padding-left:110px;text-wrap:balance}
+.msg{background:var(--chip);border:1px solid var(--line);border-radius:10px;padding:14px;white-space:pre-wrap;margin:0;font-size:1rem}
+.meters{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.meter{display:flex;flex-direction:column;gap:6px}
+.meter .label{display:flex;justify-content:space-between}
+.bar{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+.bar i{height:8px;border-radius:3px;background:var(--line)}
+.bar i.on{background:var(--accent)}
+.bar.risk i.on{background:var(--warn)}
+.tip{background:var(--warn-soft);color:var(--ink);border-radius:10px;padding:10px 14px;font-size:.93rem}
+.tip b{color:var(--warn)}
+.warn{border:1.5px solid var(--warn);background:var(--warn-soft);border-radius:10px;padding:10px 14px;font-size:.93rem;font-weight:500}
+.actions{display:flex;flex-wrap:wrap;gap:10px}
+.btn{font:inherit;font-weight:700;border-radius:10px;padding:10px 16px;cursor:pointer;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--paper)}
+.btn:hover{border-color:var(--accent)}
+.stamp{position:absolute;top:58px;left:18px;width:96px;height:96px;border:3.5px solid var(--stamp);border-radius:50%;color:var(--stamp);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--display);font-weight:800;line-height:1.05;
+  transform:rotate(-14deg);opacity:.85;text-align:center;pointer-events:none}
+.stamp span{font-size:1.2rem}.stamp small{font-size:.62rem;font-weight:700;letter-spacing:.05em}
+.stamp.hit{animation:hit .45s cubic-bezier(.2,1.6,.4,1)}
+@keyframes hit{0%{transform:rotate(-14deg) scale(2.2);opacity:0}100%{transform:rotate(-14deg) scale(1);opacity:.85}}
+@media (prefers-reduced-motion:reduce){.stamp.hit{animation:none}.go,.chip{transition:none}}
+@media (max-width:460px){.title{padding-left:0;padding-top:70px}.stamp{top:52px;width:82px;height:82px}}
+
+h2{font-family:var(--display);font-size:1.1rem;margin:0}
+.hist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.hist li{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid var(--line);padding-block:6px;font-size:.93rem}
+.hist time{color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.empty{color:var(--muted);font-size:.93rem;margin:0}
+.rules{margin:0;padding-inline-start:20px;display:flex;flex-direction:column;gap:4px;font-size:.93rem}
+.toast{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 18px;border-radius:10px;font-weight:700;z-index:5}
+</style>
+
+<div class="wrap" dir="rtl" lang="he">
+  <header>
+    <div class="eyebrow">מחלקת משכנתאות · טופס היעדרות</div>
+    <h1>אישור היעדרות</h1>
+    <p class="sub">תירוצים אמינים לאמא עובדת עם שני ילדים, עם הודעה מנומסת למנהל שמוכנה לשליחה.</p>
+  </header>
+
+  <section class="panel" aria-label="הגדרות">
+    <div class="field">
+      <span class="label">סוג היעדרות</span>
+      <div class="chips" id="types"></div>
+    </div>
+    <div class="field">
+      <span class="label">תחום התירוץ</span>
+      <div class="chips" id="cats"></div>
+    </div>
+    <div class="row">
+      <label class="field"><span class="label">שם המנהל/ת (לא חובה)</span><input id="mgr" type="text" placeholder="למשל: רונית"></label>
+      <label class="field" id="timeWrap"><span class="label" id="timeLabel">שעת הגעה משוערת</span><input id="tm" type="time" value="10:00"></label>
+    </div>
+    <div class="field">
+      <span class="label">טון ההודעה</span>
+      <div class="chips" id="tones"></div>
+    </div>
+    <button class="go" id="go">תני לי תירוץ</button>
+  </section>
+
+  <article class="slip" id="slip" aria-live="polite">
+    <div class="slip-head"><span>אסמכתא <b id="ref">—</b></span><span>תאריך <b id="date">—</b></span></div>
+    <div class="stamp" id="stamp"><small>מחלקת משכנתאות</small><span>מאושר</span><small id="stampType">יום מלא</small></div>
+    <div class="slip-body">
+      <span class="cat-tag" id="cat">—</span>
+      <h2 class="title" id="title">—</h2>
+      <pre class="msg" id="msg"></pre>
+      <div class="meters">
+        <div class="meter"><div class="label"><span>אמינות</span><span id="credTxt"></span></div><div class="bar" id="cred"></div></div>
+        <div class="meter"><div class="label"><span>סיכון בשימוש חוזר</span><span id="riskTxt"></span></div><div class="bar risk" id="risk"></div></div>
+      </div>
+      <div class="warn" id="warn" hidden></div>
+      <div class="tip" id="tip"></div>
+      <div class="actions">
+        <button class="btn primary" id="copy">העתקת ההודעה</button>
+        <a class="btn" id="wa" href="#" target="_blank" rel="noopener">פתיחה בוואטסאפ</a>
+        <button class="btn" id="again">תירוץ אחר</button>
+      </div>
+    </div>
+  </article>
+
+  <section class="panel">
+    <h2>כללי הזהב</h2>
+    <ul class="rules">
+      <li>שולחים לפני 8:00. הודעה מוקדמת נשמעת אמינה יותר מהודעה מהדרך.</li>
+      <li>קצר ועניני. הסבר ארוך מדי מעורר שאלות.</li>
+      <li>לא חוזרים על אותו תירוץ באותו חודש. הרשימה למטה זוכרת בשבילך.</li>
+      <li>מחלת ילד היא זכות אמיתית. היא נספרת מימי המחלה שלך ודורשת הצהרה או אישור, כך שכדאי לשמור אותה למקרים אמיתיים.</li>
+    </ul>
+  </section>
+
+  <section class="panel">
+    <h2>התירוצים שהשתמשתי בהם</h2>
+    <ul class="hist" id="hist"></ul>
+    <p class="empty" id="histEmpty">עוד לא העתקת אף תירוץ. כל הודעה שתעתיקי תירשם כאן עם התאריך.</p>
+  </section>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const TYPES={full:"יום מלא",late:"איחור",early:"יציאה מוקדמת",wfh:"עבודה מהבית"};
+const CATS={all:"הכל",kids:"ילדים",health:"בריאות",home:"בית",car:"רכב ודרכים",family:"משפחה",admin:"סידורים"};
+const TONES={formal:"רשמי",warm:"חברי"};
+// c=category, f=fits, r=credibility 1-5, t=title, s=sentence, tip
+const X=[
+{c:"kids",f:["full","wfh"],r:5,t:"חום אצל אחד הילדים",s:"אחד הילדים התעורר הבוקר עם חום של 38.6, ואין לי אפשרות לשלוח אותו למסגרת.",tip:"אם יבקשו, הצהרת הורה על מחלת ילד או אישור מרופא הילדים מספיקים."},
+{c:"kids",f:["full","wfh"],r:4,t:"וירוס בטן בגן",s:"קיבלנו הבוקר הודעה על וירוס בטן שמסתובב בגן, ואחד הילדים כבר לא מרגיש טוב.",tip:"תירוץ עונתי. בחורף הוא כמעט לא דורש הסבר."},
+{c:"kids",f:["late","full"],r:4,t:"כינים בכיתה",s:"הגיעה הודעה על כינים בכיתה, ואני חייבת לטפל בשני הילדים לפני שהם חוזרים למסגרת.",tip:"כל הורה מכיר את זה, ואף אחד לא ישאל שאלות המשך."},
+{c:"kids",f:["full","wfh"],r:4,t:"הגן נסגר בהתראה קצרה",s:"הגננת חולה והגן סגור היום. קיבלנו הודעה רק הבוקר ולא הצלחתי למצוא סידור לילדים.",tip:"עובד הכי טוב כשהודעה נשלחת מוקדם, ממש כשההודעה מהגן אמורה להגיע."},
+{c:"kids",f:["late","early"],r:5,t:"תור לרופא ילדים",s:"התפנה תור לרופאת הילדים לאחד הילדים, ואני לא רוצה לוותר עליו.",tip:"כדאי לנקוב בשעה מדויקת. פרטים קטנים מוסיפים אמינות."},
+{c:"kids",f:["early"],r:4,t:"טלפון מהגן",s:"התקשרו מהגן. אחד הילדים נפל ומקבל טיפול, ואני צריכה לאסוף אותו.",tip:"מתאים רק ליציאה באמצע היום, לא כהודעת בוקר."},
+{c:"kids",f:["late","early"],r:4,t:"טיפת חלב",s:"יש לנו תור בטיפת חלב לבדיקה התקופתית של אחד הילדים.",tip:"תורים כאלה נקבעים מראש, אז אפשר גם להודיע יום לפני."},
+{c:"kids",f:["late","wfh"],r:3,t:"הבייביסיטר ביטלה",s:"הבייביסיטר ביטלה ממש עכשיו, ואני מחכה שסבתא תגיע לקחת את הילדים.",tip:"אמין, אבל לא יותר מפעם בכמה חודשים."},
+{c:"kids",f:["early","late"],r:3,t:"שיחה עם המחנכת",s:"המחנכת ביקשה להיפגש איתי היום לשיחה על אחד הילדים.",tip:"לא צריך לפרט על מה השיחה. זה עניין אישי."},
+{c:"health",f:["full","wfh"],r:5,t:"דלקת גרון",s:"התעוררתי עם דלקת גרון וחום, ואני לא רוצה להדביק את הלקוחות ואת הצוות.",tip:"ההדגשה על הלקוחות מראה אחריות ומקצועיות."},
+{c:"health",f:["late"],r:5,t:"בדיקת דם בצום",s:"יש לי הבוקר בדיקת דם בצום בקופת החולים.",tip:"קצר ובלתי ניתן לערעור. איחור של שעה עד שעתיים."},
+{c:"health",f:["full","late"],r:4,t:"מיגרנה",s:"יש לי מיגרנה חזקה מהלילה, ואני לא מסוגלת לנהוג כרגע.",tip:"עדיף להוסיף שתעדכני אם המצב משתפר במהלך הבוקר."},
+{c:"health",f:["late","early"],r:4,t:"סתימה שנשברה",s:"נשברה לי סתימה בלילה, וקיבלתי תור דחוף אצל רופאת השיניים.",tip:"מקרה כאב פתאומי עובד טוב גם להודעה של הרגע האחרון."},
+{c:"health",f:["full","wfh"],r:3,t:"הגב נתפס",s:"הגב שלי נתפס הבוקר, ואני בקושי מצליחה לזוז.",tip:"עבודה מהבית מתאימה כאן במיוחד ונשמעת סבירה."},
+{c:"home",f:["late","wfh"],r:4,t:"פיצוץ בצנרת",s:"התפוצץ צינור מתחת לכיור במטבח, ואני מחכה לאינסטלטור שיגיע.",tip:"אם שואלים, האינסטלטור תמיד מאחר. זה רק מוסיף לאמינות."},
+{c:"home",f:["late","wfh"],r:4,t:"טכנאי עם חלון הגעה",s:"טכנאי של ספק האינטרנט נתן לי חלון הגעה בין 8:00 ל-12:00, ואין מי שיחכה לו בבית.",tip:"חלון הגעה של ארבע שעות הוא דבר שכולם חוו."},
+{c:"home",f:["late"],r:3,t:"ננעלתי מחוץ לבית",s:"ננעלתי מחוץ לבית עם המפתחות של הרכב בפנים, ואני מחכה למנעולן.",tip:"מתאים לאיחור קצר בלבד."},
+{c:"home",f:["late","wfh"],r:3,t:"נזילה מהשכנים",s:"יש נזילה מהדירה של השכנים לתוך התקרה שלנו, ואני צריכה לחכות לשרברב ולוועד הבית.",tip:"שימוש חוזר פחות מומלץ. נזילות לא קורות כל שבוע."},
+{c:"car",f:["late"],r:4,t:"פנצ'ר בדרך",s:"עליתי על משהו בכביש ויש לי פנצ'ר. אני מחכה לשירותי הדרך.",tip:"שלחי את ההודעה כבר מהדרך, לא מהבית."},
+{c:"car",f:["late"],r:4,t:"המצבר מת",s:"הרכב לא מניע הבוקר, כנראה המצבר. אני מחכה לגרר או להנעה.",tip:"עובד טוב במיוחד בבקרים קרים."},
+{c:"car",f:["late","full"],r:3,t:"תאונה קלה",s:"הייתה לי תאונה קלה בלי נפגעים, ואני מחכה כדי להחליף פרטים ולתעד את הנזק.",tip:"פעם בשנה לכל היותר. זה תירוץ כבד."},
+{c:"car",f:["late"],r:2,t:"פקק חריג",s:"יש תאונה בכביש ואני תקועה בפקק בלי אפשרות לצאת.",tip:"התירוץ הכי שחוק שיש. השתמשי בו רק אם באמת אין ברירה."},
+{c:"family",f:["full","early"],r:5,t:"ליווי הורה לבדיקה",s:"אני צריכה ללוות את אמא שלי לבדיקה בבית החולים, ואין מי שיחליף אותי.",tip:"משפחה ובריאות יחד. מעט מנהלים יבקשו פרטים נוספים."},
+{c:"family",f:["late","early"],r:3,t:"בן הזוג נסע",s:"בן הזוג שלי נסע בהתראה קצרה, ואני לבד עם שני הילדים בהסעות.",tip:"מתאים כשההיעדרות קצרה. אפשר לחזור על זה לכמה ימים."},
+{c:"admin",f:["late","early"],r:5,t:"תור במשרד הפנים",s:"יש לי תור במשרד הפנים לחידוש דרכון. זה התור היחיד שהיה פנוי בחודשים הקרובים.",tip:"כל מי שניסה לקבוע תור יבין מיד."},
+{c:"admin",f:["late","early"],r:4,t:"טסט לרכב",s:"יש לי תור לטסט שנתי לרכב, והתור הפנוי היחיד היה בשעות העבודה.",tip:"נשמע הכי טוב בתחילת או בסוף היום."},
+{c:"admin",f:["early","late"],r:3,t:"חתימה אצל עורך דין",s:"אני צריכה להגיע לחתימה על מסמכים אצל עורך דין, והוא זמין רק בשעות הבוקר.",tip:"במחלקת משכנתאות כולם יודעים כמה קשה לתאם עורכי דין."}
+];
+const HANDOVER=[
+"את הפגישות עם הלקוחות שקבעתי להיום אתאם מחדש מולם.",
+"תיקי המשכנתא שממתינים לאישור עקרוני יחכו לי לבוקר, ואין ביניהם משהו דחוף.",
+"אם לקוח מתקשר בעניין מסמכים לחתימה, אפשר להעביר אליי הודעה ואחזור אליו.",
+"עדכנתי את הלקוחות שמחכים לתשובה, ואת מה שמול השמאים ועורכי הדין אקדם מחר.",
+"אין לי היום מסירת מסמכים או חתימות דחופות, ואני זמינה בטלפון לכל שאלה."
+];
+const $=id=>document.getElementById(id);
+const st={type:"full",cat:"all",tone:"formal",cur:null,ref:""};
+const store={get(){try{return JSON.parse(localStorage.getItem("excuseHist")||"[]")}catch(e){return[]}},set(v){try{localStorage.setItem("excuseHist",JSON.stringify(v))}catch(e){}}};
+function chips(el,map,key){el.innerHTML="";for(const k in map){const b=document.createElement("button");b.className="chip";b.textContent=map[k];b.setAttribute("aria-pressed",st[key]===k);b.onclick=()=>{st[key]=k;chips(el,map,key);onChange(key)};el.appendChild(b)}}
+function onChange(key){updTime();if(key==="mgr"||key==="tone"){if(st.cur)render(false)}else pick()}
+function updTime(){const w=$("timeWrap");w.hidden=!(st.type==="late"||st.type==="early");$("timeLabel").textContent=st.type==="late"?"שעת הגעה משוערת":"שעת יציאה משוערת";
+  if(st.type==="early"&&$("tm").value==="10:00")$("tm").value="13:00";if(st.type==="late"&&$("tm").value==="13:00")$("tm").value="10:00"}
+const rnd=a=>a[Math.floor(Math.random()*a.length)];
+function pool(){return X.filter(x=>x.f.includes(st.type)&&(st.cat==="all"||x.c===st.cat))}
+function usedDays(t){const h=store.get().filter(e=>e.t===t);if(!h.length)return null;return Math.floor((Date.now()-h[0].d)/864e5)}
+function pick(){let p=pool();if(!p.length){p=X.filter(x=>x.f.includes(st.type));toast("אין תירוץ כזה לסוג ההיעדרות הזה, אז בחרתי מתחום אחר")}
+  const fresh=p.filter(x=>x!==st.cur&&(usedDays(x.t)===null||usedDays(x.t)>30));const src=fresh.length?fresh:p.filter(x=>x!==st.cur);
+  st.cur=rnd(src.length?src:p);st.hand=rnd(HANDOVER);st.ref="ה-"+String(Math.floor(1000+Math.random()*9000));render(true)}
+function message(){const x=st.cur,n=$("mgr").value.trim(),t=$("tm").value||"10:00",f=st.tone==="formal";
+  const hi=f?`בוקר טוב${n?" "+n:""},`:`היי${n?" "+n:""} 🙂`;
+  const abs={full:"לכן לא אוכל להגיע היום לעבודה.",late:`לכן אגיע היום באיחור, בסביבות ${t}.`,early:`לכן אצטרך לצאת היום מוקדם, בסביבות ${t}.`,wfh:"אם אפשר, אעבוד היום מהבית ואהיה זמינה בטלפון ובמייל."}[st.type];
+  const bye=f?"תודה על ההבנה, ואעדכן בהמשך.":"מצטערת על ההתראה הקצרה, תודה 🙏";
+  return `${hi}\n${x.s} ${abs}\n${st.hand}\n${bye}`}
+function bar(el,v){el.innerHTML="";for(let i=1;i<=5;i++){const s=document.createElement("i");if(i<=v)s.className="on";el.appendChild(s)}}
+function render(anim){const x=st.cur;$("cat").textContent=CATS[x.c];$("title").textContent=x.t;$("msg").textContent=message();
+  $("ref").textContent=st.ref;$("date").textContent=new Date().toLocaleDateString("he-IL");$("stampType").textContent=TYPES[st.type];
+  bar($("cred"),x.r);$("credTxt").textContent=["","נמוכה","סבירה","טובה","גבוהה","כמעט מושלמת"][x.r];
+  const d=usedDays(x.t);let risk=6-x.r;if(d!==null&&d<=30)risk=5;risk=Math.max(1,Math.min(5,risk));bar($("risk"),risk);$("riskTxt").textContent=["","נמוך","נמוך","בינוני","גבוה","גבוה מאוד"][risk];
+  const w=$("warn");if(d!==null&&d<=30){w.hidden=false;w.textContent=d===0?"כבר השתמשת בתירוץ הזה היום.":`השתמשת בתירוץ הזה לפני ${d} ימים. כדאי לבחור אחר.`}else w.hidden=true;
+  $("tip").innerHTML="";const b=document.createElement("b");b.textContent="טיפ: ";$("tip").append(b,x.tip);
+  $("wa").href="https://wa.me/?text="+encodeURIComponent(message());
+  if(anim){const s=$("stamp");s.classList.remove("hit");void s.offsetWidth;s.classList.add("hit")}}
+function log(){const h=store.get();h.unshift({t:st.cur.t,d:Date.now()});store.set(h.slice(0,30));hist();render(false)}
+function hist(){const h=store.get(),ul=$("hist");ul.innerHTML="";$("histEmpty").hidden=h.length>0;
+  h.slice(0,10).forEach(e=>{const li=document.createElement("li"),s=document.createElement("span"),tm=document.createElement("time");s.textContent=e.t;tm.textContent=new Date(e.d).toLocaleDateString("he-IL");li.append(s,tm);ul.appendChild(li)})}
+let tt;function toast(m){const t=$("toast");t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,2200)}
+$("copy").onclick=()=>{const m=message();const done=()=>{toast("ההודעה הועתקה");log()};
+  if(navigator.clipboard)navigator.clipboard.writeText(m).then(done).catch(()=>{selectMsg();toast("סמני והעתיקי ידנית")});else{selectMsg();toast("סמני והעתיקי ידנית")}};
+function selectMsg(){const r=document.createRange();r.selectNodeContents($("msg"));const s=getSelection();s.removeAllRanges();s.addRange(r)}
+$("wa").addEventListener("click",log);
+$("go").onclick=pick;$("again").onclick=pick;
+$("mgr").addEventListener("input",()=>st.cur&&render(false));$("tm").addEventListener("input",()=>st.cur&&render(false));
+chips($("types"),TYPES,"type");chips($("cats"),CATS,"cat");chips($("tones"),TONES,"tone");updTime();hist();
+st.cur=X[0];st.hand=HANDOVER[0];st.ref="ה-4172";render(false);
+</script>
+
+</body>
+</html>
