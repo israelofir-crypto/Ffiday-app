@@ -5,233 +5,458 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 </head>
 <body>
-<title>אישור היעדרות</title>
+<title>מכונת התירוצים</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;800&family=Heebo:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Secular+One&family=Heebo:wght@400;500;700;800&family=Rubik:wght@600;800&display=swap">
 <style>
-/* Layout: a single "approval slip" column — controls on top, the stamped excuse slip below, history at the bottom */
+/* Layout: one column "machine": hero with live counter → control deck (dial + option grid) → glowing lever → result ticket → AI writer → history. Deliberately dark-only neon look. */
 :root{
-  --bg:#eef2f4; --paper:#ffffff; --ink:#152433; --muted:#5d6c79; --line:#d6dee4;
-  --accent:#0f7a63; --accent-soft:#e1f2ed; --stamp:#c23b2a; --chip:#f4f7f9; --warn:#b26a00; --warn-soft:#fff3df;
-  --display:"Rubik","Heebo",system-ui,sans-serif; --body:"Heebo",system-ui,"Arial Hebrew",sans-serif;
-  --shadow:0 10px 30px rgba(21,36,51,.10);
+  color-scheme:dark;
+  --bg:#0a0d1d; --deck:#121734; --deck2:#181f44; --line:#2a3366; --ink:#eef1ff; --muted:#9aa3d1;
+  --hot:#ff5c8a; --amber:#ffb340; --mint:#3ee6b0; --violet:#8b7bff; --paper:#fbfaf6; --paper-ink:#1a1d33; --stamp:#e0412f;
+  --grad:linear-gradient(100deg,var(--mint) 0%,var(--amber) 55%,var(--hot) 100%);
+  --display:"Secular One","Heebo",system-ui,sans-serif; --body:"Heebo",system-ui,"Arial Hebrew",sans-serif; --num:"Rubik","Heebo",sans-serif;
 }
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#0f171e; --paper:#17222c; --ink:#e7eef3; --muted:#9aabb8; --line:#2a3a47;
-  --accent:#3cc29f; --accent-soft:#163a33; --stamp:#ff6b57; --chip:#1d2a35; --warn:#f0b45a; --warn-soft:#3a2c12;
-  --shadow:0 10px 30px rgba(0,0,0,.35); color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#0f171e; --paper:#17222c; --ink:#e7eef3; --muted:#9aabb8; --line:#2a3a47;
-  --accent:#3cc29f; --accent-soft:#163a33; --stamp:#ff6b57; --chip:#1d2a35; --warn:#f0b45a; --warn-soft:#3a2c12;
-  --shadow:0 10px 30px rgba(0,0,0,.35); color-scheme:dark}
 *{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;margin:0;
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
-.wrap{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
-header{display:flex;flex-direction:column;gap:4px}
-.eyebrow{font-size:.78rem;letter-spacing:.08em;color:var(--accent);font-weight:700}
-h1{font-family:var(--display);font-weight:800;font-size:clamp(1.8rem,6vw,2.5rem);line-height:1.15;margin:0;text-wrap:balance}
-.sub{color:var(--muted);margin:0}
-.panel{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:16px}
-.field{display:flex;flex-direction:column;gap:8px}
-.label{font-size:.85rem;font-weight:700;color:var(--muted)}
-.chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{font:inherit;font-size:.95rem;border:1.5px solid var(--line);background:var(--chip);color:var(--ink);border-radius:999px;padding:6px 14px;cursor:pointer;transition:.15s}
-.chip:hover{border-color:var(--accent)}
-.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--paper);font-weight:700}
-.chip:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
-.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
-input[type=text],input[type=time]{font:inherit;width:100%;padding:9px 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--chip);color:var(--ink)}
-.go{font-family:var(--display);font-weight:700;font-size:1.15rem;border:0;border-radius:12px;padding:14px;background:var(--ink);color:var(--paper);cursor:pointer;transition:transform .12s}
-.go:hover{transform:translateY(-1px)} .go:active{transform:scale(.98)}
+body{margin:0;background:
+  radial-gradient(900px 500px at 90% -10%,rgba(139,123,255,.28),transparent 60%),
+  radial-gradient(700px 420px at -10% 30%,rgba(255,92,138,.16),transparent 60%),var(--bg);
+  background-attachment:fixed;color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 60px}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+button,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--amber);outline-offset:3px}
 
-/* the slip */
-.slip{position:relative;background:var(--paper);border-radius:14px;box-shadow:var(--shadow);overflow:hidden;border:1px solid var(--line)}
-.slip-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 18px;border-bottom:1.5px dashed var(--line);font-size:.85rem;color:var(--muted);flex-wrap:wrap}
-.slip-head b{color:var(--ink);font-variant-numeric:tabular-nums}
-.slip-body{padding:18px;display:flex;flex-direction:column;gap:14px}
-.cat-tag{align-self:flex-start;background:var(--accent-soft);color:var(--accent);font-weight:700;font-size:.82rem;border-radius:6px;padding:2px 10px}
-.title{font-family:var(--display);font-weight:700;font-size:1.35rem;margin:0;line-height:1.3;padding-left:110px;text-wrap:balance}
-.msg{background:var(--chip);border:1px solid var(--line);border-radius:10px;padding:14px;white-space:pre-wrap;margin:0;font-size:1rem}
-.meters{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
-.meter{display:flex;flex-direction:column;gap:6px}
-.meter .label{display:flex;justify-content:space-between}
-.bar{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
-.bar i{height:8px;border-radius:3px;background:var(--line)}
-.bar i.on{background:var(--accent)}
-.bar.risk i.on{background:var(--warn)}
-.tip{background:var(--warn-soft);color:var(--ink);border-radius:10px;padding:10px 14px;font-size:.93rem}
-.tip b{color:var(--warn)}
-.warn{border:1.5px solid var(--warn);background:var(--warn-soft);border-radius:10px;padding:10px 14px;font-size:.93rem;font-weight:500}
-.actions{display:flex;flex-wrap:wrap;gap:10px}
-.btn{font:inherit;font-weight:700;border-radius:10px;padding:10px 16px;cursor:pointer;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);text-decoration:none;display:inline-flex;align-items:center;gap:6px}
-.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--paper)}
-.btn:hover{border-color:var(--accent)}
-.stamp{position:absolute;top:58px;left:18px;width:96px;height:96px;border:3.5px solid var(--stamp);border-radius:50%;color:var(--stamp);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--display);font-weight:800;line-height:1.05;
-  transform:rotate(-14deg);opacity:.85;text-align:center;pointer-events:none}
-.stamp span{font-size:1.2rem}.stamp small{font-size:.62rem;font-weight:700;letter-spacing:.05em}
-.stamp.hit{animation:hit .45s cubic-bezier(.2,1.6,.4,1)}
-@keyframes hit{0%{transform:rotate(-14deg) scale(2.2);opacity:0}100%{transform:rotate(-14deg) scale(1);opacity:.85}}
-@media (prefers-reduced-motion:reduce){.stamp.hit{animation:none}.go,.chip{transition:none}}
-@media (max-width:460px){.title{padding-left:0;padding-top:70px}.stamp{top:52px;width:82px;height:82px}}
+/* hero */
+.hero{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+.badge{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--line);background:rgba(255,255,255,.04);border-radius:999px;padding:4px 14px;font-size:.85rem;color:var(--muted)}
+.badge b{font-family:var(--num);color:var(--mint);font-variant-numeric:tabular-nums}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--mint);box-shadow:0 0 10px var(--mint);animation:pulse 1.6s infinite}
+@keyframes pulse{50%{opacity:.35}}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(2.6rem,11vw,4.4rem);line-height:1;margin:0;
+  background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;text-wrap:balance}
+.hero p{margin:0;color:var(--muted);max-width:56ch}
 
-h2{font-family:var(--display);font-size:1.1rem;margin:0}
-.hist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
-.hist li{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid var(--line);padding-block:6px;font-size:.93rem}
-.hist time{color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
-.empty{color:var(--muted);font-size:.93rem;margin:0}
-.rules{margin:0;padding-inline-start:20px;display:flex;flex-direction:column;gap:4px;font-size:.93rem}
-.toast{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 18px;border-radius:10px;font-weight:700;z-index:5}
+/* deck */
+.deck{background:linear-gradient(180deg,var(--deck2),var(--deck));border:1px solid var(--line);border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:20px;box-shadow:0 30px 60px -30px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.06)}
+.sec-title{font-family:var(--display);font-size:1.25rem;margin:0;display:flex;align-items:center;gap:10px}
+.sec-title small{font-family:var(--body);font-size:.8rem;color:var(--muted);font-weight:500}
+
+.dial{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center;background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:18px;padding:16px}
+.lvl-num{width:96px;height:96px;border-radius:50%;display:grid;place-items:center;font-family:var(--num);font-weight:800;font-size:2.6rem;position:relative;
+  background:radial-gradient(circle at 50% 40%,#232a5a,#0e1230);box-shadow:0 0 0 3px var(--lvl-c,var(--mint)),0 0 28px -4px var(--lvl-c,var(--mint));transition:box-shadow .25s}
+.lvl-num small{position:absolute;bottom:14px;font-size:.62rem;color:var(--muted);font-weight:600;letter-spacing:.05em}
+.dial-side{display:flex;flex-direction:column;gap:8px;min-width:0}
+.dial-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.dial-head span{font-weight:800;font-size:1.15rem;color:var(--lvl-c,var(--mint))}
+.dial-head em{font-style:normal;color:var(--muted);font-size:.85rem}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:14px;border-radius:999px;background:linear-gradient(270deg,var(--mint),var(--amber) 55%,var(--hot));direction:rtl;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:30px;height:30px;border-radius:50%;background:#fff;border:5px solid var(--lvl-c,var(--mint));box-shadow:0 4px 14px rgba(0,0,0,.5)}
+input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;border:5px solid var(--lvl-c,var(--mint))}
+.ticks{display:grid;grid-template-columns:repeat(10,1fr);font-family:var(--num);font-size:.72rem;color:var(--muted);text-align:center}
+.scale-words{display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted)}
+
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.opt{display:flex;flex-direction:column;gap:8px;min-width:0}
+.opt-label{font-size:.82rem;font-weight:700;color:var(--muted);letter-spacing:.03em}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{border:1px solid var(--line);background:rgba(255,255,255,.03);border-radius:12px;padding:7px 12px;cursor:pointer;font-size:.93rem;transition:.15s}
+.seg button:hover{border-color:var(--violet)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:800}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+.fields label{display:flex;flex-direction:column;gap:6px}
+input[type=text],input[type=time],textarea{width:100%;background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:12px;padding:10px 12px;color:var(--ink)}
+input::placeholder,textarea::placeholder{color:#6a73a6}
+
+.lever{position:relative;border:0;border-radius:18px;padding:18px;cursor:pointer;font-family:var(--display);font-size:1.5rem;color:#1a1033;background:var(--grad);
+  box-shadow:0 14px 40px -10px rgba(255,92,138,.6),inset 0 -4px 0 rgba(0,0,0,.18);transition:transform .12s}
+.lever:hover{transform:translateY(-2px)} .lever:active{transform:translateY(2px)}
+.lever small{display:block;font-family:var(--body);font-size:.85rem;font-weight:700;opacity:.75}
+.sub-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.ghost{border:1px solid var(--line);background:transparent;border-radius:12px;padding:8px 14px;cursor:pointer;color:var(--muted);font-weight:700}
+.ghost:hover{color:var(--ink);border-color:var(--violet)}
+
+/* ticket */
+.ticket{position:relative;background:var(--paper);color:var(--paper-ink);border-radius:18px;overflow:hidden;box-shadow:0 30px 60px -25px rgba(0,0,0,.8)}
+.ticket::before,.ticket::after{content:"";position:absolute;top:58px;width:26px;height:26px;border-radius:50%;background:var(--bg)}
+.ticket::before{right:-13px}.ticket::after{left:-13px}
+.t-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:14px 22px;border-bottom:2px dashed #d9d6cc;font-size:.85rem;color:#666b85;min-height:70px;align-items:center}
+.t-head b{color:var(--paper-ink);font-family:var(--num);font-variant-numeric:tabular-nums}
+.t-body{padding:20px 22px;display:flex;flex-direction:column;gap:14px}
+.t-tags{display:flex;gap:8px;flex-wrap:wrap}
+.t-tags span{background:#efece3;border-radius:8px;padding:2px 10px;font-size:.8rem;font-weight:700}
+.t-tags .lv{background:var(--lvl-c,var(--mint));color:#1a1033}
+.t-title{font-family:var(--display);font-weight:400;font-size:clamp(1.5rem,5vw,1.9rem);line-height:1.2;margin:0;padding-left:120px;text-wrap:balance;min-height:2.4em}
+.t-title.spin{filter:blur(1.2px);opacity:.7}
+.msg{margin:0;white-space:pre-wrap;background:#f2f0e8;border-radius:12px;padding:16px;font-size:1.02rem;line-height:1.75;border-right:4px solid var(--lvl-c,var(--mint))}
+.meters{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.meter{display:flex;flex-direction:column;gap:6px;font-size:.85rem;font-weight:700}
+.meter .top{display:flex;justify-content:space-between}
+.bar{display:grid;grid-template-columns:repeat(10,1fr);gap:3px}
+.bar i{height:9px;border-radius:3px;background:#e2dfd4}
+.bar.cred i.on{background:#18a57a}.bar.risk i.on{background:#e08a00}
+.warn{background:#fff1d6;border:1.5px solid #e08a00;border-radius:10px;padding:10px 14px;font-weight:600;font-size:.93rem}
+.tip{font-size:.92rem;color:#4b5070;border-top:1px solid #e6e3d9;padding-top:12px}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.btn{border-radius:12px;padding:11px 18px;font-weight:800;cursor:pointer;border:1.5px solid #d4d0c3;background:#fff;color:var(--paper-ink);text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn.main{background:var(--paper-ink);color:var(--paper);border-color:var(--paper-ink)}
+.btn.wa{background:#1fae5b;border-color:#1fae5b;color:#fff}
+.stamp{position:absolute;top:84px;left:22px;width:104px;height:104px;border:4px double var(--stamp);border-radius:50%;color:var(--stamp);display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-family:var(--display);line-height:1.05;transform:rotate(-14deg);opacity:.85;text-align:center;pointer-events:none}
+.stamp span{font-size:1.35rem}.stamp small{font-family:var(--body);font-size:.6rem;font-weight:800}
+.stamp.hit{animation:hit .5s cubic-bezier(.2,1.7,.4,1)}
+@keyframes hit{0%{transform:rotate(-30deg) scale(2.4);opacity:0}100%{transform:rotate(-14deg) scale(1);opacity:.85}}
+@media (max-width:480px){.t-title{padding-left:0;padding-top:92px}.stamp{top:80px;width:88px;height:88px}.dial{grid-template-columns:1fr;justify-items:center}.dial-side{width:100%}}
+
+/* AI */
+.ai{border:1px solid transparent;border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:14px;
+  background:linear-gradient(var(--deck),var(--deck)) padding-box,linear-gradient(120deg,var(--violet),var(--hot)) border-box}
+.ai p{margin:0;color:var(--muted);font-size:.93rem}
+.ai textarea{min-height:90px;resize:vertical}
+.ai-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.ai-go{border:0;border-radius:14px;padding:12px 18px;font-weight:800;cursor:pointer;background:linear-gradient(120deg,var(--violet),var(--hot));color:#fff}
+.ai-go[disabled]{opacity:.5;cursor:not-allowed}
+.ideas{display:flex;gap:6px;flex-wrap:wrap}
+.ideas button{border:1px dashed var(--line);background:transparent;border-radius:999px;padding:4px 12px;cursor:pointer;color:var(--muted);font-size:.85rem}
+.ideas button:hover{color:var(--ink);border-color:var(--violet)}
+.ai-status{font-size:.85rem;color:var(--amber)}
+
+/* history */
+.panel{background:var(--deck);border:1px solid var(--line);border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.hist{list-style:none;margin:0;padding:0}
+.hist li{display:flex;justify-content:space-between;gap:12px;padding-block:8px;border-bottom:1px solid var(--line);font-size:.93rem}
+.hist li:last-child{border:0}
+.hist time{color:var(--muted);font-family:var(--num);white-space:nowrap}
+.empty{margin:0;color:var(--muted);font-size:.93rem}
+.toast{position:fixed;bottom:calc(22px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);font-weight:800;padding:10px 20px;border-radius:12px;z-index:9;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
 <div class="wrap" dir="rtl" lang="he">
-  <header>
-    <div class="eyebrow">מחלקת משכנתאות · טופס היעדרות</div>
-    <h1>אישור היעדרות</h1>
-    <p class="sub">תירוצים אמינים לאמא עובדת עם שני ילדים, עם הודעה מנומסת למנהל שמוכנה לשליחה.</p>
+  <header class="hero">
+    <span class="badge"><i class="dot"></i><b id="count">0</b> תירוצים במאגר · מותאם למחלקת משכנתאות ולאמא לשניים</span>
+    <h1>מכונת התירוצים</h1>
+    <p>מכוונים את רמת ההמצאה, בוחרים את הנסיבות, מושכים בידית ומקבלים הודעה מוכנה למנהל. רוצה משהו אישי? כתבי ל-Claude מה קרה והוא ינסח בשבילך.</p>
   </header>
 
-  <section class="panel" aria-label="הגדרות">
-    <div class="field">
-      <span class="label">סוג היעדרות</span>
-      <div class="chips" id="types"></div>
+  <section class="deck" aria-label="לוח בקרה">
+    <h2 class="sec-title">לוח הבקרה <small>מכוונים לפני שמפעילים</small></h2>
+
+    <div class="dial" id="dial">
+      <div class="lvl-num"><span id="lvlNum">3</span><small>מתוך 10</small></div>
+      <div class="dial-side">
+        <div class="dial-head"><span id="lvlName">משכנע מאוד</span><em id="lvlDesc"></em></div>
+        <label for="lvl" class="opt-label">רמת ההמצאה</label>
+        <input type="range" id="lvl" min="1" max="10" step="1" value="3">
+        <div class="ticks" aria-hidden="true"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></div>
+        <div class="scale-words"><span>אמת לאמיתה</span><span>הזוי לגמרי</span></div>
+      </div>
     </div>
-    <div class="field">
-      <span class="label">תחום התירוץ</span>
-      <div class="chips" id="cats"></div>
+
+    <div class="opts">
+      <div class="opt"><span class="opt-label">סוג ההיעדרות</span><div class="seg" id="o-type"></div></div>
+      <div class="opt"><span class="opt-label">תחום התירוץ</span><div class="seg" id="o-cat"></div></div>
+      <div class="opt"><span class="opt-label">טון</span><div class="seg" id="o-tone"></div></div>
+      <div class="opt"><span class="opt-label">איך שולחים</span><div class="seg" id="o-chan"></div></div>
+      <div class="opt"><span class="opt-label">אורך ההודעה</span><div class="seg" id="o-len"></div></div>
     </div>
-    <div class="row">
-      <label class="field"><span class="label">שם המנהל/ת (לא חובה)</span><input id="mgr" type="text" placeholder="למשל: רונית"></label>
-      <label class="field" id="timeWrap"><span class="label" id="timeLabel">שעת הגעה משוערת</span><input id="tm" type="time" value="10:00"></label>
+
+    <div class="fields">
+      <label><span class="opt-label">שם המנהל/ת</span><input id="mgr" type="text" placeholder="למשל: רונית"></label>
+      <label><span class="opt-label">השם שלי (לחתימה)</span><input id="me" type="text" placeholder="לא חובה"></label>
+      <label id="tmWrap"><span class="opt-label" id="tmLabel">שעת הגעה</span><input id="tm" type="time" value="10:00"></label>
     </div>
-    <div class="field">
-      <span class="label">טון ההודעה</span>
-      <div class="chips" id="tones"></div>
+
+    <button class="lever" id="go">הפעלת המכונה<small>מושכים ומקבלים תירוץ</small></button>
+    <div class="sub-actions">
+      <button class="ghost" id="surprise">הפתיעי אותי (הכול אקראי)</button>
     </div>
-    <button class="go" id="go">תני לי תירוץ</button>
   </section>
 
-  <article class="slip" id="slip" aria-live="polite">
-    <div class="slip-head"><span>אסמכתא <b id="ref">—</b></span><span>תאריך <b id="date">—</b></span></div>
+  <article class="ticket" id="ticket" aria-live="polite">
+    <div class="t-head"><span>אסמכתא <b id="ref">—</b></span><span>תאריך <b id="date">—</b></span><span>מקור <b id="src">המאגר</b></span></div>
     <div class="stamp" id="stamp"><small>מחלקת משכנתאות</small><span>מאושר</span><small id="stampType">יום מלא</small></div>
-    <div class="slip-body">
-      <span class="cat-tag" id="cat">—</span>
-      <h2 class="title" id="title">—</h2>
+    <div class="t-body">
+      <div class="t-tags"><span class="lv" id="tagLvl">רמה 3</span><span id="tagCat">ילדים</span><span id="tagChan">וואטסאפ</span></div>
+      <h2 class="t-title" id="title">—</h2>
       <pre class="msg" id="msg"></pre>
       <div class="meters">
-        <div class="meter"><div class="label"><span>אמינות</span><span id="credTxt"></span></div><div class="bar" id="cred"></div></div>
-        <div class="meter"><div class="label"><span>סיכון בשימוש חוזר</span><span id="riskTxt"></span></div><div class="bar risk" id="risk"></div></div>
+        <div class="meter"><div class="top"><span>אמינות</span><span id="credTxt"></span></div><div class="bar cred" id="cred"></div></div>
+        <div class="meter"><div class="top"><span>סיכון בשימוש חוזר</span><span id="riskTxt"></span></div><div class="bar risk" id="risk"></div></div>
       </div>
       <div class="warn" id="warn" hidden></div>
-      <div class="tip" id="tip"></div>
       <div class="actions">
-        <button class="btn primary" id="copy">העתקת ההודעה</button>
-        <a class="btn" id="wa" href="#" target="_blank" rel="noopener">פתיחה בוואטסאפ</a>
-        <button class="btn" id="again">תירוץ אחר</button>
+        <button class="btn main" id="copy">העתקת ההודעה</button>
+        <a class="btn wa" id="wa" href="#" target="_blank" rel="noopener">שליחה בוואטסאפ</a>
+        <button class="btn" id="again">עוד אחד באותה רמה</button>
       </div>
+      <div class="tip" id="tip"></div>
     </div>
   </article>
 
-  <section class="panel">
-    <h2>כללי הזהב</h2>
-    <ul class="rules">
-      <li>שולחים לפני 8:00. הודעה מוקדמת נשמעת אמינה יותר מהודעה מהדרך.</li>
-      <li>קצר ועניני. הסבר ארוך מדי מעורר שאלות.</li>
-      <li>לא חוזרים על אותו תירוץ באותו חודש. הרשימה למטה זוכרת בשבילך.</li>
-      <li>מחלת ילד היא זכות אמיתית. היא נספרת מימי המחלה שלך ודורשת הצהרה או אישור, כך שכדאי לשמור אותה למקרים אמיתיים.</li>
-    </ul>
+  <section class="ai" aria-label="כתיבה עם Claude">
+    <h2 class="sec-title">ספרי ל-Claude מה לכתוב <small>מחובר לאינטרנט</small></h2>
+    <p>כתבי במילים שלך על מה התירוץ. Claude ישתמש ברמת ההמצאה ובכל ההגדרות שבחרת למעלה.</p>
+    <textarea id="aiTxt" placeholder="למשל: הילדה הקטנה הדביקה מסטיק בשיער של אחיה, ואני צריכה להגיע רק בצהריים"></textarea>
+    <div class="ideas" id="ideas"></div>
+    <div class="ai-row">
+      <button class="ai-go" id="aiGo">כתיבת תירוץ אישי</button>
+      <span class="ai-status" id="aiStatus"></span>
+    </div>
   </section>
 
   <section class="panel">
-    <h2>התירוצים שהשתמשתי בהם</h2>
+    <h2 class="sec-title">היסטוריית השימוש <small>נשמרת רק במכשיר שלך</small></h2>
     <ul class="hist" id="hist"></ul>
-    <p class="empty" id="histEmpty">עוד לא העתקת אף תירוץ. כל הודעה שתעתיקי תירשם כאן עם התאריך.</p>
+    <p class="empty" id="histEmpty">עוד לא שלחת תירוץ. כל תירוץ שתעתיקי או תשלחי יירשם כאן, והמכונה תדלג עליו בחודש הקרוב.</p>
   </section>
 </div>
 <div class="toast" id="toast" hidden></div>
 
 <script>
 const TYPES={full:"יום מלא",late:"איחור",early:"יציאה מוקדמת",wfh:"עבודה מהבית"};
-const CATS={all:"הכל",kids:"ילדים",health:"בריאות",home:"בית",car:"רכב ודרכים",family:"משפחה",admin:"סידורים"};
-const TONES={formal:"רשמי",warm:"חברי"};
-// c=category, f=fits, r=credibility 1-5, t=title, s=sentence, tip
-const X=[
-{c:"kids",f:["full","wfh"],r:5,t:"חום אצל אחד הילדים",s:"אחד הילדים התעורר הבוקר עם חום של 38.6, ואין לי אפשרות לשלוח אותו למסגרת.",tip:"אם יבקשו, הצהרת הורה על מחלת ילד או אישור מרופא הילדים מספיקים."},
-{c:"kids",f:["full","wfh"],r:4,t:"וירוס בטן בגן",s:"קיבלנו הבוקר הודעה על וירוס בטן שמסתובב בגן, ואחד הילדים כבר לא מרגיש טוב.",tip:"תירוץ עונתי. בחורף הוא כמעט לא דורש הסבר."},
-{c:"kids",f:["late","full"],r:4,t:"כינים בכיתה",s:"הגיעה הודעה על כינים בכיתה, ואני חייבת לטפל בשני הילדים לפני שהם חוזרים למסגרת.",tip:"כל הורה מכיר את זה, ואף אחד לא ישאל שאלות המשך."},
-{c:"kids",f:["full","wfh"],r:4,t:"הגן נסגר בהתראה קצרה",s:"הגננת חולה והגן סגור היום. קיבלנו הודעה רק הבוקר ולא הצלחתי למצוא סידור לילדים.",tip:"עובד הכי טוב כשהודעה נשלחת מוקדם, ממש כשההודעה מהגן אמורה להגיע."},
-{c:"kids",f:["late","early"],r:5,t:"תור לרופא ילדים",s:"התפנה תור לרופאת הילדים לאחד הילדים, ואני לא רוצה לוותר עליו.",tip:"כדאי לנקוב בשעה מדויקת. פרטים קטנים מוסיפים אמינות."},
-{c:"kids",f:["early"],r:4,t:"טלפון מהגן",s:"התקשרו מהגן. אחד הילדים נפל ומקבל טיפול, ואני צריכה לאסוף אותו.",tip:"מתאים רק ליציאה באמצע היום, לא כהודעת בוקר."},
-{c:"kids",f:["late","early"],r:4,t:"טיפת חלב",s:"יש לנו תור בטיפת חלב לבדיקה התקופתית של אחד הילדים.",tip:"תורים כאלה נקבעים מראש, אז אפשר גם להודיע יום לפני."},
-{c:"kids",f:["late","wfh"],r:3,t:"הבייביסיטר ביטלה",s:"הבייביסיטר ביטלה ממש עכשיו, ואני מחכה שסבתא תגיע לקחת את הילדים.",tip:"אמין, אבל לא יותר מפעם בכמה חודשים."},
-{c:"kids",f:["early","late"],r:3,t:"שיחה עם המחנכת",s:"המחנכת ביקשה להיפגש איתי היום לשיחה על אחד הילדים.",tip:"לא צריך לפרט על מה השיחה. זה עניין אישי."},
-{c:"health",f:["full","wfh"],r:5,t:"דלקת גרון",s:"התעוררתי עם דלקת גרון וחום, ואני לא רוצה להדביק את הלקוחות ואת הצוות.",tip:"ההדגשה על הלקוחות מראה אחריות ומקצועיות."},
-{c:"health",f:["late"],r:5,t:"בדיקת דם בצום",s:"יש לי הבוקר בדיקת דם בצום בקופת החולים.",tip:"קצר ובלתי ניתן לערעור. איחור של שעה עד שעתיים."},
-{c:"health",f:["full","late"],r:4,t:"מיגרנה",s:"יש לי מיגרנה חזקה מהלילה, ואני לא מסוגלת לנהוג כרגע.",tip:"עדיף להוסיף שתעדכני אם המצב משתפר במהלך הבוקר."},
-{c:"health",f:["late","early"],r:4,t:"סתימה שנשברה",s:"נשברה לי סתימה בלילה, וקיבלתי תור דחוף אצל רופאת השיניים.",tip:"מקרה כאב פתאומי עובד טוב גם להודעה של הרגע האחרון."},
-{c:"health",f:["full","wfh"],r:3,t:"הגב נתפס",s:"הגב שלי נתפס הבוקר, ואני בקושי מצליחה לזוז.",tip:"עבודה מהבית מתאימה כאן במיוחד ונשמעת סבירה."},
-{c:"home",f:["late","wfh"],r:4,t:"פיצוץ בצנרת",s:"התפוצץ צינור מתחת לכיור במטבח, ואני מחכה לאינסטלטור שיגיע.",tip:"אם שואלים, האינסטלטור תמיד מאחר. זה רק מוסיף לאמינות."},
-{c:"home",f:["late","wfh"],r:4,t:"טכנאי עם חלון הגעה",s:"טכנאי של ספק האינטרנט נתן לי חלון הגעה בין 8:00 ל-12:00, ואין מי שיחכה לו בבית.",tip:"חלון הגעה של ארבע שעות הוא דבר שכולם חוו."},
-{c:"home",f:["late"],r:3,t:"ננעלתי מחוץ לבית",s:"ננעלתי מחוץ לבית עם המפתחות של הרכב בפנים, ואני מחכה למנעולן.",tip:"מתאים לאיחור קצר בלבד."},
-{c:"home",f:["late","wfh"],r:3,t:"נזילה מהשכנים",s:"יש נזילה מהדירה של השכנים לתוך התקרה שלנו, ואני צריכה לחכות לשרברב ולוועד הבית.",tip:"שימוש חוזר פחות מומלץ. נזילות לא קורות כל שבוע."},
-{c:"car",f:["late"],r:4,t:"פנצ'ר בדרך",s:"עליתי על משהו בכביש ויש לי פנצ'ר. אני מחכה לשירותי הדרך.",tip:"שלחי את ההודעה כבר מהדרך, לא מהבית."},
-{c:"car",f:["late"],r:4,t:"המצבר מת",s:"הרכב לא מניע הבוקר, כנראה המצבר. אני מחכה לגרר או להנעה.",tip:"עובד טוב במיוחד בבקרים קרים."},
-{c:"car",f:["late","full"],r:3,t:"תאונה קלה",s:"הייתה לי תאונה קלה בלי נפגעים, ואני מחכה כדי להחליף פרטים ולתעד את הנזק.",tip:"פעם בשנה לכל היותר. זה תירוץ כבד."},
-{c:"car",f:["late"],r:2,t:"פקק חריג",s:"יש תאונה בכביש ואני תקועה בפקק בלי אפשרות לצאת.",tip:"התירוץ הכי שחוק שיש. השתמשי בו רק אם באמת אין ברירה."},
-{c:"family",f:["full","early"],r:5,t:"ליווי הורה לבדיקה",s:"אני צריכה ללוות את אמא שלי לבדיקה בבית החולים, ואין מי שיחליף אותי.",tip:"משפחה ובריאות יחד. מעט מנהלים יבקשו פרטים נוספים."},
-{c:"family",f:["late","early"],r:3,t:"בן הזוג נסע",s:"בן הזוג שלי נסע בהתראה קצרה, ואני לבד עם שני הילדים בהסעות.",tip:"מתאים כשההיעדרות קצרה. אפשר לחזור על זה לכמה ימים."},
-{c:"admin",f:["late","early"],r:5,t:"תור במשרד הפנים",s:"יש לי תור במשרד הפנים לחידוש דרכון. זה התור היחיד שהיה פנוי בחודשים הקרובים.",tip:"כל מי שניסה לקבוע תור יבין מיד."},
-{c:"admin",f:["late","early"],r:4,t:"טסט לרכב",s:"יש לי תור לטסט שנתי לרכב, והתור הפנוי היחיד היה בשעות העבודה.",tip:"נשמע הכי טוב בתחילת או בסוף היום."},
-{c:"admin",f:["early","late"],r:3,t:"חתימה אצל עורך דין",s:"אני צריכה להגיע לחתימה על מסמכים אצל עורך דין, והוא זמין רק בשעות הבוקר.",tip:"במחלקת משכנתאות כולם יודעים כמה קשה לתאם עורכי דין."}
-];
-const HANDOVER=[
-"את הפגישות עם הלקוחות שקבעתי להיום אתאם מחדש מולם.",
-"תיקי המשכנתא שממתינים לאישור עקרוני יחכו לי לבוקר, ואין ביניהם משהו דחוף.",
-"אם לקוח מתקשר בעניין מסמכים לחתימה, אפשר להעביר אליי הודעה ואחזור אליו.",
-"עדכנתי את הלקוחות שמחכים לתשובה, ואת מה שמול השמאים ועורכי הדין אקדם מחר.",
-"אין לי היום מסירת מסמכים או חתימות דחופות, ואני זמינה בטלפון לכל שאלה."
-];
+const CATS={all:"הכול",kids:"ילדים",health:"בריאות",home:"בית",car:"רכב ודרכים",family:"משפחה",admin:"סידורים"};
+const TONES={formal:"רשמי",warm:"חברי",drama:"דרמטי"};
+const CHANS={wa:"וואטסאפ",mail:"מייל",sms:"SMS",call:"תסריט לשיחה"};
+const LENS={short:"קצר",long:"מפורט"};
+const LV=[null,
+ ["אמת לאמיתה","אף אחד לא ישאל שאלות"],["שגרתי לגמרי","קורה לכולם"],["משכנע מאוד","קלאסיקה של הורים"],["סביר","קצת פחות שגרתי"],["קצת צבעוני","יש בזה סיפור"],
+ ["צריך פוקר פייס","להגיד בביטחון"],["על הגבול","מנהל עם הומור יבין"],["יצירתי מאוד","יעלה חיוך"],["הזוי","רק אם יש קשר טוב"],["סרט קומי","לשלוח על אחריותך"]];
+const lvColor=l=>l<=3?"#3ee6b0":l<=6?"#ffb340":l<=8?"#ff8a5c":"#ff5c8a";
+const F={F:"full",L:"late",E:"early",W:"wfh"};
+// event: "level|fits|title|sentence"   complication: "delta|sentence"
+const DB={
+kids:{e:[
+"1|FW|חום אצל אחד הילדים|אחד הילדים התעורר הבוקר עם חום של 38.6, ואי אפשר לשלוח אותו למסגרת.",
+"1|LE|תור לרופאת ילדים|התפנה תור לרופאת הילדים לאחד הילדים, ואני לא רוצה לוותר עליו.",
+"2|FW|וירוס בטן בגן|הגיעה הודעה על וירוס בטן שמסתובב בגן, ואחד הילדים כבר לא מרגיש טוב.",
+"2|LE|טיפת חלב|יש לנו תור בטיפת חלב לבדיקה התקופתית של אחד הילדים.",
+"3|LF|כינים בכיתה|הגיעה הודעה על כינים בכיתה, ואני חייבת לטפל בשני הילדים לפני שהם חוזרים למסגרת.",
+"3|FW|הגן נסגר בהפתעה|הגננת חולה והגן סגור היום, וההודעה הגיעה רק הבוקר.",
+"4|LW|הבייביסיטר ביטלה|הבייביסיטר ביטלה ממש עכשיו, בלי שום התראה.",
+"4|EL|שיחה דחופה עם המחנכת|המחנכת ביקשה להיפגש איתי היום לשיחה דחופה על אחד הילדים.",
+"5|E|טלפון מהגן|התקשרו מהגן, אחד הילדים נפל ומקבל טיפול, ואני צריכה לאסוף אותו.",
+"5|LW|שביתת סייעות|הודיעו על שביתת סייעות פתאומית, והצהרון לא פועל היום.",
+"6|L|ההסעה לא הגיעה|ההסעה של בית הספר פשוט לא הגיעה, ואני מסיעה את הילדים בעצמי לצד השני של העיר.",
+"6|LE|כוכב ההצגה|גיליתי הבוקר שהיום מסיבת הסוף בגן, ואחד הילדים משחק בה את התפקיד הראשי.",
+"7|L|הנעליים שנעלמו|אחד הילדים החביא את הנעליים של אחיו, ואנחנו מחפשים אותן כבר ארבעים דקות.",
+"8|L|מפתחות בפלסטלינה|אחד הילדים \"אפה\" את מפתחות הרכב בתוך עוגת פלסטלינה ושכח איפה הניח אותה.",
+"9|LW|ניסוי מדעי בבית|אחד הילדים הכין ניסוי מדעי לבית הספר, ועכשיו יש קצף ירוק בכל המקלחת.",
+"10|L|ננעלתי במרפסת|אחד הילדים נעל אותי במרפסת \"בשביל משחק\", ואני כותבת מהטלפון בזמן שאני מחכה לשכנה עם מפתח."],
+c:["0|ובן הזוג כבר יצא מוקדם לעבודה.","0|ניסיתי למצוא סידור חלופי ולא הצלחתי.","0|וסבתא, שבדרך כלל עוזרת, לא זמינה השבוע.","1|והשני, כמובן, החליט להצטרף ולסרב ללכת לבד.",
+"1|והגננת ביקשה שלא נגיע בלי בירור.","1|ואני היחידה שהצליחו להשיג בטלפון.","0|ואין לי את מי להשאיר איתם.","2|והילדים כבר הכריזו שזה \"היום הכי גרוע בחיים\".",
+"1|ובקבוצת ההורים יש כבר 140 הודעות על זה.","0|אני מעדכנת כבר עכשיו כדי שתדעו מראש.","2|והכלב, משום מה, מחליט שזה הזמן לחגוג."]},
+health:{e:[
+"1|FW|דלקת גרון|התעוררתי עם דלקת גרון וחום, ואני לא רוצה להדביק את הלקוחות ואת הצוות.",
+"1|L|בדיקת דם בצום|יש לי הבוקר בדיקת דם בצום בקופת החולים.",
+"2|FL|מיגרנה|יש לי מיגרנה חזקה מהלילה, ואני לא מסוגלת לנהוג כרגע.",
+"2|LE|סתימה שנשברה|נשברה לי סתימה בלילה, וקיבלתי תור דחוף אצל רופאת השיניים.",
+"3|FW|הגב נתפס|הגב נתפס לי הבוקר, ואני בקושי מצליחה לזוז.",
+"3|FW|בדיקה ביתית חיובית|הבדיקה הביתית יצאה חיובית, ואני מעדיפה לא להגיע לסניף.",
+"4|LE|רופא עיניים|הגיע תור לרופא עיניים שחיכיתי לו חצי שנה, והוא כולל הרחבת אישונים.",
+"4|FW|הרעלת קיבה|כנראה אכלתי משהו לא טוב אתמול בערב, ואני מבלה את הבוקר קרוב מאוד לשירותים.",
+"5|LE|פיזיותרפיה|הפיזיותרפיסטית הזיזה את הטיפול שלי להיום בבוקר, ואין לו תור חלופי.",
+"5|FW|תגובה לחיסון|קיבלתי אתמול חיסון, ואני עם צמרמורות וחום.",
+"6|L|עדשה תקועה|עדשת מגע נתקעה לי בעין, ואני בדרך למוקד.",
+"6|FW|נקע בקרסול|עשיתי צעד לא נכון במדרגות ונקעתי את הקרסול.",
+"7|FW|עקיצה בשפה|דבורה עקצה אותי בשפה, ואני נראית כמו ברווז. זה יעבור, אבל לא עד הצהריים.",
+"8|FW|בלי קול|איבדתי לגמרי את הקול, ושיחות על משכנתאות בתנועות ידיים לא באות בחשבון.",
+"9|F|החתול של השכנה|החתול של השכנה ישן לי הלילה על הכרית, והאלרגיה שלי חוגגת.",
+"10|F|שיהוק שלא נגמר|יש לי שיהוק שלא מפסיק כבר שלוש שעות, והרופאה אמרה לנוח."],
+c:["0|הרופאה המליצה לנוח היום.","0|אשלח אישור מחלה ברגע שאקבל אותו.","0|אני מקווה שמחר אהיה כבר בסדר.","1|ניסיתי להתאושש בכוחות עצמי ולא הלך.",
+"1|ובן הזוג אסר עליי בתוקף לצאת מהבית.","0|אני לא רוצה לסכן אף אחד בצוות.","1|גם הילדים כבר מסתכלים עליי בדאגה.","2|וגוגל אמר משהו מפחיד, אבל אני לא מאמינה לו.",
+"0|אעדכן בצהריים איך אני מרגישה.","1|וזה דווקא ביום מלא בפגישות.","2|ואפילו הקפה לא עוזר."]},
+home:{e:[
+"1|LW|פיצוץ בצנרת|התפוצץ צינור מתחת לכיור במטבח, ואני מחכה לאינסטלטור.",
+"1|LW|טכנאי עם חלון הגעה|טכנאי של ספק האינטרנט נתן חלון הגעה בין 8:00 ל-12:00, ואין מי שיחכה לו.",
+"2|LW|הדוד דולף|הדוד דולף ומציף את המרפסת, והטכנאי בדרך.",
+"2|L|ננעלתי בחוץ|ננעלתי מחוץ לבית עם המפתחות בפנים, ואני מחכה למנעולן.",
+"3|LW|נזילה מהשכנים|יש נזילה מהדירה של השכנים לתוך התקרה שלנו.",
+"3|LW|הפסקת חשמל|יש הפסקת חשמל בכל הבניין, והמעלית לא עובדת.",
+"4|LW|משלוח רהיטים|המשלוח של הארון החדש מגיע היום, ורק אני יכולה לקבל אותו.",
+"4|L|ידית שנשברה|ידית הדלת בשירותים נשברה כשהייתי בפנים, ואני מחכה לחילוץ.",
+"5|LW|סגירת מים|ועד הבית סגר את המים לתיקון, ואני צריכה להיות בבית כשפותחים.",
+"5|L|תקועה במעלית|נתקעתי במעלית בין הקומה השלישית לרביעית, ומחכים לטכנאי.",
+"6|FW|מקק ענק|יש מקק בגודל של חתול במטבח, ואני לא משאירה את הילדים לבד איתו.",
+"6|LW|המדיח הציף|המדיח החליט להציף את המטבח בקצף.",
+"7|L|יונה בסלון|יונה נכנסה לסלון מהחלון ולא מוכנה לצאת.",
+"8|LW|עכבר|ראיתי עכבר, ואני עומדת על הכיסא כבר חצי שעה.",
+"9|L|נחש בחצר|יש נחש בחצר, והפקח של העירייה ביקש שלא נצא עד שהוא יגיע.",
+"10|F|סוכה מול הדלת|השכן בנה סוכה בגודל של אולם אירועים בדיוק מול הדלת שלנו, ואין לנו דרך לצאת."],
+c:["0|וזה לא יכול לחכות לסוף היום.","0|ואין אף אחד אחר בבית שיכול לטפל בזה.","0|אני כבר מטפלת בזה ומקווה שייגמר מהר.","1|ובן הזוג, כמובן, בחו״ל בדיוק השבוע.",
+"1|והילדים מתלהבים מכל העניין הרבה יותר ממני.","0|אשלח עדכון ברגע שהכול יסתדר.","1|ובעל הבית לא עונה לטלפון.","2|ויש לי כבר תמונות, למקרה שמישהו לא מאמין.",
+"1|והשכנה מלמטה כבר דפקה בדלת פעמיים.","2|ובקבוצת הוואטסאפ של הבניין מתנהל דיון סוער.","0|ניסיתי להזיז את זה לשעה אחרת ולא הסכימו."]},
+car:{e:[
+"1|L|פנצ'ר|עליתי על משהו בכביש ויש לי פנצ'ר. אני מחכה לשירותי הדרך.",
+"1|L|המצבר מת|הרכב לא מניע הבוקר, כנראה המצבר.",
+"2|LE|טסט לרכב|יש לי תור לטסט לרכב, והתור הפנוי היחיד היה בשעות העבודה.",
+"2|L|תאונה בכביש|יש תאונה קשה בכביש, ואני תקועה בפקק בלי יציאה.",
+"3|LF|תאונה קלה|הייתה לי תאונה קלה בלי נפגעים, ואני מחכה כדי לתעד ולהחליף פרטים.",
+"3|L|הרכבת נעצרה|הרכבת עצרה בין התחנות כבר עשרים דקות, בלי הסבר.",
+"4|L|שמשה שבורה|מישהו שבר בלילה את השמשה של הרכב שלי.",
+"4|LE|המוסך מתקשר|מהמוסך התקשרו: הרכב מוכן, אבל רק אם אגיע לקחת אותו עד עשר.",
+"5|L|הרכב נגרר|העירייה גררה לי את הרכב כי בלילה צבעו שם את המדרכה באדום-לבן.",
+"5|L|האוטובוס לא יוצא|קו האוטובוס שלי לא יוצא היום בגלל עיצומים.",
+"6|L|מפתח בביוב|המפתח של הרכב נפל לי לתוך פתח ביוב ליד הבית.",
+"6|L|חתול במנוע|חתול נכנס למנוע של הרכב ולא מוכן לצאת.",
+"7|L|גלגל אחד נגנב|גנבו לי בלילה גלגל מהרכב. רק אחד.",
+"8|L|שיירת טרקטורים|נתקעתי מאחורי שיירת טרקטורים של הפגנת חקלאים.",
+"9|L|ברווזים על הכביש|משפחת ברווזים חוצה את הכביש בקצב שלה, ואף אחד לא מעז לצפור.",
+"10|L|שדה חמניות|הניווט שלח אותי לדרך עפר, ועכשיו אני באמצע שדה חמניות."],
+c:["0|אני כבר מטפלת בזה.","0|אעדכן כשאהיה בדרך.","0|בדקתי תחבורה ציבורית ואין חלופה מהירה.","1|והטלפון שלי על 8 אחוז סוללה.",
+"1|ושירותי הדרך אמרו \"עד שעתיים\".","0|מצטערת על העיכוב.","1|והילדים איתי באוטו ושואלים כל דקה אם הגענו.","2|לפחות יש לי זמן לסיים את הפודקאסט.",
+"1|ובן הזוג לקח את הרכב השני.","2|והנהג שמאחוריי כבר יצא לעשן שלוש סיגריות.","0|אגיע ברגע שזה יסתדר."]},
+family:{e:[
+"1|FE|ליווי אמא לבדיקה|אני צריכה ללוות את אמא שלי לבדיקה בבית החולים.",
+"1|LE|הסעה של אבא|אבא שלי צריך שאסיע אותו לבדיקה, ואין לו דרך אחרת להגיע.",
+"2|LE|בן הזוג נסע|בן הזוג נסע בהתראה קצרה, ואני לבד עם הילדים בהסעות.",
+"2|F|סבתא אושפזה|סבתא שלי אושפזה בלילה, ואני רוצה להיות לידה הבוקר.",
+"3|E|ברית במשפחה|יש ברית לאחיין שלי בצהריים, והמועד נקבע רק אתמול.",
+"3|LE|אמא מעדה|אמא שלי מעדה בבית. היא בסדר, אבל אני רוצה לקפוץ לבדוק אותה.",
+"4|FE|אחותי יולדת|אחותי בדרך לחדר לידה, ואני אחראית על הילדים שלה.",
+"4|LW|נחיתה מחו״ל|הדודה נוחתת הבוקר מחו״ל, ואני היחידה שיכולה לאסוף אותה מנתב״ג.",
+"5|E|טקס בבית הספר|יש טקס בבית הספר של אחד הילדים, והוא מקריא שיר שכתב.",
+"5|LW|הכלב ברח|הכלב שלנו יצא מהחצר ולא חזר, ואנחנו מחפשים אותו בשכונה.",
+"6|LE|אמא ננעלה|אמא שלי ננעלה מחוץ לבית, ויש לי את המפתח היחיד.",
+"6|E|חתונה בשישי|אחי מתחתן ביום שישי, ואני מסדרת היום את הושבת האורחים.",
+"7|L|הדוד והכספומט|הכספומט בלע לדוד שלי את הכרטיס, ומשום מה זו הפכה לבעיה של כל המשפחה.",
+"8|LW|התמונות של אמא|אמא שלי מחקה בטעות את כל התמונות מהטלפון, ואני בשיחת חירום איתה.",
+"9|F|התוכי של סבתא|התוכי של סבתא ברח, וכל המשפחה מגויסת לחיפושים.",
+"10|F|כינוס חירום|הדודה הכריזה על \"כינוס משפחתי חירום\" בעניין הצוואה של החתול שלה."],
+c:["0|ואין מישהו אחר במשפחה שזמין היום.","0|אני מקווה לחזור לשגרה כבר מחר.","0|זה נפל עליי בהפתעה הבוקר.","1|ואמא שלי לא מוכנה לשמוע על אף אחד אחר.",
+"1|והאחים שלי, כרגיל, \"באמצע משהו\".","0|אני כמובן זמינה בטלפון.","1|ובקבוצת המשפחה כבר יש כאוס.","2|ואני כבר אחרי שלוש כוסות קפה.",
+"1|וזה בדיוק כשבן הזוג בעבודה.","0|אשמח להשלים שעות בהמשך השבוע.","2|וסבתא כבר הודיעה שהיא \"לא רוצה להטריח\"."]},
+admin:{e:[
+"1|LE|משרד הפנים|יש לי תור במשרד הפנים לחידוש דרכון, היחיד שהיה פנוי בחודשים הקרובים.",
+"1|LE|חתימה אצל עורך דין|אני צריכה לחתום על מסמכים אצל עורך דין, והוא זמין רק בבוקר.",
+"2|LE|ביטוח לאומי|זומנתי לפגישה בביטוח לאומי, ואי אפשר לדחות אותה.",
+"2|L|מס הכנסה|יש לי פגישה במס הכנסה בעניין החזר מס.",
+"3|LE|רישום לבית ספר|היום היום האחרון לרישום לבית הספר, ומערכת הרישום באינטרנט קרסה.",
+"3|LE|חתימה ברשות המסים|ברשות המסים ביקשו שאגיע פיזית לחתום על מסמך.",
+"4|LE|רשומה בדואר|יש רשומה שמחכה לי בדואר כבר שבוע, והיום היום האחרון לאסוף אותה.",
+"4|L|ערעור בעירייה|אני צריכה לערער בעירייה על דוח חניה, וקבלת הקהל רק בבוקר.",
+"5|LE|ועדת ערר|זומנתי לדיון בוועדת ערר על הארנונה.",
+"5|L|ראיון בשגרירות|יש לי ראיון בשגרירות לקבלת ויזה.",
+"6|L|התור ששכחתי|יש לי תור במוקד קופת החולים שקבעתי לפני חודשיים, ונזכרתי בו רק הבוקר.",
+"6|LE|מבחן ריענון נהיגה|זומנתי למבחן ריענון נהיגה, והוא נקבע בדיוק להיום.",
+"7|L|צילום של צילום|הפקידה ביקשה צילום של תעודת הזהות, ואחר כך צילום של הצילום.",
+"8|L|מספר 247|קיבלתי מספר תור 247, ועכשיו קוראים למספר 12.",
+"9|L|הלוך ושוב|שלחו אותי מהקופה למוקד, מהמוקד לסניף, ומהסניף חזרה לקופה.",
+"10|F|הוכחת חיים|ברשות האוכלוסין טוענים שאני רשומה כנפטרת, ואני צריכה להוכיח שאני חיה."],
+c:["0|זה התור היחיד שהיה פנוי.","0|אגיע מיד אחרי.","0|ניסיתי לעשות את זה באינטרנט, אבל חייבים להגיע פיזית.","1|ויש לפניי לפחות עשרים אנשים.",
+"1|והפקיד בדיוק יצא להפסקה.","0|אני משתדלת לסיים כמה שיותר מהר.","1|וכמובן שהמערכת \"לא עובדת\".","2|והמזגן כאן מכוון לטמפרטורה של אנטארקטיקה.",
+"1|וביקשו מסמך שאף אחד לא אמר לי להביא.","0|אשמח להשלים את השעות.","2|ואני כבר מכירה בשם את כל מי שבתור."]}
+};
+const HANDOVER=["את הפגישות עם הלקוחות שקבעתי להיום אתאם מחדש מולם.","תיקי המשכנתא שממתינים לאישור עקרוני יחכו לי, ואין ביניהם משהו דחוף.",
+"אם לקוח מתקשר בעניין מסמכים לחתימה, אפשר להעביר אליי הודעה ואחזור אליו.","עדכנתי את הלקוחות שמחכים לתשובה, ואת מה שמול השמאים ועורכי הדין אקדם מחר.",
+"אין לי היום מסירת מסמכים או חתימות דחופות, ואני זמינה בטלפון לכל שאלה.","את ההצעות ללקוחות שביקשו מחזור משכנתא אשלח מהבית עד סוף היום."];
+const TIPS=["שולחים לפני 8:00. הודעה מוקדמת נשמעת אמינה יותר מהודעה מהדרך.","קצר ועניני. הסבר ארוך מדי מעורר שאלות.","לא חוזרים על אותו תירוץ באותו חודש. המכונה זוכרת בשבילך.",
+"מחלת ילד היא זכות אמיתית, אבל היא נספרת מימי המחלה שלך. כדאי לשמור אותה למקרים אמיתיים.","פרט קטן ומדויק, כמו שעה או מספר, מוסיף הרבה אמינות.","מעל רמה 7 עדיף לשלוח רק למנהל/ת עם חוש הומור."];
+
+// build the full bank
+const BANK=[];
+for(const c in DB){DB[c].e.forEach((ev,i)=>{const[l,f,t,s]=ev.split("|");DB[c].c.forEach((cm,j)=>{const[d,cs]=cm.split("|");
+  BANK.push({k:c+i+"-"+j,c,t,s,cs,lvl:Math.min(10,+l+(+d)),fits:[...f].map(x=>F[x])})})})}
+
 const $=id=>document.getElementById(id);
-const st={type:"full",cat:"all",tone:"formal",cur:null,ref:""};
-const store={get(){try{return JSON.parse(localStorage.getItem("excuseHist")||"[]")}catch(e){return[]}},set(v){try{localStorage.setItem("excuseHist",JSON.stringify(v))}catch(e){}}};
-function chips(el,map,key){el.innerHTML="";for(const k in map){const b=document.createElement("button");b.className="chip";b.textContent=map[k];b.setAttribute("aria-pressed",st[key]===k);b.onclick=()=>{st[key]=k;chips(el,map,key);onChange(key)};el.appendChild(b)}}
-function onChange(key){updTime();if(key==="mgr"||key==="tone"){if(st.cur)render(false)}else pick()}
-function updTime(){const w=$("timeWrap");w.hidden=!(st.type==="late"||st.type==="early");$("timeLabel").textContent=st.type==="late"?"שעת הגעה משוערת":"שעת יציאה משוערת";
-  if(st.type==="early"&&$("tm").value==="10:00")$("tm").value="13:00";if(st.type==="late"&&$("tm").value==="13:00")$("tm").value="10:00"}
+const st={type:"full",cat:"all",tone:"formal",chan:"wa",len:"long",lvl:3,cur:null,ai:null,hand:HANDOVER[0],ref:"",tip:TIPS[0]};
+const store={get(){try{return JSON.parse(localStorage.getItem("excuseHist2")||"[]")}catch(e){return[]}},set(v){try{localStorage.setItem("excuseHist2",JSON.stringify(v))}catch(e){}}};
 const rnd=a=>a[Math.floor(Math.random()*a.length)];
-function pool(){return X.filter(x=>x.f.includes(st.type)&&(st.cat==="all"||x.c===st.cat))}
-function usedDays(t){const h=store.get().filter(e=>e.t===t);if(!h.length)return null;return Math.floor((Date.now()-h[0].d)/864e5)}
-function pick(){let p=pool();if(!p.length){p=X.filter(x=>x.f.includes(st.type));toast("אין תירוץ כזה לסוג ההיעדרות הזה, אז בחרתי מתחום אחר")}
-  const fresh=p.filter(x=>x!==st.cur&&(usedDays(x.t)===null||usedDays(x.t)>30));const src=fresh.length?fresh:p.filter(x=>x!==st.cur);
-  st.cur=rnd(src.length?src:p);st.hand=rnd(HANDOVER);st.ref="ה-"+String(Math.floor(1000+Math.random()*9000));render(true)}
-function message(){const x=st.cur,n=$("mgr").value.trim(),t=$("tm").value||"10:00",f=st.tone==="formal";
-  const hi=f?`בוקר טוב${n?" "+n:""},`:`היי${n?" "+n:""} 🙂`;
+
+function seg(id,map,key){const el=$(id);el.innerHTML="";for(const k in map){const b=document.createElement("button");b.type="button";b.textContent=map[k];b.setAttribute("aria-pressed",st[key]===k);
+  b.onclick=()=>{st[key]=k;seg(id,map,key);changed(key)};el.appendChild(b)}}
+function changed(key){updTime();if(key==="type"||key==="cat"){pick(true)}else if(st.cur||st.ai)render(false)}
+function updTime(){const show=st.type==="late"||st.type==="early";$("tmWrap").hidden=!show;$("tmLabel").textContent=st.type==="late"?"שעת הגעה":"שעת יציאה";
+  if(st.type==="early"&&$("tm").value==="10:00")$("tm").value="13:00";if(st.type==="late"&&$("tm").value==="13:00")$("tm").value="10:00"}
+function updLvl(){const l=st.lvl,c=lvColor(l);$("dial").style.setProperty("--lvl-c",c);$("lvlNum").textContent=l;$("lvlName").textContent=LV[l][0];$("lvlDesc").textContent=LV[l][1]}
+function usedDays(k){const h=store.get().find(e=>e.k===k);return h?Math.floor((Date.now()-h.d)/864e5):null}
+function pick(silent){
+  let p=BANK.filter(x=>x.fits.includes(st.type)&&(st.cat==="all"||x.c===st.cat));
+  if(!p.length){p=BANK.filter(x=>x.fits.includes(st.type));if(!silent)toast("אין תירוץ כזה לסוג ההיעדרות הזה, אז בחרתי מתחום אחר")}
+  let near=[];for(let r=0;r<=9&&!near.length;r++)near=p.filter(x=>Math.abs(x.lvl-st.lvl)<=r);
+  const fresh=near.filter(x=>x!==st.cur&&(usedDays(x.k)===null||usedDays(x.k)>30));
+  st.cur=rnd(fresh.length?fresh:near);st.ai=null;st.hand=rnd(HANDOVER);st.tip=rnd(TIPS);st.ref="ת-"+(1000+Math.floor(Math.random()*9000));
+  spin(()=>render(true));}
+function spin(done){const t=$("title");if(matchMedia("(prefers-reduced-motion: reduce)").matches){done();return}
+  t.classList.add("spin");let n=0;const iv=setInterval(()=>{t.textContent=rnd(BANK).t;if(++n>10){clearInterval(iv);t.classList.remove("spin");done()}},55)}
+function parts(){const n=$("mgr").value.trim(),t=$("tm").value||"10:00",me=$("me").value.trim();
+  const hi={formal:`בוקר טוב${n?" "+n:""},`,warm:`היי${n?" "+n:""} 🙂`,drama:`${n?n+", ":""}לא תאמינו מה קרה לי הבוקר...`}[st.tone];
   const abs={full:"לכן לא אוכל להגיע היום לעבודה.",late:`לכן אגיע היום באיחור, בסביבות ${t}.`,early:`לכן אצטרך לצאת היום מוקדם, בסביבות ${t}.`,wfh:"אם אפשר, אעבוד היום מהבית ואהיה זמינה בטלפון ובמייל."}[st.type];
-  const bye=f?"תודה על ההבנה, ואעדכן בהמשך.":"מצטערת על ההתראה הקצרה, תודה 🙏";
-  return `${hi}\n${x.s} ${abs}\n${st.hand}\n${bye}`}
-function bar(el,v){el.innerHTML="";for(let i=1;i<=5;i++){const s=document.createElement("i");if(i<=v)s.className="on";el.appendChild(s)}}
-function render(anim){const x=st.cur;$("cat").textContent=CATS[x.c];$("title").textContent=x.t;$("msg").textContent=message();
-  $("ref").textContent=st.ref;$("date").textContent=new Date().toLocaleDateString("he-IL");$("stampType").textContent=TYPES[st.type];
-  bar($("cred"),x.r);$("credTxt").textContent=["","נמוכה","סבירה","טובה","גבוהה","כמעט מושלמת"][x.r];
-  const d=usedDays(x.t);let risk=6-x.r;if(d!==null&&d<=30)risk=5;risk=Math.max(1,Math.min(5,risk));bar($("risk"),risk);$("riskTxt").textContent=["","נמוך","נמוך","בינוני","גבוה","גבוה מאוד"][risk];
+  const bye={formal:"תודה על ההבנה, ואעדכן בהמשך.",warm:"מצטערת על ההתראה הקצרה, תודה 🙏",drama:"אני מבטיחה לפצות על זה 🙈"}[st.tone];
+  return{n,t,me,hi,abs,bye}}
+function message(){
+  if(st.ai)return st.ai;
+  const x=st.cur,p=parts(),long=st.len==="long";
+  const story=x.s+(long?" "+x.cs:"");
+  if(st.chan==="sms")return `${p.hi} ${x.s} ${p.abs}${p.me?"\n"+p.me:""}`;
+  if(st.chan==="call")return `תסריט לשיחה עם ${p.n||"המנהל/ת"}:\n• פתיחה: ${p.hi.replace(/,$/,"")}, יש לך דקה?\n• מה קרה: ${story}\n• ההשלכה: ${p.abs}\n• מה עם העבודה: ${st.hand}\n• סיום: ${p.bye}\n\nלדבר לאט, בלי להתנצל יותר מדי, ולסיים בשאלה "זה בסדר מבחינתך?"`;
+  const body=`${p.hi}\n${story} ${p.abs}${long?"\n"+st.hand:""}\n${p.bye}`;
+  if(st.chan==="mail"){const subj={full:"היעדרות היום",late:"איחור היום",early:"יציאה מוקדמת היום",wfh:"עבודה מהבית היום"}[st.type]+(p.me?" – "+p.me:"");
+    return `נושא: ${subj}\n\n${body.replace(/\n/g,"\n\n")}\n\nבברכה,\n${p.me||""}`.trim()}
+  return body+(p.me?"\n"+p.me:"")}
+function bar(el,v){el.innerHTML="";for(let i=1;i<=10;i++){const s=document.createElement("i");if(i<=v)s.className="on";el.appendChild(s)}}
+function render(anim){
+  const lvl=st.ai?st.lvl:st.cur.lvl;
+  $("ticket").style.setProperty("--lvl-c",lvColor(lvl));
+  $("title").textContent=st.ai?(st.aiTitle||"תירוץ אישי"):st.cur.t;$("msg").textContent=message();
+  $("tagLvl").textContent="רמת המצאה "+lvl;$("tagCat").textContent=st.ai?"כתיבה אישית":CATS[st.cur.c];$("tagChan").textContent=CHANS[st.chan];
+  $("ref").textContent=st.ref;$("date").textContent=new Date().toLocaleDateString("he-IL");$("src").textContent=st.ai?"Claude":"המאגר";$("stampType").textContent=TYPES[st.type];
+  const cred=11-lvl;bar($("cred"),cred);$("credTxt").textContent=cred+"/10";
+  const d=st.ai?null:usedDays(st.cur.k);let risk=Math.max(1,Math.min(10,lvl+(d!==null&&d<=30?5:0)));bar($("risk"),risk);$("riskTxt").textContent=risk+"/10";
   const w=$("warn");if(d!==null&&d<=30){w.hidden=false;w.textContent=d===0?"כבר השתמשת בתירוץ הזה היום.":`השתמשת בתירוץ הזה לפני ${d} ימים. כדאי לבחור אחר.`}else w.hidden=true;
-  $("tip").innerHTML="";const b=document.createElement("b");b.textContent="טיפ: ";$("tip").append(b,x.tip);
+  $("tip").textContent="טיפ: "+st.tip;
   $("wa").href="https://wa.me/?text="+encodeURIComponent(message());
   if(anim){const s=$("stamp");s.classList.remove("hit");void s.offsetWidth;s.classList.add("hit")}}
-function log(){const h=store.get();h.unshift({t:st.cur.t,d:Date.now()});store.set(h.slice(0,30));hist();render(false)}
+function log(){const h=store.get();h.unshift({k:st.ai?"ai-"+Date.now():st.cur.k,t:st.ai?(st.aiTitle||"תירוץ אישי"):st.cur.t,d:Date.now()});store.set(h.slice(0,60));hist();render(false)}
 function hist(){const h=store.get(),ul=$("hist");ul.innerHTML="";$("histEmpty").hidden=h.length>0;
-  h.slice(0,10).forEach(e=>{const li=document.createElement("li"),s=document.createElement("span"),tm=document.createElement("time");s.textContent=e.t;tm.textContent=new Date(e.d).toLocaleDateString("he-IL");li.append(s,tm);ul.appendChild(li)})}
-let tt;function toast(m){const t=$("toast");t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,2200)}
-$("copy").onclick=()=>{const m=message();const done=()=>{toast("ההודעה הועתקה");log()};
-  if(navigator.clipboard)navigator.clipboard.writeText(m).then(done).catch(()=>{selectMsg();toast("סמני והעתיקי ידנית")});else{selectMsg();toast("סמני והעתיקי ידנית")}};
+  h.slice(0,12).forEach(e=>{const li=document.createElement("li"),s=document.createElement("span"),tm=document.createElement("time");s.textContent=e.t;tm.textContent=new Date(e.d).toLocaleDateString("he-IL");li.append(s,tm);ul.appendChild(li)})}
+let tt;function toast(m){const t=$("toast");t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,2400)}
 function selectMsg(){const r=document.createRange();r.selectNodeContents($("msg"));const s=getSelection();s.removeAllRanges();s.addRange(r)}
+
+$("lvl").addEventListener("input",e=>{st.lvl=+e.target.value;updLvl()});
+$("lvl").addEventListener("change",()=>pick(true));
+$("go").onclick=()=>{pick();$("ticket").scrollIntoView({behavior:"smooth",block:"start"})};
+$("again").onclick=()=>pick();
+$("surprise").onclick=()=>{st.lvl=1+Math.floor(Math.random()*10);$("lvl").value=st.lvl;st.type=rnd(Object.keys(TYPES));st.cat=rnd(Object.keys(CATS));st.tone=rnd(Object.keys(TONES));
+  seg("o-type",TYPES,"type");seg("o-cat",CATS,"cat");seg("o-tone",TONES,"tone");updLvl();updTime();pick();$("ticket").scrollIntoView({behavior:"smooth",block:"start"})};
+["mgr","me","tm"].forEach(id=>$(id).addEventListener("input",()=>{if(st.cur||st.ai){if(st.ai)return;render(false)}}));
+$("copy").onclick=()=>{const m=message(),done=()=>{toast("ההודעה הועתקה");log()};
+  if(navigator.clipboard)navigator.clipboard.writeText(m).then(done).catch(()=>{selectMsg();toast("סמני את הטקסט והעתיקי ידנית")});else{selectMsg();toast("סמני את הטקסט והעתיקי ידנית")}};
 $("wa").addEventListener("click",log);
-$("go").onclick=pick;$("again").onclick=pick;
-$("mgr").addEventListener("input",()=>st.cur&&render(false));$("tm").addEventListener("input",()=>st.cur&&render(false));
-chips($("types"),TYPES,"type");chips($("cats"),CATS,"cat");chips($("tones"),TONES,"tone");updTime();hist();
-st.cur=X[0];st.hand=HANDOVER[0];st.ref="ה-4172";render(false);
+
+// AI writer
+const IDEAS=["הילדה הדביקה מסטיק בשיער של אחיה","הכלב אכל את המפתחות","השכנה תקעה את הרכב שלה מאחורי שלי","יש לי ראיון בגן חדש לקטן","הלקוחות ביטלו ואני צריכה יום לעצמי"];
+IDEAS.forEach(t=>{const b=document.createElement("button");b.type="button";b.textContent=t;b.onclick=()=>{$("aiTxt").value=t;$("aiTxt").focus()};$("ideas").appendChild(b)});
+let sampleFn=null,ctrl=null;
+(async()=>{try{sampleFn=await window.claude?.use?.("sample")}catch(e){sampleFn=null}
+  if(!sampleFn){$("aiStatus").textContent="הכתיבה האישית זמינה כשפותחים את האפליקציה ב-Claude."}})();
+$("aiGo").onclick=async()=>{
+  const topic=$("aiTxt").value.trim();if(!topic){toast("כתבי קודם על מה התירוץ");$("aiTxt").focus();return}
+  if(!sampleFn){toast("החיבור ל-Claude לא זמין בתצוגה הזו");return}
+  ctrl?.abort();ctrl=new AbortController();const p=parts();
+  const prompt=`את/ה כותב/ת תירוצים להיעדרות מהעבודה.
+הכותבת: אישה שעובדת במחלקת משכנתאות בבנק, אמא לשני ילדים. כתוב/כתבי בעברית תקנית, בגוף ראשון לשון נקבה.
+נושא התירוץ (מה שהיא ביקשה): ${topic}
+רמת ההמצאה: ${st.lvl} מתוך 10 (${LV[st.lvl][0]}: ${LV[st.lvl][1]}). 1 = אמין ושגרתי לחלוטין, 10 = הזוי ומצחיק.
+סוג ההיעדרות: ${TYPES[st.type]}${st.type==="late"?", הגעה בסביבות "+p.t:st.type==="early"?", יציאה בסביבות "+p.t:""}.
+טון: ${TONES[st.tone]}. ערוץ: ${CHANS[st.chan]}. אורך: ${LENS[st.len]}.
+${p.n?"שם המנהל/ת: "+p.n+".":"בלי שם מנהל."} ${p.me?"חתימה: "+p.me+".":""}
+${st.len==="long"?"הוסיפי משפט קצר ומקצועי על הטיפול בלקוחות או בתיקי המשכנתא.":""}
+${st.chan==="mail"?"התחילי בשורה 'נושא: ...'.":""}${st.chan==="call"?"כתבי תסריט שיחה קצר בנקודות.":""}
+החזר/י בשורה הראשונה כותרת של 2–4 מילים בפורמט "כותרת: ...", ואז שורה ריקה ואז רק את ההודעה עצמה, בלי הסברים.`;
+  $("aiGo").disabled=true;$("aiStatus").textContent="Claude כותב...";st.ai=" ";st.aiTitle="רגע, כותבים...";st.ref="ת-"+(1000+Math.floor(Math.random()*9000));st.tip=rnd(TIPS);
+  render(true);$("ticket").scrollIntoView({behavior:"smooth",block:"start"});
+  const apply=txt=>{const m=txt.match(/^\s*כותרת:\s*(.+)\n+/);if(m){st.aiTitle=m[1].trim();st.ai=txt.slice(m[0].length).trim()||" "}else{st.ai=txt.trim()||" "}render(false)};
+  try{const r=await sampleFn(prompt,{modelTier:"quick",cache:false,signal:ctrl.signal,onText:({text})=>apply(text)});apply(r.text);$("aiStatus").textContent="מוכן. אפשר להעתיק או לשלוח."}
+  catch(e){if(e?.name==="AbortError")return;st.ai=null;$("aiStatus").textContent=e?.code==="not_granted"?"לא ניתנה הרשאה לשימוש ב-Claude.":e?.code==="rate_limited"?"יותר מדי בקשות. נסי שוב בעוד דקה.":"משהו השתבש בכתיבה. נסי שוב.";if(st.cur)render(false)}
+  finally{$("aiGo").disabled=false}};
+
+// init
+$("count").textContent=BANK.length.toLocaleString("he-IL");
+seg("o-type",TYPES,"type");seg("o-cat",CATS,"cat");seg("o-tone",TONES,"tone");seg("o-chan",CHANS,"chan");seg("o-len",LENS,"len");
+updLvl();updTime();hist();
+st.cur=BANK.find(x=>x.c==="kids"&&x.lvl===3&&x.fits.includes("full"))||BANK[0];st.ref="ת-4172";render(false);
 </script>
 
 </body>
