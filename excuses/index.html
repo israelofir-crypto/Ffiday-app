@@ -5,239 +5,128 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 </head>
 <body>
-<title>מכונת התירוצים</title>
+<title>תירוץ טוב לבוקר</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Secular+One&family=Heebo:wght@400;500;700;800&family=Rubik:wght@600;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Varela+Round&family=Assistant:wght@400;600;700&display=swap">
 <style>
-/* Layout: one column "machine": hero with live counter → control deck (dial + option grid) → glowing lever → result ticket → AI writer → history. Deliberately dark-only neon look. */
+/* Layout: one calm centered column — greeting, two big choice tiles, one button, a soft message card. Light, airy, single deliberate theme. */
 :root{
-  color-scheme:dark;
-  --bg:#0a0d1d; --deck:#121734; --deck2:#181f44; --line:#2a3366; --ink:#eef1ff; --muted:#9aa3d1;
-  --hot:#ff5c8a; --amber:#ffb340; --mint:#3ee6b0; --violet:#8b7bff; --paper:#fbfaf6; --paper-ink:#1a1d33; --stamp:#e0412f;
-  --grad:linear-gradient(100deg,var(--mint) 0%,var(--amber) 55%,var(--hot) 100%);
-  --display:"Secular One","Heebo",system-ui,sans-serif; --body:"Heebo",system-ui,"Arial Hebrew",sans-serif; --num:"Rubik","Heebo",sans-serif;
+  color-scheme:light;
+  --bg:#f5f7fb; --card:#ffffff; --ink:#22304a; --muted:#6f7b93; --line:#e6eaf2;
+  --peach:#ffb38a; --peach-soft:#fff0e7; --sky:#6aa8ff; --sky-soft:#eaf3ff; --mint:#3dbf98; --mint-soft:#e5f7f1;
+  --round:"Varela Round","Assistant",system-ui,sans-serif; --body:"Assistant",system-ui,"Arial Hebrew",sans-serif;
 }
 *{box-sizing:border-box}
-body{margin:0;background:
-  radial-gradient(900px 500px at 90% -10%,rgba(139,123,255,.28),transparent 60%),
-  radial-gradient(700px 420px at -10% 30%,rgba(255,92,138,.16),transparent 60%),var(--bg);
-  background-attachment:fixed;color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 60px}
-.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
-button,input,textarea{font:inherit;color:inherit}
-:focus-visible{outline:3px solid var(--amber);outline-offset:3px}
+[hidden]{display:none!important}
+html,body{min-height:100%}
+body{margin:0;color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;
+  background:radial-gradient(520px 340px at 100% 0%,#ffe3d3 0%,transparent 70%),radial-gradient(520px 380px at 0% 100%,#dcecff 0%,transparent 70%),var(--bg);
+  background-attachment:fixed;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 56px}
+.wrap{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--sky);outline-offset:3px}
+header{text-align:center;display:flex;flex-direction:column;gap:6px;align-items:center}
+.sun{width:64px;height:64px}
+h1{font-family:var(--round);font-weight:400;font-size:clamp(1.9rem,7vw,2.4rem);line-height:1.15;margin:0;text-wrap:balance}
+.sub{margin:0;color:var(--muted)}
 
-/* hero */
-.hero{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
-.badge{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--line);background:rgba(255,255,255,.04);border-radius:999px;padding:4px 14px;font-size:.85rem;color:var(--muted)}
-.badge b{font-family:var(--num);color:var(--mint);font-variant-numeric:tabular-nums}
-.dot{width:8px;height:8px;border-radius:50%;background:var(--mint);box-shadow:0 0 10px var(--mint);animation:pulse 1.6s infinite}
-@keyframes pulse{50%{opacity:.35}}
-h1{font-family:var(--display);font-weight:400;font-size:clamp(2.6rem,11vw,4.4rem);line-height:1;margin:0;
-  background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;text-wrap:balance}
-.hero p{margin:0;color:var(--muted);max-width:56ch}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.choice{border:2px solid var(--line);background:var(--card);border-radius:24px;padding:20px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;
+  box-shadow:0 8px 24px -14px rgba(34,48,74,.25);transition:transform .15s,border-color .15s,background .15s}
+.choice:hover{transform:translateY(-2px)}
+.choice svg{width:46px;height:46px}
+.choice b{font-family:var(--round);font-weight:400;font-size:1.2rem}
+.choice span{font-size:.88rem;color:var(--muted)}
+.choice[aria-pressed="true"].day{border-color:var(--peach);background:var(--peach-soft)}
+.choice[aria-pressed="true"].late{border-color:var(--sky);background:var(--sky-soft)}
 
-/* deck */
-.deck{background:linear-gradient(180deg,var(--deck2),var(--deck));border:1px solid var(--line);border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:20px;box-shadow:0 30px 60px -30px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.06)}
-.sec-title{font-family:var(--display);font-size:1.25rem;margin:0;display:flex;align-items:center;gap:10px}
-.sec-title small{font-family:var(--body);font-size:.8rem;color:var(--muted);font-weight:500}
+.times{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.times button{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:5px 16px;cursor:pointer;font-weight:600;font-variant-numeric:tabular-nums}
+.times button[aria-pressed="true"]{background:var(--sky);border-color:var(--sky);color:#fff}
 
-.dial{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center;background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:18px;padding:16px}
-.lvl-num{width:96px;height:96px;border-radius:50%;display:grid;place-items:center;font-family:var(--num);font-weight:800;font-size:2.6rem;position:relative;
-  background:radial-gradient(circle at 50% 40%,#232a5a,#0e1230);box-shadow:0 0 0 3px var(--lvl-c,var(--mint)),0 0 28px -4px var(--lvl-c,var(--mint));transition:box-shadow .25s}
-.lvl-num small{position:absolute;bottom:14px;font-size:.62rem;color:var(--muted);font-weight:600;letter-spacing:.05em}
-.dial-side{display:flex;flex-direction:column;gap:8px;min-width:0}
-.dial-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
-.dial-head span{font-weight:800;font-size:1.15rem;color:var(--lvl-c,var(--mint))}
-.dial-head em{font-style:normal;color:var(--muted);font-size:.85rem}
-input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:14px;border-radius:999px;background:linear-gradient(270deg,var(--mint),var(--amber) 55%,var(--hot));direction:rtl;cursor:pointer}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:30px;height:30px;border-radius:50%;background:#fff;border:5px solid var(--lvl-c,var(--mint));box-shadow:0 4px 14px rgba(0,0,0,.5)}
-input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;border:5px solid var(--lvl-c,var(--mint))}
-.ticks{display:grid;grid-template-columns:repeat(10,1fr);font-family:var(--num);font-size:.72rem;color:var(--muted);text-align:center}
-.scale-words{display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted)}
+.go{border:0;border-radius:20px;padding:16px;font-family:var(--round);font-size:1.3rem;cursor:pointer;color:#fff;
+  background:linear-gradient(135deg,#ff9f7a,#ff7f8f);box-shadow:0 14px 30px -12px rgba(255,127,143,.7);transition:transform .12s}
+.go:hover{transform:translateY(-2px)}.go:active{transform:translateY(1px)}
 
-.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
-.opt{display:flex;flex-direction:column;gap:8px;min-width:0}
-.opt-label{font-size:.82rem;font-weight:700;color:var(--muted);letter-spacing:.03em}
-.seg{display:flex;flex-wrap:wrap;gap:6px}
-.seg button{border:1px solid var(--line);background:rgba(255,255,255,.03);border-radius:12px;padding:7px 12px;cursor:pointer;font-size:.93rem;transition:.15s}
-.seg button:hover{border-color:var(--violet)}
-.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:800}
-.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
-.fields label{display:flex;flex-direction:column;gap:6px}
-input[type=text],input[type=time],textarea{width:100%;background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:12px;padding:10px 12px;color:var(--ink)}
-input::placeholder,textarea::placeholder{color:#6a73a6}
+.card{background:var(--card);border-radius:26px;padding:22px;display:flex;flex-direction:column;gap:14px;box-shadow:0 20px 44px -22px rgba(34,48,74,.35);position:relative}
+.card.pop{animation:pop .4s cubic-bezier(.2,1.3,.4,1)}
+@keyframes pop{from{opacity:.3;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+.tag{align-self:flex-start;font-size:.82rem;font-weight:700;border-radius:999px;padding:3px 12px;background:var(--mint-soft);color:#1f8a6a}
+.title{font-family:var(--round);font-weight:400;font-size:1.35rem;margin:0;line-height:1.3}
+.msg{margin:0;white-space:pre-wrap;font-family:var(--body);font-size:1.05rem;line-height:1.75;background:#f7f9fc;border-radius:18px;padding:16px}
+.ask{font-size:.95rem;color:var(--muted);border-top:1px dashed var(--line);padding-top:12px}
+.ask b{color:var(--ink)}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{border-radius:16px;padding:12px;font-weight:700;cursor:pointer;border:1.5px solid var(--line);background:var(--card);text-decoration:none;color:var(--ink);text-align:center}
+.btn.copy{background:var(--ink);border-color:var(--ink);color:#fff}
+.btn.wa{background:#25c26a;border-color:#25c26a;color:#fff}
+.btn.other{grid-column:1/-1;background:transparent}
+.note{font-size:.9rem;color:#a05a2c;background:var(--peach-soft);border-radius:14px;padding:8px 12px}
 
-.lever{position:relative;border:0;border-radius:18px;padding:18px;cursor:pointer;font-family:var(--display);font-size:1.5rem;color:#1a1033;background:var(--grad);
-  box-shadow:0 14px 40px -10px rgba(255,92,138,.6),inset 0 -4px 0 rgba(0,0,0,.18);transition:transform .12s}
-.lever:hover{transform:translateY(-2px)} .lever:active{transform:translateY(2px)}
-.lever small{display:block;font-family:var(--body);font-size:.85rem;font-weight:700;opacity:.75}
-.sub-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
-.ghost{border:1px solid var(--line);background:transparent;border-radius:12px;padding:8px 14px;cursor:pointer;color:var(--muted);font-weight:700}
-.ghost:hover{color:var(--ink);border-color:var(--violet)}
-
-/* ticket */
-.ticket{position:relative;background:var(--paper);color:var(--paper-ink);border-radius:18px;overflow:hidden;box-shadow:0 30px 60px -25px rgba(0,0,0,.8)}
-.ticket::before,.ticket::after{content:"";position:absolute;top:58px;width:26px;height:26px;border-radius:50%;background:var(--bg)}
-.ticket::before{right:-13px}.ticket::after{left:-13px}
-.t-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:14px 22px;border-bottom:2px dashed #d9d6cc;font-size:.85rem;color:#666b85;min-height:70px;align-items:center}
-.t-head b{color:var(--paper-ink);font-family:var(--num);font-variant-numeric:tabular-nums}
-.t-body{padding:20px 22px;display:flex;flex-direction:column;gap:14px}
-.t-tags{display:flex;gap:8px;flex-wrap:wrap}
-.t-tags span{background:#efece3;border-radius:8px;padding:2px 10px;font-size:.8rem;font-weight:700}
-.t-tags .lv{background:var(--lvl-c,var(--mint));color:#1a1033}
-.t-title{font-family:var(--display);font-weight:400;font-size:clamp(1.5rem,5vw,1.9rem);line-height:1.2;margin:0;padding-left:120px;text-wrap:balance;min-height:2.4em}
-.t-title.spin{filter:blur(1.2px);opacity:.7}
-.msg{margin:0;white-space:pre-wrap;background:#f2f0e8;border-radius:12px;padding:16px;font-size:1.02rem;line-height:1.75;border-right:4px solid var(--lvl-c,var(--mint))}
-.meters{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
-.meter{display:flex;flex-direction:column;gap:6px;font-size:.85rem;font-weight:700}
-.meter .top{display:flex;justify-content:space-between}
-.bar{display:grid;grid-template-columns:repeat(10,1fr);gap:3px}
-.bar i{height:9px;border-radius:3px;background:#e2dfd4}
-.bar.cred i.on{background:#18a57a}.bar.risk i.on{background:#e08a00}
-.warn{background:#fff1d6;border:1.5px solid #e08a00;border-radius:10px;padding:10px 14px;font-weight:600;font-size:.93rem}
-.tip{font-size:.92rem;color:#4b5070;border-top:1px solid #e6e3d9;padding-top:12px}
-.actions{display:flex;gap:10px;flex-wrap:wrap}
-.btn{border-radius:12px;padding:11px 18px;font-weight:800;cursor:pointer;border:1.5px solid #d4d0c3;background:#fff;color:var(--paper-ink);text-decoration:none;display:inline-flex;align-items:center;gap:6px}
-.btn.main{background:var(--paper-ink);color:var(--paper);border-color:var(--paper-ink)}
-.btn.wa{background:#1fae5b;border-color:#1fae5b;color:#fff}
-.stamp{position:absolute;top:84px;left:22px;width:104px;height:104px;border:4px double var(--stamp);border-radius:50%;color:var(--stamp);display:flex;flex-direction:column;align-items:center;justify-content:center;
-  font-family:var(--display);line-height:1.05;transform:rotate(-14deg);opacity:.85;text-align:center;pointer-events:none}
-.stamp span{font-size:1.35rem}.stamp small{font-family:var(--body);font-size:.6rem;font-weight:800}
-.stamp.hit{animation:hit .5s cubic-bezier(.2,1.7,.4,1)}
-@keyframes hit{0%{transform:rotate(-30deg) scale(2.4);opacity:0}100%{transform:rotate(-14deg) scale(1);opacity:.85}}
-@media (max-width:480px){.t-title{padding-left:0;padding-top:92px}.stamp{top:80px;width:88px;height:88px}.dial{grid-template-columns:1fr;justify-items:center}.dial-side{width:100%}}
-
-/* AI */
-.ai{border:1px solid transparent;border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:14px;
-  background:linear-gradient(var(--deck),var(--deck)) padding-box,linear-gradient(120deg,var(--violet),var(--hot)) border-box}
-.ai p{margin:0;color:var(--muted);font-size:.93rem}
-.ai textarea{min-height:90px;resize:vertical}
-.ai-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.ai-go{border:0;border-radius:14px;padding:12px 18px;font-weight:800;cursor:pointer;background:linear-gradient(120deg,var(--violet),var(--hot));color:#fff}
-.ai-go[disabled]{opacity:.5;cursor:not-allowed}
-.ideas{display:flex;gap:6px;flex-wrap:wrap}
-.ideas button{border:1px dashed var(--line);background:transparent;border-radius:999px;padding:4px 12px;cursor:pointer;color:var(--muted);font-size:.85rem}
-.ideas button:hover{color:var(--ink);border-color:var(--violet)}
-.ai-status{font-size:.85rem;color:var(--amber)}
-
-/* history */
-.panel{background:var(--deck);border:1px solid var(--line);border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:12px}
-.hist{list-style:none;margin:0;padding:0}
-.hist li{display:flex;justify-content:space-between;gap:12px;padding-block:8px;border-bottom:1px solid var(--line);font-size:.93rem}
-.hist li:last-child{border:0}
-.hist time{color:var(--muted);font-family:var(--num);white-space:nowrap}
-.empty{margin:0;color:var(--muted);font-size:.93rem}
-.toast{position:fixed;bottom:calc(22px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);font-weight:800;padding:10px 20px;border-radius:12px;z-index:9;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+details{background:rgba(255,255,255,.7);border:1px solid var(--line);border-radius:18px;padding:12px 16px}
+summary{cursor:pointer;font-weight:700;color:var(--muted)}
+.set{display:grid;gap:10px;margin-top:12px}
+.set label{display:flex;flex-direction:column;gap:4px;font-size:.88rem;color:var(--muted);font-weight:600}
+.set input{border:1.5px solid var(--line);border-radius:12px;padding:8px 12px;background:#fff}
+.row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end}
+.g{display:flex;gap:4px}
+.g button{border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:7px 12px;cursor:pointer;font-weight:600}
+.g button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.foot{text-align:center;font-size:.85rem;color:var(--muted);margin:0}
+.toast{position:fixed;bottom:calc(22px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;font-weight:700;padding:10px 20px;border-radius:14px;z-index:9}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-</style>
-<style>
-.kids{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
-.kid{display:flex;gap:8px;align-items:center;background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:14px;padding:10px}
-.kid input{flex:1;min-width:0}
-.kid .seg button{padding:6px 10px}
-.ask{background:#eef6f2;border-radius:12px;padding:12px 14px;font-size:.95rem;border-right:4px solid #18a57a}
-.ask b{display:block;font-size:.8rem;color:#18a57a;margin-bottom:2px}
-.prep{font-size:.9rem;color:#4b5070}
 </style>
 
 <div class="wrap" dir="rtl" lang="he">
-  <header class="hero">
-    <span class="badge"><i class="dot"></i><b id="count">0</b> תירוצים במאגר · <b id="sits">0</b> מצבים אמיתיים מהשגרה</span>
-    <h1>מכונת התירוצים</h1>
-    <p>רק תירוצים שקורים באמת לאמא לשני ילדים שעובדת במחלקת משכנתאות. מכוונים את משקל התירוץ ואת הנסיבות, מפעילים ומקבלים הודעה קצרה ועניינית, יחד עם תשובה מוכנה אם ישאלו.</p>
+  <header>
+    <svg class="sun" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="13" fill="#ffb38a"/><g stroke="#ffb38a" stroke-width="4" stroke-linecap="round"><path d="M32 6v7M32 51v7M6 32h7M51 32h7M13.6 13.6l5 5M45.4 45.4l5 5M13.6 50.4l5-5M45.4 18.6l5-5"/></g></svg>
+    <h1>תירוץ טוב לבוקר</h1>
+    <p class="sub">בוחרים מה צריך, ומקבלים הודעה אמינה ומנומסת למנהל.</p>
   </header>
 
-  <section class="deck" aria-label="לוח בקרה">
-    <h2 class="sec-title">לוח הבקרה <small>מכוונים לפני שמפעילים</small></h2>
+  <div class="choices">
+    <button class="choice day" id="cDay" aria-pressed="true">
+      <svg viewBox="0 0 48 48" aria-hidden="true"><rect x="7" y="10" width="34" height="31" rx="7" fill="#ffd9c4"/><rect x="7" y="10" width="34" height="10" rx="5" fill="#ff9f7a"/><path d="M16 6v8M32 6v8" stroke="#22304a" stroke-width="3" stroke-linecap="round"/><path d="M17 30l5 5 9-10" stroke="#22304a" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <b>יום שלם</b><span>לא מגיעה היום</span>
+    </button>
+    <button class="choice late" id="cLate" aria-pressed="false">
+      <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="25" r="17" fill="#d6e8ff"/><circle cx="24" cy="25" r="17" fill="none" stroke="#6aa8ff" stroke-width="3"/><path d="M24 15v10l7 5" stroke="#22304a" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+      <b>איחור</b><span>מגיעה מאוחר יותר</span>
+    </button>
+  </div>
+  <div class="times" id="times" hidden></div>
 
-    <div class="dial" id="dial">
-      <div class="lvl-num"><span id="lvlNum">4</span><small>מתוך 10</small></div>
-      <div class="dial-side">
-        <div class="dial-head"><span id="lvlName"></span><em id="lvlDesc"></em></div>
-        <label for="lvl" class="opt-label">משקל התירוץ</label>
-        <input type="range" id="lvl" min="1" max="10" step="1" value="4">
-        <div class="ticks" aria-hidden="true"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></div>
-        <div class="scale-words"><span>סידור קטן</span><span>אירוע רציני</span></div>
-      </div>
+  <button class="go" id="go">תני לי תירוץ</button>
+
+  <article class="card" id="card" aria-live="polite">
+    <span class="tag" id="tag">ילדים</span>
+    <h2 class="title" id="title"></h2>
+    <pre class="msg" id="msg"></pre>
+    <div class="note" id="note" hidden></div>
+    <div class="actions">
+      <button class="btn copy" id="copy">העתקה</button>
+      <a class="btn wa" id="wa" href="#" target="_blank" rel="noopener">וואטסאפ</a>
+      <button class="btn other" id="other">תירוץ אחר</button>
     </div>
-
-    <div class="opts">
-      <div class="opt"><span class="opt-label">סוג ההיעדרות</span><div class="seg" id="o-type"></div></div>
-      <div class="opt"><span class="opt-label">תחום התירוץ</span><div class="seg" id="o-cat"></div></div>
-      <div class="opt"><span class="opt-label">טון</span><div class="seg" id="o-tone"></div></div>
-      <div class="opt"><span class="opt-label">איך שולחים</span><div class="seg" id="o-chan"></div></div>
-      <div class="opt"><span class="opt-label">אורך ההודעה</span><div class="seg" id="o-len"></div></div>
-    </div>
-
-    <div class="opt">
-      <span class="opt-label">הילדים שלי (כדי שההודעה תישמע אמיתית)</span>
-      <div class="kids">
-        <div class="kid"><input id="k0" type="text" placeholder="שם הילד/ה הראשון/ה"><div class="seg" id="g0"></div></div>
-        <div class="kid"><input id="k1" type="text" placeholder="שם הילד/ה השני/ה"><div class="seg" id="g1"></div></div>
-      </div>
-    </div>
-
-    <div class="fields">
-      <label><span class="opt-label">שם המנהל/ת</span><input id="mgr" type="text" placeholder="למשל: רונית"></label>
-      <label><span class="opt-label">השם שלי (לחתימה)</span><input id="me" type="text" placeholder="לא חובה"></label>
-      <label id="tmWrap"><span class="opt-label" id="tmLabel">שעת הגעה</span><input id="tm" type="time" value="10:00"></label>
-    </div>
-
-    <button class="lever" id="go">הפעלת המכונה<small>מקבלים תירוץ אמין ומוכן לשליחה</small></button>
-  </section>
-
-  <article class="ticket" id="ticket" aria-live="polite">
-    <div class="t-head"><span>אסמכתא <b id="ref">—</b></span><span>תאריך <b id="date">—</b></span><span>מקור <b id="src">המאגר</b></span></div>
-    <div class="stamp" id="stamp"><small>מחלקת משכנתאות</small><span>מאושר</span><small id="stampType">יום מלא</small></div>
-    <div class="t-body">
-      <div class="t-tags"><span class="lv" id="tagLvl">משקל 4</span><span id="tagCat">ילדים</span><span id="tagChan">וואטסאפ</span></div>
-      <h2 class="t-title" id="title">—</h2>
-      <pre class="msg" id="msg"></pre>
-      <div class="ask" id="ask"><b>אם שואלים, אפשר לענות</b><span id="askTxt"></span></div>
-      <div class="prep" id="prep"></div>
-      <div class="warn" id="warn" hidden></div>
-      <div class="actions">
-        <button class="btn main" id="copy">העתקת ההודעה</button>
-        <a class="btn wa" id="wa" href="#" target="_blank" rel="noopener">שליחה בוואטסאפ</a>
-        <button class="btn" id="again">תירוץ אחר</button>
-      </div>
-      <div class="tip" id="tip"></div>
-    </div>
+    <div class="ask"><b>אם שואלים:</b> <span id="ask"></span></div>
   </article>
 
-  <section class="ai" aria-label="כתיבה עם Claude">
-    <h2 class="sec-title">ספרי ל-Claude מה לכתוב <small>מחובר לאינטרנט</small></h2>
-    <p>כתבי במילים שלך מה קרה. Claude ינסח הודעה קצרה, אמינה ועניינית לפי כל ההגדרות שבחרת למעלה.</p>
-    <textarea id="aiTxt" placeholder="למשל: הקטנה עם שיעול כבר שלושה ימים ויש לה תור לרופאה ב-9:30"></textarea>
-    <div class="ideas" id="ideas"></div>
-    <div class="ai-row">
-      <button class="ai-go" id="aiGo">כתיבת תירוץ אישי</button>
-      <span class="ai-status" id="aiStatus"></span>
+  <details id="settings">
+    <summary>התאמה אישית (לא חובה)</summary>
+    <div class="set">
+      <label>שם המנהל/ת<input id="mgr" type="text" placeholder="למשל: רונית"></label>
+      <div class="row"><label>שם הילד/ה הראשון/ה<input id="k0" type="text" placeholder="למשל: יואב"></label><div class="g" id="g0"></div></div>
+      <div class="row"><label>שם הילד/ה השני/ה<input id="k1" type="text" placeholder="למשל: נועה"></label><div class="g" id="g1"></div></div>
     </div>
-  </section>
-
-  <section class="panel">
-    <h2 class="sec-title">היסטוריית השימוש <small>נשמרת רק במכשיר שלך</small></h2>
-    <ul class="hist" id="hist"></ul>
-    <p class="empty" id="histEmpty">עוד לא שלחת תירוץ. כל תירוץ שתעתיקי או תשלחי יירשם כאן, והמכונה לא תציע אותו שוב בחודש הקרוב.</p>
-  </section>
+  </details>
+  <p class="foot"><span id="count"></span> תירוצים אמינים, ואף אחד מהם לא חוזר על עצמו באותו חודש.</p>
 </div>
 <div class="toast" id="toast" hidden></div>
 
 <script>
-const TYPES={full:"יום מלא",late:"איחור",early:"יציאה מוקדמת",wfh:"עבודה מהבית"};
-const CATS={all:"הכול",kids:"ילדים",health:"בריאות",home:"בית",car:"רכב ודרכים",family:"משפחה",admin:"סידורים"};
-const TONES={formal:"רשמי",warm:"חברי"};
-const CHANS={wa:"וואטסאפ",mail:"מייל",sms:"SMS",call:"תסריט לשיחה"};
-const LENS={short:"קצר",long:"מפורט"};
-const LV=[null,["סידור קטן","איחור של שעה, בלי שאלות"],["סידור קטן","תור קבוע מראש"],["תור או תקלה","קורה לכולם"],["תור או תקלה","דורש כמה שעות"],
- ["ילד חולה","הסיבה הכי מוכרת"],["מחלה קלה","יום אחד בבית"],["מחלה","יום מלא, אולי שניים"],["משפחה","ליווי של הורה"],["אירוע רציני","אף אחד לא ישאל"],["אירוע רציני","להשתמש רק כשבאמת צריך"]];
-const lvColor=l=>l<=3?"#3ee6b0":l<=6?"#ffb340":l<=8?"#ff8a5c":"#ff5c8a";
 const FT={F:"full",L:"late",E:"early",W:"wfh"};
-// slots: {K} kid name, {lK} "ל"+kid, [m|f] kid gender, {T} temp, {H} morning hour, {A} afternoon hour, {V} situation variant
-const SL={T:["38.2","38.3","38.4","38.5","38.7","38.8","38.9","39.1"],H:["8:00","8:15","8:30","8:45","9:00","9:15","9:30","10:00","10:30"],A:["12:30","13:00","13:30","14:00"]};
+const SL={T:["38.2","38.3","38.4","38.5","38.6","38.7","38.8","38.9","39.0","39.1"],H:["8:00","8:15","8:30","8:45","9:00","9:15","9:30","10:00","10:30"],A:["12:30","13:00","13:30","14:00"]};
 // [cat, weight, fits, title, text, ifAsked, variants?, prep?]
 const S=[
 ["kids",5,"FW","חום אצל {K}","{K} [התעורר|התעוררה] הבוקר עם חום של {T}.","נתתי אקמול. אם החום לא יורד עד הצהריים, אני לוקחת [אותו|אותה] לרופאה.",0,"אם יבקשו, הצהרת הורה על מחלת ילד מספיקה ליום אחד."],
@@ -344,116 +233,52 @@ S.push(
 ["admin",3,"LE","חתימה בטאבו","יש לי תור בלשכת רישום המקרקעין ב-{H}.","זה בשביל רישום הדירה של ההורים שלי."],
 ["admin",2,"E","אסיפת דיירים","יש אסיפת דיירים עם עורך הדין של פרויקט {V} ב-{A}.","מקבלים שם החלטות, וחשוב שכל דייר יהיה.",["תמ\"א 38","פינוי בינוי","השיפוץ בבניין"]]
 );
-const HANDOVER=["את הפגישות עם הלקוחות שקבעתי להיום אתאם מחדש מולם.","תיקי המשכנתא שממתינים לאישור עקרוני יחכו לי, ואין ביניהם משהו דחוף.",
-"אם לקוח מתקשר בעניין מסמכים לחתימה, אפשר להעביר אליי הודעה ואחזור אליו.","עדכנתי את הלקוחות שמחכים לתשובה, ואת מה שמול השמאים ועורכי הדין אקדם מחר.",
-"אין לי היום חתימות או מסירות דחופות.","את ההצעות למחזור משכנתא שביקשו ממני אשלים מחר בבוקר."];
-const TIPS=["שולחים לפני 8:00. הודעה מוקדמת נשמעת אמינה יותר מהודעה מהדרך.","קצר ועניני. מי שאומר אמת לא מסביר יותר מדי.","לא חוזרים על אותו תירוץ באותו חודש. המכונה זוכרת בשבילך.",
-"מחלת ילד היא זכות אמיתית, אבל היא נספרת מימי המחלה שלך.","פרט קטן ומדויק, כמו שעה או חום, מוסיף אמינות.","תמיד להוסיף מה קורה עם העבודה. זה מה שמנהל באמת רוצה לדעת.","לא להתנצל יותר מפעם אחת. זה נשמע בטוח יותר."];
 
+S.push(["kids",5,"FL","תור דחוף לרופאת הילדים","{K} [התעורר|התעוררה] עם {V}, וקיבלתי תור לרופאת הילדים ב-{H}.","אחרי הרופאה אדע אם [הוא יכול|היא יכולה] לחזור למסגרת מחר.",["כאב גרון חזק","חום ושיעול","כאב בטן","כאב באוזן"]]);
+const HANDOVER=["את הפגישות עם הלקוחות שקבעתי להיום אתאם מחדש.","אין לי היום חתימות או פגישות דחופות, ואני זמינה בטלפון.","אם לקוח מחפש אותי, אפשר להעביר לי הודעה ואחזור אליו.","את התיקים שממתינים לאישור אקדם מחר בבוקר."];
 const $=id=>document.getElementById(id);
-const st={type:"full",cat:"all",tone:"formal",chan:"wa",len:"long",lvl:4,g0:"m",g1:"f",cur:null,ai:null,hand:HANDOVER[0],ref:"",tip:TIPS[0]};
+const st={type:"full",late:"10:00",g0:"m",g1:"f",cur:null};
 const ls={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const mins=x=>{const[a,b]=x.split(":");return a*60+ +b};
 const rnd=a=>a[Math.floor(Math.random()*a.length)];
+const POOL={full:S.filter(s=>s[2].includes("F")),late:S.filter(s=>s[2].includes("L"))};
 const needsKid=s=>/\{l?K\}|\[/.test(s[3]+s[4]+s[5]);
-// count every distinct filled combination
 function combos(s){const t=s[3]+s[4];let n=1;if(needsKid(s))n*=2;if(t.includes("{T}"))n*=SL.T.length;if(t.includes("{H}"))n*=SL.H.length;if(t.includes("{A}"))n*=SL.A.length;if(s[6])n*=s[6].length;return n}
-function kidName(i){const v=$("k"+i).value.trim(),g=st["g"+i];if(v)return{n:v,l:"ל"+v,g};const base=i===0?(g==="m"?"הגדול":"הגדולה"):(g==="m"?"הקטן":"הקטנה");return{n:base,l:"ל"+base.slice(1),g}}
+function kid(i){const v=$("k"+i).value.trim(),g=st["g"+i];if(v)return{n:v,l:"ל"+v,g};const b=i===0?(g==="m"?"הגדול":"הגדולה"):(g==="m"?"הקטן":"הקטנה");return{n:b,l:"ל"+b.slice(1),g}}
 function fill(str,c){return str.replace(/\{K\}/g,c.k.n).replace(/\{lK\}/g,c.k.l).replace(/\[([^|\]]*)\|([^\]]*)\]/g,(_,m,f)=>c.k.g==="m"?m:f)
-  .replace(/משתתף\/ת/g,c.k.g==="m"?"משתתף":"משתתפת").replace(/\{T\}/g,c.T).replace(/\{H\}/g,c.H).replace(/\{A\}/g,c.A).replace(/\{V\}/g,c.V)}
-function seg(id,map,key){const el=$(id);el.innerHTML="";for(const k in map){const b=document.createElement("button");b.type="button";b.textContent=map[k];b.setAttribute("aria-pressed",st[key]===k);
-  b.onclick=()=>{st[key]=k;seg(id,map,key);changed(key)};el.appendChild(b)}}
-function changed(key){updTime();ls.set("excuseSet",{g0:st.g0,g1:st.g1,k0:$("k0").value,k1:$("k1").value,mgr:$("mgr").value,me:$("me").value});
-  if(key==="type"||key==="cat")pick(true);else if(st.cur&&!st.ai)render(false)}
-function updTime(){const show=st.type==="late"||st.type==="early";$("tmWrap").hidden=!show;$("tmLabel").textContent=st.type==="late"?"שעת הגעה":"שעת יציאה";
-  if(st.type==="early"&&$("tm").value==="10:00")$("tm").value="13:00";if(st.type==="late"&&$("tm").value==="13:00")$("tm").value="10:00"}
-function updLvl(){const l=st.lvl;$("dial").style.setProperty("--lvl-c",lvColor(l));$("lvlNum").textContent=l;$("lvlName").textContent=LV[l][0];$("lvlDesc").textContent=LV[l][1]}
-const hist=()=>ls.get("excuseHist3",[]);
-function usedDays(t){const h=hist().find(e=>e.t===t);return h?Math.floor((Date.now()-h.d)/864e5):null}
-function pick(silent){
-  let p=S.filter(s=>[...s[2]].some(x=>FT[x]===st.type)&&(st.cat==="all"||s[0]===st.cat));
-  if(!p.length){p=S.filter(s=>[...s[2]].some(x=>FT[x]===st.type));if(!silent)toast("אין מצב כזה לסוג ההיעדרות הזה, אז בחרתי מתחום אחר")}
-  let near=[];for(let r=0;r<=9&&!near.length;r++)near=p.filter(s=>Math.abs(s[1]-st.lvl)<=r);
-  if(near.length<3)near=p.filter(s=>Math.abs(s[1]-st.lvl)<=Math.max(2,Math.abs(near[0][1]-st.lvl)+1));
-  const fresh=near.filter(s=>s!==st.cur?.s&&(usedDays(s[3])===null||usedDays(s[3])>30));
-  const s=rnd(fresh.length?fresh:near.filter(x=>x!==st.cur?.s).length?near.filter(x=>x!==st.cur?.s):near);
-  st.cur={s,ki:Math.random()<.5?0:1,T:rnd(SL.T),H:rnd(SL.H),A:rnd(SL.A),V:s[6]?rnd(s[6]):""};
-  st.ai=null;st.hand=rnd(HANDOVER);st.tip=rnd(TIPS);st.ref="ת-"+(1000+Math.floor(Math.random()*9000));spin(()=>render(true))}
-function ctx(){return{...st.cur,k:kidName(st.cur.ki)}}
-function spin(done){const t=$("title");if(matchMedia("(prefers-reduced-motion: reduce)").matches){done();return}
-  t.classList.add("spin");let n=0;const iv=setInterval(()=>{t.textContent=rnd(S)[3].replace(/\{.*?\}/g,"").trim();if(++n>9){clearInterval(iv);t.classList.remove("spin");done()}},55)}
-function parts(){const n=$("mgr").value.trim(),t=$("tm").value||"10:00",me=$("me").value.trim();
-  const hi=st.tone==="formal"?`בוקר טוב${n?" "+n:""},`:`היי${n?" "+n:""},`;
-  const abs={full:"לכן לא אוכל להגיע היום.",late:`לכן אגיע היום באיחור, בסביבות ${t}.`,early:`לכן אצטרך לצאת היום מוקדם, בסביבות ${t}.`,wfh:"אם אפשר, אעבוד היום מהבית ואהיה זמינה בטלפון ובמייל."}[st.type];
-  const bye=st.tone==="formal"?"אעדכן במהלך היום. תודה על ההבנה.":"תודה רבה 🙏";
-  return{n,t,me,hi,abs,bye}}
-function message(){
-  if(st.ai)return st.ai;
-  const c=ctx(),p=parts(),long=st.len==="long",reason=fill(c.s[4],c);
-  if(st.chan==="sms")return `${p.hi} ${reason} ${p.abs}${p.me?"\n"+p.me:""}`;
-  if(st.chan==="call")return `תסריט לשיחה עם ${p.n||"המנהל/ת"}:\n• פתיחה: ${p.hi.replace(/,$/,"")}, יש לך דקה?\n• מה קרה: ${reason}\n• מה זה אומר: ${p.abs}\n• מה עם העבודה: ${st.hand}\n• אם שואלים: ${fill(c.s[5],c)}\n• סיום: ${p.bye}\n\nלדבר בקצב רגיל, להתנצל פעם אחת בלבד, ולסיים בשאלה "זה בסדר מבחינתך?"`;
-  const body=`${p.hi}\n${reason} ${p.abs}${long?"\n"+st.hand:""}\n${p.bye}`;
-  if(st.chan==="mail"){const subj={full:"היעדרות היום",late:"איחור היום",early:"יציאה מוקדמת היום",wfh:"עבודה מהבית היום"}[st.type]+(p.me?" – "+p.me:"");
-    return `נושא: ${subj}\n\n${body.replace(/\n/g,"\n\n")}\n\nבברכה,\n${p.me||""}`.trim()}
-  return body+(p.me?"\n"+p.me:"")}
-function render(anim){
-  const lvl=st.ai?st.lvl:st.cur.s[1],c=st.ai?null:ctx();
-  $("ticket").style.setProperty("--lvl-c",lvColor(lvl));
-  $("title").textContent=st.ai?(st.aiTitle||"תירוץ אישי"):fill(c.s[3],c);$("msg").textContent=message();
-  $("tagLvl").textContent="משקל "+lvl;$("tagCat").textContent=st.ai?"כתיבה אישית":CATS[c.s[0]];$("tagChan").textContent=CHANS[st.chan];
-  $("ref").textContent=st.ref;$("date").textContent=new Date().toLocaleDateString("he-IL");$("src").textContent=st.ai?"Claude":"המאגר";$("stampType").textContent=TYPES[st.type];
-  $("ask").hidden=!!st.ai;if(c)$("askTxt").textContent=fill(c.s[5],c);
-  $("prep").hidden=!(c&&c.s[7]);if(c&&c.s[7])$("prep").textContent="כדאי לדעת: "+c.s[7];
-  const d=c?usedDays(c.s[3]):null,w=$("warn");if(d!==null&&d<=30){w.hidden=false;w.textContent=d===0?"כבר השתמשת בתירוץ הזה היום.":`השתמשת בתירוץ הזה לפני ${d} ימים. כדאי לבחור אחר.`}else w.hidden=true;
-  $("tip").textContent="טיפ: "+st.tip;$("wa").href="https://wa.me/?text="+encodeURIComponent(message());
-  if(anim){const s=$("stamp");s.classList.remove("hit");void s.offsetWidth;s.classList.add("hit")}}
-function log(){const h=hist();h.unshift({t:st.ai?"ai":st.cur.s[3],n:st.ai?(st.aiTitle||"תירוץ אישי"):$("title").textContent,d:Date.now()});ls.set("excuseHist3",h.slice(0,60));drawHist();render(false)}
-function drawHist(){const h=hist(),ul=$("hist");ul.innerHTML="";$("histEmpty").hidden=h.length>0;
-  h.slice(0,12).forEach(e=>{const li=document.createElement("li"),s=document.createElement("span"),tm=document.createElement("time");s.textContent=e.n;tm.textContent=new Date(e.d).toLocaleDateString("he-IL");li.append(s,tm);ul.appendChild(li)})}
-let tt;function toast(m){const t=$("toast");t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,2400)}
-function selectMsg(){const r=document.createRange();r.selectNodeContents($("msg"));const s=getSelection();s.removeAllRanges();s.addRange(r)}
-
-$("lvl").addEventListener("input",e=>{st.lvl=+e.target.value;updLvl()});
-$("lvl").addEventListener("change",()=>pick(true));
-$("go").onclick=()=>{pick();$("ticket").scrollIntoView({behavior:"smooth",block:"start"})};
-$("again").onclick=()=>pick();
-["mgr","me","tm","k0","k1"].forEach(id=>$(id).addEventListener("input",()=>changed(id)));
-$("copy").onclick=()=>{const m=message(),done=()=>{toast("ההודעה הועתקה");log()};
-  if(navigator.clipboard)navigator.clipboard.writeText(m).then(done).catch(()=>{selectMsg();toast("סמני את הטקסט והעתיקי ידנית")});else{selectMsg();toast("סמני את הטקסט והעתיקי ידנית")}};
+  .replace(/\{T\}/g,c.T).replace(/\{H\}/g,c.H).replace(/\{A\}/g,c.A).replace(/\{V\}/g,c.V)}
+const CAT={kids:"ילדים",health:"בריאות",home:"בית",car:"בדרך",family:"משפחה",admin:"סידורים"};
+const hist=()=>ls.get("goodExcuseHist",[]);
+function pick(){const used=new Set(hist().filter(h=>Date.now()-h.d<30*864e5).map(h=>h.t));
+  let p=POOL[st.type].filter(s=>s!==st.cur?.s&&!used.has(s[3]));if(!p.length)p=POOL[st.type].filter(s=>s!==st.cur?.s);
+  const s=rnd(p);st.cur={s,ki:Math.random()<.5?0:1,T:rnd(SL.T),H:rnd(SL.H.filter(h=>st.type!=="late"||mins(h)<=mins(st.late)-45))||SL.H[0],A:rnd(SL.A),V:s[6]?rnd(s[6]):"",hand:rnd(HANDOVER)};
+  render(true)}
+function message(){const c={...st.cur,k:kid(st.cur.ki)},n=$("mgr").value.trim();
+  const abs=st.type==="full"?"לכן לא אוכל להגיע היום.":`לכן אגיע היום קצת מאוחר יותר, בסביבות ${st.late}.`;
+  return `בוקר טוב${n?" "+n:""},\n${fill(c.s[4],c)} ${abs}\n${c.hand}\nתודה על ההבנה.`}
+function render(anim){const c={...st.cur,k:kid(st.cur.ki)};
+  $("tag").textContent=CAT[c.s[0]];$("title").textContent=fill(c.s[3],c);$("msg").textContent=message();$("ask").textContent=fill(c.s[5],c);
+  $("note").hidden=!c.s[7];if(c.s[7])$("note").textContent=c.s[7];
+  $("wa").href="https://wa.me/?text="+encodeURIComponent(message());
+  if(anim){const k=$("card");k.classList.remove("pop");void k.offsetWidth;k.classList.add("pop")}}
+function setType(t){st.type=t;$("cDay").setAttribute("aria-pressed",t==="full");$("cLate").setAttribute("aria-pressed",t==="late");$("times").hidden=t!=="late";pick()}
+function times(){const el=$("times");el.innerHTML="";["9:30","10:00","11:00","12:00"].forEach(t=>{const b=document.createElement("button");b.type="button";b.textContent=t;b.setAttribute("aria-pressed",st.late===t);
+  b.onclick=()=>{st.late=t;times();if(st.cur)render(false)};el.appendChild(b)})}
+function gseg(i){const el=$("g"+i);el.innerHTML="";[["m","בן"],["f","בת"]].forEach(([k,l])=>{const b=document.createElement("button");b.type="button";b.textContent=l;b.setAttribute("aria-pressed",st["g"+i]===k);
+  b.onclick=()=>{st["g"+i]=k;gseg(i);save();render(false)};el.appendChild(b)})}
+function save(){ls.set("goodExcuseSet",{mgr:$("mgr").value,k0:$("k0").value,k1:$("k1").value,g0:st.g0,g1:st.g1})}
+let tt;function toast(m){const t=$("toast");t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,2200)}
+function log(){const h=hist();h.unshift({t:st.cur.s[3],d:Date.now()});ls.set("goodExcuseHist",h.slice(0,80))}
+$("cDay").onclick=()=>setType("full");$("cLate").onclick=()=>setType("late");$("go").onclick=()=>{pick();$("card").scrollIntoView({behavior:"smooth",block:"center"})};$("other").onclick=pick;
+$("copy").onclick=()=>{const m=message();const ok=()=>{toast("הועתק. אפשר להדביק ולשלוח");log()};
+  const fb=()=>{const r=document.createRange();r.selectNodeContents($("msg"));const s=getSelection();s.removeAllRanges();s.addRange(r);toast("סמני את הטקסט והעתיקי")};
+  navigator.clipboard?navigator.clipboard.writeText(m).then(ok).catch(fb):fb()};
 $("wa").addEventListener("click",log);
-
-// AI writer
-const IDEAS=["הקטנה עם שיעול כבר שלושה ימים ויש לה תור לרופאה","טכנאי המזגן מגיע בין 8 ל-12","אני צריכה ללוות את אבא שלי לבדיקה","יש לי אסיפת הורים בצהריים"];
-IDEAS.forEach(t=>{const b=document.createElement("button");b.type="button";b.textContent=t;b.onclick=()=>{$("aiTxt").value=t;$("aiTxt").focus()};$("ideas").appendChild(b)});
-let sampleFn=null,ctrl=null;
-(async()=>{try{sampleFn=await window.claude?.use?.("sample")}catch(e){sampleFn=null}
-  if(!sampleFn)$("aiStatus").textContent="הכתיבה האישית זמינה כשפותחים את האפליקציה ב-Claude."})();
-$("aiGo").onclick=async()=>{
-  const topic=$("aiTxt").value.trim();if(!topic){toast("כתבי קודם מה קרה");$("aiTxt").focus();return}
-  if(!sampleFn){toast("החיבור ל-Claude לא זמין בתצוגה הזו");return}
-  ctrl?.abort();ctrl=new AbortController();const p=parts(),k0=kidName(0),k1=kidName(1);
-  const prompt=`נסח/י הודעת היעדרות מהעבודה למנהל/ת.
-הכותבת: אישה רצינית וסולידית שעובדת במחלקת משכנתאות בבנק, אמא לשני ילדים (${k0.n}, ${k0.g==="m"?"בן":"בת"}; ${k1.n}, ${k1.g==="m"?"בן":"בת"}).
-מה קרה, במילים שלה: ${topic}
-סוג ההיעדרות: ${TYPES[st.type]}${st.type==="late"?", הגעה בסביבות "+p.t:st.type==="early"?", יציאה בסביבות "+p.t:""}.
-טון: ${TONES[st.tone]}. ערוץ: ${CHANS[st.chan]}. אורך: ${LENS[st.len]}.
-${p.n?"שם המנהל/ת: "+p.n+".":"בלי שם מנהל."} ${p.me?"חתימה: "+p.me+".":""}
-כללים: עברית תקנית בגוף ראשון לשון נקבה. ההודעה חייבת להישמע אמיתית לגמרי: סיבה אחת, פרט קונקרטי אחד (שעה, מקום או מספר), בלי הגזמות, בלי בדיחות, בלי התנצלות יותר מפעם אחת ובלי סימני קריאה.
-${st.len==="long"?"הוסיפי משפט קצר ומקצועי על הטיפול בלקוחות או בתיקי המשכנתא.":""}${st.chan==="mail"?" התחילי בשורה 'נושא: ...'.":""}${st.chan==="call"?" כתבי תסריט שיחה קצר בנקודות.":""}
-החזר/י בשורה הראשונה "כותרת: " ו-2 עד 4 מילים, אחריה שורה ריקה, ואז רק את ההודעה, בלי הסברים.`;
-  $("aiGo").disabled=true;$("aiStatus").textContent="Claude כותב...";st.ai=" ";st.aiTitle="רגע, כותבים...";st.ref="ת-"+(1000+Math.floor(Math.random()*9000));st.tip=rnd(TIPS);
-  render(true);$("ticket").scrollIntoView({behavior:"smooth",block:"start"});
-  const apply=txt=>{const m=txt.match(/^\s*כותרת:\s*(.+)\n+/);if(m){st.aiTitle=m[1].trim();st.ai=txt.slice(m[0].length).trim()||" "}else st.ai=txt.trim()||" ";render(false)};
-  try{const r=await sampleFn(prompt,{modelTier:"default",cache:false,signal:ctrl.signal,onText:({text})=>apply(text)});apply(r.text);$("aiStatus").textContent="מוכן. אפשר להעתיק או לשלוח."}
-  catch(e){if(e?.name==="AbortError")return;st.ai=null;$("aiStatus").textContent=e?.code==="not_granted"?"לא ניתנה הרשאה לשימוש ב-Claude.":e?.code==="rate_limited"?"יותר מדי בקשות. נסי שוב בעוד דקה.":"משהו השתבש בכתיבה. נסי שוב.";if(st.cur)render(false)}
-  finally{$("aiGo").disabled=false}};
-
-// init
-const saved=ls.get("excuseSet",{});["k0","k1","mgr","me"].forEach(k=>{if(saved[k])$(k).value=saved[k]});if(saved.g0)st.g0=saved.g0;if(saved.g1)st.g1=saved.g1;
-const G={m:"בן",f:"בת"};seg("g0",G,"g0");seg("g1",G,"g1");
-$("count").textContent=S.reduce((a,s)=>a+combos(s),0).toLocaleString("he-IL");$("sits").textContent=S.length;
-seg("o-type",TYPES,"type");seg("o-cat",CATS,"cat");seg("o-tone",TONES,"tone");seg("o-chan",CHANS,"chan");seg("o-len",LENS,"len");
-updLvl();updTime();drawHist();
-st.cur={s:S[0],ki:1,T:"38.6",H:"9:00",A:"13:00",V:""};st.ref="ת-4172";render(false);
+["mgr","k0","k1"].forEach(id=>$(id).addEventListener("input",()=>{save();render(false)}));
+const sv=ls.get("goodExcuseSet",{});["mgr","k0","k1"].forEach(k=>{if(sv[k])$(k).value=sv[k]});if(sv.g0)st.g0=sv.g0;if(sv.g1)st.g1=sv.g1;
+gseg(0);gseg(1);times();
+$("count").textContent=[...new Set([...POOL.full,...POOL.late])].reduce((a,s)=>a+combos(s),0).toLocaleString("he-IL");
+st.cur={s:S[0],ki:1,T:"38.4",H:"9:00",A:"13:00",V:"",hand:HANDOVER[0]};render(false);
 </script>
 
 </body>
