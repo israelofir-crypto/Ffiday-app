@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>תירוץ טוב לבוקר</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Varela+Round&family=Assistant:wght@400;600;700&display=swap">
+<style>
+/* Layout: one calm centered column — greeting, two big choice tiles, one button, a soft message card. Light, airy, single deliberate theme. */
+:root{
+  color-scheme:light;
+  --bg:#f5f7fb; --card:#ffffff; --ink:#22304a; --muted:#6f7b93; --line:#e6eaf2;
+  --peach:#ffb38a; --peach-soft:#fff0e7; --sky:#6aa8ff; --sky-soft:#eaf3ff; --mint:#3dbf98; --mint-soft:#e5f7f1;
+  --round:"Varela Round","Assistant",system-ui,sans-serif; --body:"Assistant",system-ui,"Arial Hebrew",sans-serif;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{min-height:100%}
+body{margin:0;color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;
+  background:radial-gradient(520px 340px at 100% 0%,#ffe3d3 0%,transparent 70%),radial-gradient(520px 380px at 0% 100%,#dcecff 0%,transparent 70%),var(--bg);
+  background-attachment:fixed;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 56px}
+.wrap{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--sky);outline-offset:3px}
+header{text-align:center;display:flex;flex-direction:column;gap:6px;align-items:center}
+.sun{width:64px;height:64px}
+h1{font-family:var(--round);font-weight:400;font-size:clamp(1.9rem,7vw,2.4rem);line-height:1.15;margin:0;text-wrap:balance}
+.sub{margin:0;color:var(--muted)}
+
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.choice{border:2px solid var(--line);background:var(--card);border-radius:24px;padding:20px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;
+  box-shadow:0 8px 24px -14px rgba(34,48,74,.25);transition:transform .15s,border-color .15s,background .15s}
+.choice:hover{transform:translateY(-2px)}
+.choice svg{width:46px;height:46px}
+.choice b{font-family:var(--round);font-weight:400;font-size:1.2rem}
+.choice span{font-size:.88rem;color:var(--muted)}
+.choice[aria-pressed="true"].day{border-color:var(--peach);background:var(--peach-soft)}
+.choice[aria-pressed="true"].late{border-color:var(--sky);background:var(--sky-soft)}
+
+.times{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.times button{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:5px 16px;cursor:pointer;font-weight:600;font-variant-numeric:tabular-nums}
+.times button[aria-pressed="true"]{background:var(--sky);border-color:var(--sky);color:#fff}
+
+.go{border:0;border-radius:20px;padding:16px;font-family:var(--round);font-size:1.3rem;cursor:pointer;color:#fff;
+  background:linear-gradient(135deg,#ff9f7a,#ff7f8f);box-shadow:0 14px 30px -12px rgba(255,127,143,.7);transition:transform .12s}
+.go:hover{transform:translateY(-2px)}.go:active{transform:translateY(1px)}
+
+.card{background:var(--card);border-radius:26px;padding:22px;display:flex;flex-direction:column;gap:14px;box-shadow:0 20px 44px -22px rgba(34,48,74,.35);position:relative}
+.card.pop{animation:pop .4s cubic-bezier(.2,1.3,.4,1)}
+@keyframes pop{from{opacity:.3;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+.tag{align-self:flex-start;font-size:.82rem;font-weight:700;border-radius:999px;padding:3px 12px;background:var(--mint-soft);color:#1f8a6a}
+.title{font-family:var(--round);font-weight:400;font-size:1.35rem;margin:0;line-height:1.3}
+.msg{margin:0;white-space:pre-wrap;font-family:var(--body);font-size:1.05rem;line-height:1.75;background:#f7f9fc;border-radius:18px;padding:16px}
+.ask{font-size:.95rem;color:var(--muted);border-top:1px dashed var(--line);padding-top:12px}
+.ask b{color:var(--ink)}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{border-radius:16px;padding:12px;font-weight:700;cursor:pointer;border:1.5px solid var(--line);background:var(--card);text-decoration:none;color:var(--ink);text-align:center}
+.btn.copy{background:var(--ink);border-color:var(--ink);color:#fff}
+.btn.wa{background:#25c26a;border-color:#25c26a;color:#fff}
+.btn.other{grid-column:1/-1;background:transparent}
+.note{font-size:.9rem;color:#a05a2c;background:var(--peach-soft);border-radius:14px;padding:8px 12px}
+
+details{background:rgba(255,255,255,.7);border:1px solid var(--line);border-radius:18px;padding:12px 16px}
+summary{cursor:pointer;font-weight:700;color:var(--muted)}
+.set{display:grid;gap:10px;margin-top:12px}
+.set label{display:flex;flex-direction:column;gap:4px;font-size:.88rem;color:var(--muted);font-weight:600}
+.set input{border:1.5px solid var(--line);border-radius:12px;padding:8px 12px;background:#fff}
+.row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end}
+.g{display:flex;gap:4px}
+.g button{border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:7px 12px;cursor:pointer;font-weight:600}
+.g button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.foot{text-align:center;font-size:.85rem;color:var(--muted);margin:0}
+.toast{position:fixed;bottom:calc(22px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;font-weight:700;padding:10px 20px;border-radius:14px;z-index:9}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap" dir="rtl" lang="he">
+  <header>
+    <svg class="sun" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="13" fill="#ffb38a"/><g stroke="#ffb38a" stroke-width="4" stroke-linecap="round"><path d="M32 6v7M32 51v7M6 32h7M51 32h7M13.6 13.6l5 5M45.4 45.4l5 5M13.6 50.4l5-5M45.4 18.6l5-5"/></g></svg>
+    <h1>תירוץ טוב לבוקר</h1>
+    <p class="sub">בוחרים מה צריך, ומקבלים הודעה אמינה ומנומסת למנהל.</p>
+  </header>
+
+  <div class="choices">
+    <button class="choice day" id="cDay" aria-pressed="true">
+      <svg viewBox="0 0 48 48" aria-hidden="true"><rect x="7" y="10" width="34" height="31" rx="7" fill="#ffd9c4"/><rect x="7" y="10" width="34" height="10" rx="5" fill="#ff9f7a"/><path d="M16 6v8M32 6v8" stroke="#22304a" stroke-width="3" stroke-linecap="round"/><path d="M17 30l5 5 9-10" stroke="#22304a" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <b>יום שלם</b><span>לא מגיעה היום</span>
+    </button>
+    <button class="choice late" id="cLate" aria-pressed="false">
+      <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="25" r="17" fill="#d6e8ff"/><circle cx="24" cy="25" r="17" fill="none" stroke="#6aa8ff" stroke-width="3"/><path d="M24 15v10l7 5" stroke="#22304a" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+      <b>איחור</b><span>מגיעה מאוחר יותר</span>
+    </button>
+  </div>
+  <div class="times" id="times" hidden></div>
+
+  <button class="go" id="go">תני לי תירוץ</button>
+
+  <article class="card" id="card" aria-live="polite">
+    <span class="tag" id="tag">ילדים</span>
+    <h2 class="title" id="title"></h2>
+    <pre class="msg" id="msg"></pre>
+    <div class="note" id="note" hidden></div>
+    <div class="actions">
+      <button class="btn copy" id="copy">העתקה</button>
+      <a class="btn wa" id="wa" href="#" target="_blank" rel="noopener">וואטסאפ</a>
+      <button class="btn other" id="other">תירוץ אחר</button>
+    </div>
+    <div class="ask"><b>אם שואלים:</b> <span id="ask"></span></div>
+  </article>
+
+  <details id="settings">
+    <summary>התאמה אישית (לא חובה)</summary>
+    <div class="set">
+      <label>שם המנהל/ת<input id="mgr" type="text" placeholder="למשל: רונית"></label>
+      <div class="row"><label>שם הילד/ה הראשון/ה<input id="k0" type="text" placeholder="למשל: יואב"></label><div class="g" id="g0"></div></div>
+      <div class="row"><label>שם הילד/ה השני/ה<input id="k1" type="text" placeholder="למשל: נועה"></label><div class="g" id="g1"></div></div>
+    </div>
+  </details>
+  <p class="foot"><span id="count"></span> תירוצים אמינים, ואף אחד מהם לא חוזר על עצמו באותו חודש.</p>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const FT={F:"full",L:"late",E:"early",W:"wfh"};
+const SL={T:["38.2","38.3","38.4","38.5","38.6","38.7","38.8","38.9","39.0","39.1"],H:["8:00","8:15","8:30","8:45","9:00","9:15","9:30","10:00","10:30"],A:["12:30","13:00","13:30","14:00"]};
+// [cat, weight, fits, title, text, ifAsked, variants?, prep?]
+const S=[
+["kids",5,"FW","חום אצל {K}","{K} [התעורר|התעוררה] הבוקר עם חום של {T}.","נתתי אקמול. אם החום לא יורד עד הצהריים, אני לוקחת [אותו|אותה] לרופאה.",0,"אם יבקשו, הצהרת הורה על מחלת ילד מספיקה ליום אחד."],
+["kids",5,"FW","הקאות בלילה","{K} [הקיא|הקיאה] בלילה כמה פעמים, ובגן מבקשים לא להחזיר ילד 24 שעות אחרי הקאה.","[הוא|היא] כבר שותה ונראה שזה עובר, אבל הכלל בגן ברור."],
+["kids",4,"FLW","כאב אוזניים","{K} [התלונן|התלוננה] כל הלילה על כאב באוזן, וקבעתי תור לרופאת הילדים ל-{H}.","כנראה דלקת אוזניים. נראה מה הרופאה תגיד."],
+["kids",3,"LE","ביקורת אצל רופאת הילדים","יש {lK} תור ביקורת אצל רופאת הילדים ב-{H}, אחרי {V}.","זה תור שנקבע מראש, רק לוודא שהכול עבר.",["האנטיביוטיקה","דלקת הגרון","הדלקת באוזן","שבוע של שיעול"]],
+["kids",3,"LE","בדיקה שנקבעה מראש","יש {lK} בדיקת {V} ב-{H}, שנקבעה לפני כמה חודשים.","בדיקה שגרתית. התור הבא היה רק בעוד חודשיים.",["ראייה","שמיעה","התפתחות","אלרגיה"]],
+["kids",4,"FW","הגן סגור","קיבלנו הבוקר הודעה שהגננת חולה ואין מחליפה, אז הגן של {K} סגור היום.","ניסיתי את סבתא, אבל היא לא זמינה היום."],
+["kids",3,"LW","הסידור נפל","סבתא, שהייתה אמורה להישאר היום עם {K}, לא מרגישה טוב, ואני מארגנת סידור אחר.","אני מקווה שעד הצהריים זה יסתדר."],
+["kids",4,"FW","{V} היום","יש היום {V}, ו{K} [נשאר|נשארה] בבית.","הודיעו על זה רק אתמול בערב.",["שביתה של הסייעות","שביתה בבית הספר","עיצומים בצהרון"]],
+["kids",3,"E","טלפון מהגן","התקשרו מהגן. {K} לא [מרגיש|מרגישה] טוב ו[צריך|צריכה] שיאספו [אותו|אותה].","יש [לו|לה] חום קל. אני אאסוף ונראה איך זה מתפתח."],
+["kids",2,"E","שיחה עם המחנכת","המחנכת של {K} קבעה איתי שיחה היום ב-{A}.","שיחה רגילה על ההתקדמות בכיתה."],
+["kids",2,"LE","רופאת שיניים לילדים","יש {lK} תור לרופאת שיניים ב-{H}.","בדיקה תקופתית וניקוי. זה התור שהיה פנוי."],
+["kids",4,"FLW","דלקת עיניים","{lK} יש דלקת עיניים, ובגן לא מקבלים עד יום שלם של טיפול בטיפות.","קיבלנו טיפות מרופאת הילדים, ומחר [הוא|היא] כבר [חוזר|חוזרת]."],
+["kids",3,"FL","כינים","קיבלנו הודעה על כינים בגן, ואצל {K} מצאנו. מבקשים לא להגיע לפני טיפול.","אני מטפלת עכשיו בשני הילדים, כדי שזה לא יחזור."],
+["kids",3,"LE","טיפול קבוע","הטיפול של {K} ב{V} הוזז היום לבוקר, ב-{H}.","זה טיפול שבועי, ובדרך כלל הוא אחר הצהריים.",["ריפוי בעיסוק","קלינאית תקשורת","פיזיותרפיה"]],
+["kids",6,"F","חום כבר יומיים","{K} עם חום כבר יומיים, ורופאת הילדים ביקשה לראות [אותו|אותה] שוב היום ולשלוח לבדיקת דם.","כנראה וירוס, אבל היא רוצה לשלול דלקת."],
+["kids",2,"E","מסיבה בגן","היום מסיבת {V} בגן של {K}, ב-{A}.","ההורים מוזמנים, ו[הוא|היא] מחכה לזה כל השבוע.",["חנוכה","פורים","סוף השנה","יום ההולדת"]],
+["kids",3,"L","ההסעה לא הגיעה","ההסעה של {K} לא הגיעה הבוקר, ואני מסיעה [אותו|אותה] בעצמי.","ניסיתי להשיג את הנהג ולא הצלחתי."],
+["kids",5,"FW","וירוס בטן","{K} [חזר|חזרה] אתמול מהגן עם שלשול, ובגן מבקשים יום בבית אחרי זה.","יש וירוס שמסתובב בגן. כמה ילדים כבר חולים."],
+["kids",6,"FW","שני הילדים חולים","שני הילדים חולים מהלילה, עם חום ושיעול.","זה עבר מאחד לשני. אני לוקחת אותם לרופאה."],
+["kids",2,"E","יום קצר בגן","היום יום קצר בגן של {K}, עם סיום ב-12:00, ואין מי שיאסוף.","זה מופיע בלוח החופשות של הגן, פשוט נפל על יום שבן הזוג עובד."],
+["kids",2,"L","פרידה קשה בגן","{lK} היה בוקר קשה בפרידה בגן, והגננת ביקשה שאשאר קצת.","זה קורה מדי פעם, בדרך כלל זה עובר אחרי חצי שעה."],
+["kids",3,"E","טקס בבית הספר","יש טקס {V} בבית הספר של {K} ב-{A}.","[הוא משתתף|היא משתתפת] בטקס, וחשוב [לו|לה] שאהיה שם.",["סוף השנה","קבלת סידור","יום המשפחה"]],
+["health",6,"FW","חום ומיחושים","התעוררתי עם חום של {T} וכאבי גוף.","אני הולכת לרופאת המשפחה ואשלח אישור מחלה.",0,"אישור מחלה מהרופאה לרוב נשלח בקופה ישירות לנייד."],
+["health",6,"FW","דלקת גרון","יש לי דלקת גרון, וכמעט אין לי קול. גם ככה לא הייתי יכולה לדבר היום עם לקוחות.","קבעתי תור לרופאה ואעדכן."],
+["health",5,"FW","קלקול קיבה","משהו שאכלתי אתמול לא עשה לי טוב, ואני עם בחילות מהלילה.","זה כנראה עניין של יום. אעדכן מחר בבוקר."],
+["health",4,"FL","מיגרנה","התעוררתי עם מיגרנה. לקחתי כדור ואני מחכה שזה יעבור.","זה קורה לי מדי פעם. בדרך כלל עובר תוך כמה שעות."],
+["health",2,"L","בדיקת דם בצום","יש לי בדיקת דם בצום בקופה ב-{H}.","בדיקות שגרתיות שהרופאה ביקשה."],
+["health",2,"LE","רופאת המשפחה","קבעתי תור לרופאת המשפחה ב-{H} בגלל {V}.","זה התור הראשון שהתפנה.",["כאבי ראש שחוזרים","שיעול שלא עובר","כאב בכתף","בדיקות שגרתיות"]],
+["health",3,"LE","רופאת שיניים","יש לי תור לרופאת השיניים ב-{H}, בגלל {V}.","זה כבר לא יכול לחכות.",["סתימה שנשברה","טיפול שורש","כאב בשן"]],
+["health",3,"LE","תור לרופא מומחה","יש לי {V} ב-{H}. חיכיתי לתור הזה כמה חודשים.","זה התור הראשון שהיה, ולא רציתי לדחות.",["תור לרופא עור","תור לאורתופד","תור לרופא עיניים","תור לרופאת נשים","בדיקת אולטרסאונד"]],
+["health",5,"FW","הגב נתפס","הגב נתפס לי הבוקר כשהרמתי את {K}.","אני בקושי זזה. אם זה לא משתפר, אלך לרופאה."],
+["health",4,"FW","אחרי חיסון","קיבלתי אתמול חיסון, ואני עם חום קל וחולשה.","תופעה מוכרת. זה אמור לעבור תוך יום."],
+["health",7,"F","בדיקה עם טשטוש","יש לי היום {V} עם טשטוש, ואסור לי לנהוג או לעבוד אחרי זה.","זו בדיקה שנקבעה מראש לפי הפניה.",["גסטרוסקופיה","קולונוסקופיה"],"עדיף להודיע על זה יום מראש."],
+["health",2,"LE","פיזיותרפיה","יש לי פיזיותרפיה ב-{H}, הטיפול האחרון בסדרה.","זה בגלל הכאבים בגב מלפני כמה חודשים."],
+["home",4,"LW","נזילה במטבח","יש נזילה מתחת לכיור במטבח, והאינסטלטור מגיע ב-{H}.","זה לא יכול לחכות, המים כבר הגיעו לארון."],
+["home",3,"LW","טכנאי עם חלון הגעה","{V} נתן חלון הגעה של 8:00 עד 12:00, ואין מי שיחכה לו בבית.","זה התור הראשון שהיה, ואם אבטל זה יידחה בשבועיים.",["טכנאי של ספק האינטרנט","טכנאי המזגן","טכנאי מכונת הכביסה","טכנאי המקרר"]],
+["home",4,"LW","הדוד דולף","הדוד דולף ואין מים חמים. השרברב מגיע ב-{H}.","אי אפשר להשאיר ככה את הבית עם הילדים."],
+["home",3,"L","הפסקת חשמל","אין חשמל בבניין מהלילה, והמעלית לא עובדת. אני מחכה שיחזור כדי לארגן את הילדים.","חברת החשמל אמרה שזה עניין של שעה או שעתיים."],
+["home",3,"L","המנעול נתקע","המנעול בדלת נתקע, ואני מחכה למנעולן.","אי אפשר לנעול את הבית ולצאת ככה."],
+["home",2,"LW","משלוח לבית","מגיע היום משלוח של {V}, וצריך מישהו בבית שיקבל ויחתום.","זה תואם מראש, וחלון ההגעה הוא בבוקר.",["מקרר","מכונת כביסה","ספה","ארון"]],
+["home",3,"LW","בדיקת גז בבניין","בודקים היום את צנרת הגז בבניין, ומבקשים שיהיה מישהו בכל דירה.","ועד הבית הודיע על זה רק אתמול."],
+["home",4,"LW","הצפה בבית","מכונת הכביסה הציפה את הבית בלילה. אני מנקה ומחכה לטכנאי.","המים הגיעו עד הסלון, צריך לייבש לפני שהפרקט נהרס."],
+["home",2,"LW","שמאי מהביטוח","שמאי מחברת הביטוח מגיע ב-{H} לראות את נזק {V}.","זה תואם כבר כמה ימים, והוא נותן רק שעה מדויקת."],
+["car",3,"L","פנצ'ר","יש לי פנצ'ר, ואני מחכה לשירותי הדרך.","אמרו לי שהם מגיעים תוך חצי שעה."],
+["car",3,"L","הרכב לא מניע","הרכב לא מניע. נראה שזה המצבר, ואני מחכה להנעה.","הזמנתי את שירותי הדרך. אם זה מתארך אגיע במונית."],
+["car",2,"LE","טסט לרכב","יש לי תור לטסט ב-{H}.","תוקף הרישיון של הרכב נגמר השבוע."],
+["car",2,"L","טיפול במוסך","אני משאירה את הרכב במוסך לטיפול ב-{H}, ומשם אגיע במונית.","זה טיפול תקופתי שנדחה כבר פעמיים."],
+["car",4,"L","תאונה קלה","מישהו פגע לי ברכב מאחור ברמזור. אין נפגעים, אבל אנחנו מחליפים פרטים ומתעדים.","אני בסדר, רק נזק לפגוש."],
+["car",3,"L","כביש חסום","{V} חסום בגלל תאונה, והתנועה עומדת.","ניסיתי דרך אחרת, אבל גם שם הכול עמוס.",["איילון","כביש 4","כביש 1","הכביש הראשי"]],
+["car",3,"L","הרכבת בוטלה","הרכבת שלי בוטלה, והבאה רק בעוד {V}.","אפשר לראות את זה גם באפליקציה של רכבת ישראל.",["40 דקות","שעה"]],
+["car",3,"L","שמשה סדוקה","גיליתי הבוקר שהשמשה של הרכב סדוקה לרוחב, ואני מחכה לטכנאי שמשות.","אי אפשר לנסוע ככה בבטחה."],
+["family",8,"FE","ליווי לבית החולים","אני מלווה את אמא שלי ל{V} בבית החולים.","היא לא יכולה להגיע לבד, ואחי לא בארץ.",["בדיקת MRI","ייעוץ אצל רופא מומחה","בדיקות לפני ניתוח","טיפול רפואי"]],
+["family",6,"FLE","אבא לא מרגיש טוב","אבא שלי לא מרגיש טוב, ואני לוקחת אותו לרופא.","הוא לא היה רוצה להטריח, אבל עדיף לבדוק."],
+["family",9,"F","אמא אושפזה","אמא שלי אושפזה בלילה, ואני בבית החולים.","היא במעקב. אעדכן כשנדע יותר."],
+["family",9,"F","אבא אושפז","אבא שלי אושפז בלילה, ואני בבית החולים.","הוא במעקב. אעדכן כשנדע יותר."],
+["family",4,"L","לבד בבוקר","בן הזוג נסע לחו״ל לעבודה בהתראה קצרה, ואני לבד עם ההסעות הבוקר.","זה לכמה ימים, ואני מארגנת סידור קבוע מחר."],
+["family",5,"E","אחותי ילדה","אחותי ילדה הלילה, ואני רוצה לקפוץ אליה לבית החולים.","הכול עבר טוב, תודה."],
+["family",6,"FE","שחרור מבית החולים","אמא שלי משתחררת היום מבית החולים. אני אוספת אותה ומסדרת לה את הבית.","היא אחרי ניתוח קטן וצריכה עזרה ביום הראשון."],
+["family",6,"LE","סבתא נפלה","סבתא שלי נפלה בבית. היא בסדר, אבל אני נוסעת לבדוק אותה ולקחת אותה לבדיקה.","זה ליתר ביטחון. בגיל שלה עדיף לבדוק."],
+["family",5,"L","המטפלת לא הגיעה","המטפלת של אבא שלי לא הגיעה הבוקר, ואני איתו עד שתגיע מחליפה.","החברה מסדרת מחליפה, זה עניין של כמה שעות."],
+["admin",2,"LE","משרד הפנים","יש לי תור במשרד הפנים ב-{H} ל{V}.","זה התור היחיד שהיה פנוי בחודשים הקרובים.",["חידוש דרכון","הנפקת תעודת זהות ביומטרית","הוצאת דרכונים לילדים"]],
+["admin",2,"LE","חתימה אצל עורך דין","אני צריכה לחתום על מסמכים אצל עורך דין ב-{H}.","זה עניין משפחתי שצריך לסגור השבוע."],
+["admin",3,"LE","ביטוח לאומי","יש לי פגישה בביטוח לאומי ב-{H}.","זה בירור על דמי לידה מלפני שנה."],
+["admin",2,"LE","רישום של הילדים","היום רישום {V}, וצריך להגיע פיזית עם מסמכים.","אפשר להירשם באינטרנט, אבל חסר לנו מסמך וצריך להגיע.",["לגן","לכיתה א'","לצהרון"]],
+["admin",1,"L","דואר רשום","אני אוספת דואר רשום שמחכה לי, והסניף נפתח ב-8:00.","זה יום אחרון לאיסוף לפני שזה חוזר לשולח."],
+["admin",3,"LE","פגישה בעירייה","יש לי פגישה בעירייה בעניין {V}, ב-{H}.","קבלת הקהל היא רק בבוקר.",["הנחה בארנונה","ערעור על דוח חניה","תו חניה לאזור"]],
+["admin",3,"L","רשות המסים","יש לי פגישה ברשות המסים ב-{H} בעניין החזר מס.","הם ביקשו שאגיע עם המסמכים המקוריים."]
+];
+// fix "נזק {V}" variants for שמאי
+S.find(s=>s[3]==="שמאי מהביטוח")[6]=["המים בתקרה","הנזילה מהשכנים","ההצפה בדירה"];
+S.push(
+["kids",5,"FW","שיעול בלילה","{K} [השתעל|השתעלה] כל הלילה וכמעט לא [ישן|ישנה]. יש לנו תור לרופאה ב-{H}.","זה שיעול שהתחיל לפני יומיים. נראה מה הרופאה אומרת."],
+["kids",4,"FLW","פריחה","ל{K} הופיעה פריחה הבוקר, ובגן מבקשים אישור רופא לפני שחוזרים. התור שלנו ב-{H}.","כנראה משהו ויראלי, אבל בלי אישור לא מקבלים [אותו|אותה]."],
+["kids",5,"FW","דלקת גרון לילד","ל{K} יש דלקת גרון. [הוא|היא] כבר על אנטיביוטיקה, וצריך 24 שעות בבית לפני שחוזרים למסגרת.","רופאת הילדים אמרה שמחר כבר אפשר לחזור."],
+["kids",3,"L","תור לבדיקת דם לילד","{K} [צריך|צריכה] לעשות בדיקת דם בצום, והתור בקופה ב-{H}.","בדיקה שרופאת הילדים ביקשה אחרי המחלה האחרונה."],
+["kids",2,"E","חוג אחרי הצהריים","יש {lK} היום {V} ב-{A}, ואין מי שייקח.","בדרך כלל סבתא לוקחת, אבל היום היא לא יכולה.",["בדיקת עיניים","טיפול אצל רופאת השיניים","פגישה עם יועצת בית הספר","תור לאורתופד"]],
+["kids",4,"E","חום בצהריים","קיבלתי טלפון מהגננת: {K} עם חום של {T} ו[צריך|צריכה] שיאספו.","בבוקר [הוא|היא] היה בסדר גמור. זה התחיל לפני שעה."],
+["kids",3,"LE","ייעוץ התפתחותי","יש {lK} פגישה במכון להתפתחות הילד ב-{H}.","זה מעקב שגרתי. חיכינו לתור הזה כמה חודשים."],
+["kids",4,"W","ילד מחלים","{K} עדיין לא [חזר|חזרה] לגן אחרי המחלה, ונשאר עוד יום אחד בבית.","[הוא כבר מרגיש|היא כבר מרגישה] טוב יותר, ומחר חוזרים לשגרה."],
+["kids",3,"L","קבלת הוראה בבית הספר","המחנכת ביקשה שאגיע הבוקר לפגישה קצרה בבית הספר של {K}, ב-{H}.","פגישה רגילה, היא פשוט פנויה רק בשעה הזאת."],
+["kids",6,"F","מיון עם ילד","{K} [נפל|נפלה] אתמול בערב ושלחו אותנו לצילום. אנחנו עדיין מחכים לאורתופד.","כנראה רק נקע, אבל צריך לוודא."],
+["health",5,"FW","דלקת עיניים","יש לי דלקת עיניים, והרופאה ביקשה לא לעבוד מול מחשב ולא לבוא במגע עם אנשים יומיים.","קיבלתי טיפות, זה אמור לעבור מהר."],
+["health",4,"FW","כאבי שיניים אחרי טיפול","עשיתי אתמול {V}, ואני עם כאבים ונפיחות.","רופאת השיניים אמרה שזה צפוי ליום או יומיים.",["טיפול שורש","עקירה של שן בינה","השתלה"]],
+["health",3,"L","בדיקות שגרה","יש לי {V} בקופה ב-{H}.","זה חלק מבדיקות השגרה השנתיות.",["בדיקת אק\"ג","בדיקת לחץ דם","בדיקת ממוגרפיה","בדיקת צפיפות עצם"]],
+["health",6,"FW","שפעת","יש לי שפעת. חום של {T}, כאבי ראש וחולשה.","אני בבית, שותה הרבה, ואעדכן מחר."],
+["health",5,"FW","סחרחורות","התעוררתי עם סחרחורת חזקה, ואני לא מרגישה בטוחה לנהוג.","אני הולכת לרופאת המשפחה לבדוק."],
+["health",3,"LE","טיפול בקופה","יש לי {V} ב-{H}.","זה המשך טיפול שהתחלתי לפני כמה שבועות.",["טיפול בפיזיותרפיה","מעקב אצל הרופאה","טיפול בדיאטנית","מעקב אצל רופא העור"]],
+["home",3,"LW","טכנאי עם שעה מדויקת","{V} מגיע ב-{H}, ואני צריכה להיות בבית.","זה התור הכי מוקדם שהיה.",["טכנאי של ספק האינטרנט","טכנאי המזגן","טכנאי הדוד","חשמלאי","טכנאי מכונת הכביסה"]],
+["home",3,"L","המעלית תקועה","המעלית בבניין תקועה, ואני עם הילדים בקומה גבוהה. אני מחכה לטכנאי כדי להוריד את העגלה והתיקים.","ועד הבית כבר הזמין טכנאי."],
+["home",2,"LW","קבלת מפתחות","בעל הבית מגיע ב-{H} לתיקון {V}, ואני צריכה לפתוח לו.","זה תואם כבר מתחילת השבוע.",["החלון בסלון","הברז במקלחת","הדלת במרפסת","התריס בחדר הילדים"]],
+["home",4,"LW","נזילה מהשכנים","יש נזילה מהדירה של השכנים לתוך התקרה בחדר הרחצה שלנו. השרברב מגיע ב-{H}.","צריך לאתר את מקור הנזילה לפני שזה מחמיר."],
+["car",3,"L","תקלה ברכב","נדלקה לי נורת {V} בדרך, ועצרתי לבדוק במוסך ליד הבית.","המוסך אמר שזה בדיקה של חצי שעה עד שעה.",["מנוע","שמן","בלמים","לחץ אוויר בצמיגים"]],
+["car",4,"L","הרכב נגרר","הרכב שלי נגרר בלילה בגלל עבודות בכביש שלא היה עליהן שלט. אני בדרך למגרש הגרירה.","יש לי תמונות מהמקום, כבר הגשתי בקשה לביטול."],
+["car",3,"L","האוטובוס לא הגיע","האוטובוס שלי לא הגיע, והבא רק בעוד {V}.","אני כבר מזמינה מונית.",["30 דקות","40 דקות","שעה"]],
+["car",2,"L","הסעה חלופית","הרכב אצל בן הזוג היום, ואני מגיעה ב{V}.","הוא היה צריך אותו לנסיעה לצפון.",["רכבת","אוטובוס","מונית"]],
+["family",6,"FE","ליווי אבא לבדיקה","אני מלווה את אבא שלי ל{V} בבית החולים, ב-{H}.","הוא לא נוהג מאז הניתוח, ואין מי שייקח אותו.",["בדיקת CT","ביקורת אצל הקרדיולוג","בדיקות דם וקבלת תשובות","מעקב אצל האורתופד"]],
+["family",5,"E","אמא צריכה עזרה","אמא שלי צריכה עזרה בפגישה {V} ב-{A}.","היא מתקשה לבד עם הבירוקרטיה, ואני מטפלת בזה.",["בביטוח לאומי","בקופת החולים","בבנק","אצל עורך הדין"]],
+["family",7,"F","טיפול אחרי ניתוח","בן הזוג עבר אתמול ניתוח קטן, ואני איתו היום בבית.","הכול עבר טוב, הוא רק צריך עזרה ביום הראשון."],
+["family",4,"L","הקטן נשאר עם אבא","בן הזוג חולה, ואני מארגנת את הבוקר לבד עם שני הילדים.","הוא עם חום, אז הוא לא יכול לקחת אותם."],
+["admin",2,"LE","פגישה בבנק אחר","יש לי פגישה ב-{H} בעניין {V}.","זה עניין אישי שצריך לסגור השבוע.",["החשבון של אמא שלי","קרן ההשתלמות","ביטוח החיים"]],
+["admin",2,"L","אישור ממשרד הרישוי","אני צריכה להגיע למשרד הרישוי ב-{H} ל{V}.","אי אפשר לעשות את זה באינטרנט.",["חידוש רישיון נהיגה","העברת בעלות על הרכב","צילום לרישיון"]],
+["admin",3,"LE","חתימה בטאבו","יש לי תור בלשכת רישום המקרקעין ב-{H}.","זה בשביל רישום הדירה של ההורים שלי."],
+["admin",2,"E","אסיפת דיירים","יש אסיפת דיירים עם עורך הדין של פרויקט {V} ב-{A}.","מקבלים שם החלטות, וחשוב שכל דייר יהיה.",["תמ\"א 38","פינוי בינוי","השיפוץ בבניין"]]
+);
+
+S.push(["kids",5,"FL","תור דחוף לרופאת הילדים","{K} [התעורר|התעוררה] עם {V}, וקיבלתי תור לרופאת הילדים ב-{H}.","אחרי הרופאה אדע אם [הוא יכול|היא יכולה] לחזור למסגרת מחר.",["כאב גרון חזק","חום ושיעול","כאב בטן","כאב באוזן"]]);
+const HANDOVER=["את הפגישות עם הלקוחות שקבעתי להיום אתאם מחדש.","אין לי היום חתימות או פגישות דחופות, ואני זמינה בטלפון.","אם לקוח מחפש אותי, אפשר להעביר לי הודעה ואחזור אליו.","את התיקים שממתינים לאישור אקדם מחר בבוקר."];
+const $=id=>document.getElementById(id);
+const st={type:"full",late:"10:00",g0:"m",g1:"f",cur:null};
+const ls={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const mins=x=>{const[a,b]=x.split(":");return a*60+ +b};
+const rnd=a=>a[Math.floor(Math.random()*a.length)];
+const POOL={full:S.filter(s=>s[2].includes("F")),late:S.filter(s=>s[2].includes("L"))};
+const needsKid=s=>/\{l?K\}|\[/.test(s[3]+s[4]+s[5]);
+function combos(s){const t=s[3]+s[4];let n=1;if(needsKid(s))n*=2;if(t.includes("{T}"))n*=SL.T.length;if(t.includes("{H}"))n*=SL.H.length;if(t.includes("{A}"))n*=SL.A.length;if(s[6])n*=s[6].length;return n}
+function kid(i){const v=$("k"+i).value.trim(),g=st["g"+i];if(v)return{n:v,l:"ל"+v,g};const b=i===0?(g==="m"?"הגדול":"הגדולה"):(g==="m"?"הקטן":"הקטנה");return{n:b,l:"ל"+b.slice(1),g}}
+function fill(str,c){return str.replace(/\{K\}/g,c.k.n).replace(/\{lK\}/g,c.k.l).replace(/\[([^|\]]*)\|([^\]]*)\]/g,(_,m,f)=>c.k.g==="m"?m:f)
+  .replace(/\{T\}/g,c.T).replace(/\{H\}/g,c.H).replace(/\{A\}/g,c.A).replace(/\{V\}/g,c.V)}
+const CAT={kids:"ילדים",health:"בריאות",home:"בית",car:"בדרך",family:"משפחה",admin:"סידורים"};
+const hist=()=>ls.get("goodExcuseHist",[]);
+function pick(){const used=new Set(hist().filter(h=>Date.now()-h.d<30*864e5).map(h=>h.t));
+  let p=POOL[st.type].filter(s=>s!==st.cur?.s&&!used.has(s[3]));if(!p.length)p=POOL[st.type].filter(s=>s!==st.cur?.s);
+  const s=rnd(p);st.cur={s,ki:Math.random()<.5?0:1,T:rnd(SL.T),H:rnd(SL.H.filter(h=>st.type!=="late"||mins(h)<=mins(st.late)-45))||SL.H[0],A:rnd(SL.A),V:s[6]?rnd(s[6]):"",hand:rnd(HANDOVER)};
+  render(true)}
+function message(){const c={...st.cur,k:kid(st.cur.ki)},n=$("mgr").value.trim();
+  const abs=st.type==="full"?"לכן לא אוכל להגיע היום.":`לכן אגיע היום קצת מאוחר יותר, בסביבות ${st.late}.`;
+  return `בוקר טוב${n?" "+n:""},\n${fill(c.s[4],c)} ${abs}\n${c.hand}\nתודה על ההבנה.`}
+function render(anim){const c={...st.cur,k:kid(st.cur.ki)};
+  $("tag").textContent=CAT[c.s[0]];$("title").textContent=fill(c.s[3],c);$("msg").textContent=message();$("ask").textContent=fill(c.s[5],c);
+  $("note").hidden=!c.s[7];if(c.s[7])$("note").textContent=c.s[7];
+  $("wa").href="https://wa.me/?text="+encodeURIComponent(message());
+  if(anim){const k=$("card");k.classList.remove("pop");void k.offsetWidth;k.classList.add("pop")}}
+function setType(t){st.type=t;$("cDay").setAttribute("aria-pressed",t==="full");$("cLate").setAttribute("aria-pressed",t==="late");$("times").hidden=t!=="late";pick()}
+function times(){const el=$("times");el.innerHTML="";["9:30","10:00","11:00","12:00"].forEach(t=>{const b=document.createElement("button");b.type="button";b.textContent=t;b.setAttribute("aria-pressed",st.late===t);
+  b.onclick=()=>{st.late=t;times();if(st.cur)render(false)};el.appendChild(b)})}
+function gseg(i){const el=$("g"+i);el.innerHTML="";[["m","בן"],["f","בת"]].forEach(([k,l])=>{const b=document.createElement("button");b.type="button";b.textContent=l;b.setAttribute("aria-pressed",st["g"+i]===k);
+  b.onclick=()=>{st["g"+i]=k;gseg(i);save();render(false)};el.appendChild(b)})}
+function save(){ls.set("goodExcuseSet",{mgr:$("mgr").value,k0:$("k0").value,k1:$("k1").value,g0:st.g0,g1:st.g1})}
+let tt;function toast(m){const t=$("toast");t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,2200)}
+function log(){const h=hist();h.unshift({t:st.cur.s[3],d:Date.now()});ls.set("goodExcuseHist",h.slice(0,80))}
+$("cDay").onclick=()=>setType("full");$("cLate").onclick=()=>setType("late");$("go").onclick=()=>{pick();$("card").scrollIntoView({behavior:"smooth",block:"center"})};$("other").onclick=pick;
+$("copy").onclick=()=>{const m=message();const ok=()=>{toast("הועתק. אפשר להדביק ולשלוח");log()};
+  const fb=()=>{const r=document.createRange();r.selectNodeContents($("msg"));const s=getSelection();s.removeAllRanges();s.addRange(r);toast("סמני את הטקסט והעתיקי")};
+  navigator.clipboard?navigator.clipboard.writeText(m).then(ok).catch(fb):fb()};
+$("wa").addEventListener("click",log);
+["mgr","k0","k1"].forEach(id=>$(id).addEventListener("input",()=>{save();render(false)}));
+const sv=ls.get("goodExcuseSet",{});["mgr","k0","k1"].forEach(k=>{if(sv[k])$(k).value=sv[k]});if(sv.g0)st.g0=sv.g0;if(sv.g1)st.g1=sv.g1;
+gseg(0);gseg(1);times();
+$("count").textContent=[...new Set([...POOL.full,...POOL.late])].reduce((a,s)=>a+combos(s),0).toLocaleString("he-IL");
+st.cur={s:S[0],ki:1,T:"38.4",H:"9:00",A:"13:00",V:"",hand:HANDOVER[0]};render(false);
+</script>
+
+</body>
+</html>
